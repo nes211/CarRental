@@ -1,6 +1,13 @@
 package pl.tdelektro.CarRental.Project;
 
-import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.repository.CrudRepository;
+import org.springframework.stereotype.Repository;
 
-interface CarRentalRepository extends JpaRepository<Car, Long> {
+import java.util.Optional;
+
+@Repository
+interface CarRentalRepository extends CrudRepository<Car, Long> {
+
+    @Override
+    Optional<Car> findById(Long aLong);
 }

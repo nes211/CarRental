@@ -1,17 +1,16 @@
 package pl.tdelektro.CarRental.Project;
 
-import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDateTime;
 
-
-@Entity(name = "car")
-
+@Entity
+@Table(name = "car")
 class Car {
 
     @Id
