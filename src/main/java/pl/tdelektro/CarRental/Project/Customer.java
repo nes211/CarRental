@@ -1,4 +1,4 @@
 package pl.tdelektro.CarRental.Project;
 
-class CarRentalUsers {
+class CarRentalCustomer {
 }
