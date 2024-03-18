@@ -15,7 +15,7 @@ class Car {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Integer id;
     private String make;
     private String model;
     private String type;

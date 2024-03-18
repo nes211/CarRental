@@ -2,7 +2,7 @@ package pl.tdelektro.CarRental.Project;
 
 public class CarDTO {
 
-    private Long id;
+    private Integer id;
     private String make;
     private String model;
     private String type;
@@ -11,6 +11,12 @@ public class CarDTO {
     public CarDTO() {
     }
 
-
-
+    CarDTO(Integer id, String make, String model, String type, int modelYear, boolean available) {
+        this.id = id;
+        this.make = make;
+        this.model = model;
+        this.type = type;
+        this.modelYear = modelYear;
+        this.available = available;
+    }
 }
