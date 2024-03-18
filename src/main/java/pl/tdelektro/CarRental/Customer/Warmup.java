@@ -16,7 +16,7 @@ class Warmup implements ApplicationListener<ContextRefreshedEvent> {
     public void onApplicationEvent(ContextRefreshedEvent event) {
 
         //Fill warmup data if repository is empty
-        if (!customerRepository.existsById(1)) {
+        if (customerRepository.findByIdNotNull().isEmpty()) {
 
             customerRepository.save(new Customer.CustomerBuilder()
                     .name("Dawid")

@@ -8,6 +8,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.NoArgsConstructor;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
@@ -15,7 +16,7 @@ import org.hibernate.type.SqlTypes;
 @Table(name = "customer")
 @Builder
 @AllArgsConstructor
-
+@NoArgsConstructor
 class Customer {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -30,8 +31,7 @@ class Customer {
 
 
 
-    public Customer() {
-    }
+
 
 
 }

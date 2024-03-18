@@ -8,7 +8,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
@@ -21,17 +20,20 @@ class CarController {
 
     CarRepository carRepository;
 
+
     @GetMapping
     ResponseEntity<List<Car>>getAvailableCars(){
         List<Car> availableCarList = (List<Car>) carRepository.findAll();
+
         return new ResponseEntity<>(availableCarList, HttpStatus.OK);
     }
 
     @GetMapping("/{id}")
     ResponseEntity<CarDTO> getCarById (@PathVariable int id){
         Optional<Car> car = carRepository.findById(id);
-        CarDTO carDTO = new CarDTO(car.get());
-        return new ResponseEntity<>(carDTO,HttpStatus.OK);
+        CarDTO carDTO = new CarDTO(car.get(
+        ));
+        return new ResponseEntity<>(carDTO, HttpStatus.OK);
     }
 
     @PostMapping("/addNew")

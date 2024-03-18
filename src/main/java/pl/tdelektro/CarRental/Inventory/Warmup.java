@@ -14,7 +14,7 @@ class Warmup implements ApplicationListener<ContextRefreshedEvent> {
     @Override
     public void onApplicationEvent(ContextRefreshedEvent event) {
 
-        if (!carRepository.existsById(1)) {
+        if (carRepository.findByIdNotNull().isEmpty()) {
 
             carRepository.save(new Car.CarBuilder()
                     .make("Mercedes")

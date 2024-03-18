@@ -6,6 +6,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import lombok.Builder;
+import lombok.NoArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDateTime;
@@ -14,6 +15,7 @@ import java.time.LocalDateTime;
 @Builder
 @Entity
 @Table(name = "car")
+@NoArgsConstructor
 class Car {
 
     @Id
@@ -25,8 +27,6 @@ class Car {
     private int modelYear;
     private float oneDayCost;
 
-    Car() {
-    }
     Car(Integer id, String make, String model, String type, int modelYear,float oneDayCost) {
         this.id = id;
         this.make = make;
