@@ -1,4 +1,4 @@
-package pl.tdelektro.CarRental.Project;
+package pl.tdelektro.CarRental.Customer;
 
 import org.springframework.data.repository.CrudRepository;
 
