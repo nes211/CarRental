@@ -22,7 +22,25 @@ public class CustomerDTO {
     String password;
     String emailAddress;
     Float funds;
+    String token;
 
+    String getToken() {
+        return token;
+    }
+
+    CustomerDTO setToken(String token) {
+        this.token = token;
+        return this;
+    }
+
+    CustomerDTO() {
+    }
+
+    CustomerDTO(Customer customer) {
+        this.name = customer.getName();
+        this.password = customer.getPassword();
+        this.emailAddress = customer.getEmailAddress();
+    }
 
     public int getId() {
         return id;

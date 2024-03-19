@@ -11,6 +11,7 @@ import lombok.Builder;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 @Entity
 @Table(name = "customer")
@@ -29,11 +30,47 @@ class Customer {
     String emailAddress;
     Float funds;
 
+    Customer(String name, String password, String emailAddress) {
+        this.name = name;
+        this.password = password;
+        this.emailAddress = emailAddress;
+    }
 
+    String getPassword() {
+        return password;
+    }
 
+    Customer setPassword(String password) {
+        this.password = password;
+        return this;
+    }
 
+    String getEmailAddress() {
+        return emailAddress;
+    }
 
+    Customer setEmailAddress(String emailAddress) {
+        this.emailAddress = emailAddress;
+        return this;
+    }
 
+    Float getFunds() {
+        return funds;
+    }
+
+    Customer setFunds(Float funds) {
+        this.funds = funds;
+        return this;
+    }
+
+    String getName() {
+        return name;
+    }
+
+    Customer setName(String name) {
+        this.name = name;
+        return this;
+    }
 }
 
 

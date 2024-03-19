@@ -21,6 +21,7 @@ class Warmup implements ApplicationListener<ContextRefreshedEvent> {
                     .model("W211T")
                     .modelYear(2005)
                     .oneDayCost(300f)
+                    .type("D")
                     .build());
         }
     }

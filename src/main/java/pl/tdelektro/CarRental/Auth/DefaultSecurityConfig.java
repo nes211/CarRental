@@ -13,6 +13,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
 
@@ -24,8 +25,6 @@ class DefaultSecurityConfig {
     public BCryptPasswordEncoder passwordEncoder()  {
         return new BCryptPasswordEncoder();
     }
-
-
 
     @Bean
     @ConditionalOnMissingBean(UserDetailsService.class)
@@ -46,7 +45,12 @@ class DefaultSecurityConfig {
         http
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests((authorize) -> authorize
-                        .requestMatchers(HttpMethod.GET).hasAnyRole("ADMIN", "USER")
+                        .requestMatchers("/login", "/token","/customer/register").permitAll()
+                        .requestMatchers(HttpMethod.GET).hasAnyAuthority("ADMIN", "USER")
+                        .requestMatchers(HttpMethod.POST, "/customer/register").permitAll()
+                        .requestMatchers(HttpMethod.POST).hasAnyAuthority("ADMIN", "USER")
+                        .requestMatchers(HttpMethod.PUT).hasAnyAuthority("ADMIN", "USER")
+                        .requestMatchers(HttpMethod.DELETE).hasAnyAuthority("ADMIN", "USER")
                         .anyRequest().authenticated()
                 )
                 .httpBasic(Customizer.withDefaults())
@@ -54,7 +58,5 @@ class DefaultSecurityConfig {
 
         return http.build();
     }
-
-
 
 }
