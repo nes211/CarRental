@@ -23,13 +23,44 @@ public class CustomerDTO {
     String emailAddress;
     Float funds;
 
+
     public int getId() {
         return id;
     }
 
-    public void setId(int id) {
-        this.id = id;
+    public String getName() {
+        return name;
     }
 
+    public CustomerDTO setName(String name) {
+        this.name = name;
+        return this;
+    }
 
+    public String getPassword() {
+        return password;
+    }
+
+    public CustomerDTO setPassword(String password) {
+        this.password = password;
+        return this;
+    }
+
+    public String getEmailAddress() {
+        return emailAddress;
+    }
+
+    public CustomerDTO setEmailAddress(String emailAddress) {
+        this.emailAddress = emailAddress;
+        return this;
+    }
+
+    public Float getFunds() {
+        return funds;
+    }
+
+    public CustomerDTO setFunds(Float funds) {
+        this.funds = funds;
+        return this;
+    }
 }

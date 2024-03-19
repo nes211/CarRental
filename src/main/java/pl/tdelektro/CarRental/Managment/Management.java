@@ -9,7 +9,7 @@ class Management {
 
 
     @DateTimeFormat(pattern = "yyyy-MM-dd hh:mm:ss")
-    private LocalDateTime localDateTime;
+    private LocalDateTime timestamp;
 
 
 }
