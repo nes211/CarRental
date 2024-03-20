@@ -1,5 +1,6 @@
 package pl.tdelektro.CarRental.Auth;
 
+import lombok.AllArgsConstructor;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Bean;
@@ -19,7 +20,10 @@ import org.springframework.security.web.SecurityFilterChain;
 
 @EnableWebSecurity
 @Configuration
+@AllArgsConstructor
 class DefaultSecurityConfig {
+
+    CustomAuthenticationManager customAuthenticationManager;
 
     @Bean
     public BCryptPasswordEncoder passwordEncoder()  {
@@ -42,6 +46,10 @@ class DefaultSecurityConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+        AuthenticationFilter authenticationFilter = new AuthenticationFilter(customAuthenticationManager);
+        authenticationFilter.setFilterProcessesUrl("/authenticate");
+
+
         http
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests((authorize) -> authorize
@@ -53,6 +61,8 @@ class DefaultSecurityConfig {
                         .requestMatchers(HttpMethod.DELETE).hasAnyAuthority("ADMIN", "USER")
                         .anyRequest().authenticated()
                 )
+                .addFilter(authenticationFilter)
+                .addFilterBefore(new ExceptionHandlerFilter(), AuthenticationFilter.class)
                 .httpBasic(Customizer.withDefaults())
                 .formLogin(Customizer.withDefaults());
 
