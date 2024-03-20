@@ -20,7 +20,6 @@ public class CustomerFacade {
 
         public void addNewCustomer(Customer customer){
             Optional<Customer> customerCheck = customerRepository.findByEmailAddress(customer.emailAddress);
-
             if(customerCheck.isEmpty()) {
                 Customer customerToSave = new Customer.CustomerBuilder()
                         .name(customer.emailAddress)

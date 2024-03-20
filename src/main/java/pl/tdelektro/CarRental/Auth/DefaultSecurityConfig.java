@@ -48,7 +48,7 @@ class DefaultSecurityConfig {
                         .requestMatchers("/login", "/token","/customer/register").permitAll()
                         .requestMatchers(HttpMethod.GET).hasAnyAuthority("ADMIN", "USER")
                         .requestMatchers(HttpMethod.POST, "/customer/register").permitAll()
-                        .requestMatchers(HttpMethod.POST).hasAnyAuthority("ADMIN", "USER")
+                        .requestMatchers(HttpMethod.POST, "/car/**", "/customer/**").hasAnyAuthority("ADMIN")
                         .requestMatchers(HttpMethod.PUT).hasAnyAuthority("ADMIN", "USER")
                         .requestMatchers(HttpMethod.DELETE).hasAnyAuthority("ADMIN", "USER")
                         .anyRequest().authenticated()

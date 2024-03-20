@@ -23,6 +23,14 @@ class Warmup implements ApplicationListener<ContextRefreshedEvent> {
                     .oneDayCost(300f)
                     .type("D")
                     .build());
+
+            carRepository.save(new Car.CarBuilder()
+                    .make("Polones")
+                    .model("1500 GLE")
+                    .modelYear(1990)
+                    .oneDayCost(500f)
+                    .type("E")
+                    .build());
         }
     }
 }
