@@ -6,12 +6,14 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
+import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.hibernate.validator.constraints.UniqueElements;
 
 @Entity
 @Table(name = "customer")
@@ -25,15 +27,18 @@ class Customer {
     @JdbcTypeCode(SqlTypes.INTEGER)
     private int id;
 
+    @Column(name = "name", unique = true)
+    @NotBlank
     String name;
     String password;
     String emailAddress;
+    String phoneNumber;
     Float funds;
 
-    Customer(String name, String password, String emailAddress) {
-        this.name = name;
-        this.password = password;
+    Customer(String emailAddress, String password) {
+        this.name = emailAddress;
         this.emailAddress = emailAddress;
+        this.password = password;
     }
 
     String getPassword() {
@@ -69,6 +74,15 @@ class Customer {
 
     Customer setName(String name) {
         this.name = name;
+        return this;
+    }
+
+    String getPhoneNumber() {
+        return phoneNumber;
+    }
+
+    Customer setPhoneNumber(String phoneNumber) {
+        this.phoneNumber = phoneNumber;
         return this;
     }
 }

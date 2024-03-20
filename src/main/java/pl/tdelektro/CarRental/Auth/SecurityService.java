@@ -1,7 +1,6 @@
 package pl.tdelektro.CarRental.Auth;
 
 import lombok.AllArgsConstructor;
-import org.aspectj.weaver.ast.Var;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;

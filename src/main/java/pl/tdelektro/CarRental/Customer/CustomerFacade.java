@@ -1,12 +1,14 @@
 package pl.tdelektro.CarRental.Customer;
 
 import lombok.AllArgsConstructor;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @AllArgsConstructor
@@ -17,17 +19,19 @@ public class CustomerFacade {
 
 
         public void addNewCustomer(Customer customer){
-            Customer customerToSave = new Customer.CustomerBuilder()
-                    .name(customer.name)
-                    .password(bCryptPasswordEncoder.encode(customer.password))
-                    .emailAddress(customer.emailAddress)
-                    .funds(customer.funds)
-                    .build();
-            
-            customerRepository.save(customerToSave);
+            Optional<Customer> customerCheck = customerRepository.findByEmailAddress(customer.emailAddress);
 
+            if(customerCheck.isEmpty()) {
+                Customer customerToSave = new Customer.CustomerBuilder()
+                        .name(customer.emailAddress)
+                        .password(bCryptPasswordEncoder.encode(customer.password))
+                        .emailAddress(customer.emailAddress)
+                        .funds(customer.funds)
+                        .build();
+                customerRepository.save(customerToSave);
+            }
         }
-        public Customer editCustomer(CustomerDTO customerDTO){
+        public Customer editCustomer(Customer customer){
 
             // TODO: 19.03.2024  
             return new Customer();
@@ -47,4 +51,10 @@ public class CustomerFacade {
                 }
         }
 
+    public void findCustomer(Customer customer) {
+        Optional<Customer> optional = customerRepository.findByEmailAddress(customer.emailAddress);
+        if(optional.isEmpty()){
+            throw new UsernameNotFoundException("User not find in repo. Please register yourself");
+        }
+    }
 }
