@@ -35,8 +35,11 @@ class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
 
     @Override
     protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain, Authentication authResult) throws IOException, ServletException {
+        System.out.println("AUTH WORKS");
+    }
 
-
-        super.successfulAuthentication(request, response, chain, authResult);
+    @Override
+    protected void unsuccessfulAuthentication(HttpServletRequest request, HttpServletResponse response, AuthenticationException failed) throws IOException, ServletException {
+        System.out.println("unsuccessful auth");
     }
 }

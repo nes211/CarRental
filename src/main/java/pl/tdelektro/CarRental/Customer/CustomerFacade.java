@@ -1,6 +1,7 @@
 package pl.tdelektro.CarRental.Customer;
 
 import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -12,6 +13,7 @@ import java.util.Optional;
 
 @Service
 @AllArgsConstructor
+@NoArgsConstructor
 public class CustomerFacade {
 
         CustomerRepository customerRepository;
@@ -55,5 +57,13 @@ public class CustomerFacade {
         if(optional.isEmpty()){
             throw new UsernameNotFoundException("User not find in repo. Please register yourself");
         }
+    }
+
+    public CustomerDTO findCustomerByName(String username) {
+        Optional<Customer> optional = customerRepository.findByName(username);
+        if(optional.isEmpty()){
+            throw new UsernameNotFoundException("User not find in repo. Please register yourself");
+        }
+        return new CustomerDTO(optional.get());
     }
 }

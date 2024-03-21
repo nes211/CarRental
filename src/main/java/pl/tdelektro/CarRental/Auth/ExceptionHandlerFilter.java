@@ -1,5 +1,6 @@
 package pl.tdelektro.CarRental.Auth;
 
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -14,11 +15,20 @@ class ExceptionHandlerFilter extends OncePerRequestFilter {
             throws ServletException, IOException {
         try{
             filterChain.doFilter(request,response);
-        }catch(RuntimeException e){
+
+        }
+        catch(EntityNotFoundException e){
+            response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+            response.getWriter().write("Entity not found");
+            response.getWriter().flush();
+        }
+
+        catch(RuntimeException e){
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
             response.getWriter().write("Object mapper - problem with JSON String");
             response.getWriter().flush();
         }
+
 
 
 
