@@ -15,7 +15,6 @@ import pl.tdelektro.CarRental.Customer.CustomerFacade;
 import java.util.Optional;
 
 @Component
-
 class CustomAuthenticationManager implements AuthenticationManager {
 
 
@@ -26,10 +25,19 @@ class CustomAuthenticationManager implements AuthenticationManager {
     public Authentication authenticate(Authentication authentication) throws AuthenticationException {
         CustomerDTO customerDTO = customerFacade.findCustomerByName(authentication.getName());
 
-        if(!passwordEncoder.matches(authentication.getCredentials().toString(), customerDTO.getPassword() )){
+        System.out.println(" =========================== ");
+        System.out.println(customerDTO.getName());
+        System.out.println(customerDTO.getPassword());
+
+        System.out.println(" =========================== ");
+        System.out.println(authentication.getPrincipal());
+        System.out.println(authentication.getCredentials().toString());
+        System.out.println(" =========================== ");
+
+        if (!passwordEncoder.matches(authentication.getCredentials().toString(), customerDTO.getPassword())) {
             throw new BadCredentialsException("Wrong password");
         }
 
-        return new UsernamePasswordAuthenticationToken(authentication.getName(),customerDTO.getPassword());
+        return new UsernamePasswordAuthenticationToken(authentication.getName(), customerDTO.getPassword());
     }
 }

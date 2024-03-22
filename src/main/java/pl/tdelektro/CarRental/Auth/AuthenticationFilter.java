@@ -11,10 +11,15 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import pl.tdelektro.CarRental.Customer.CustomerDTO;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 @AllArgsConstructor
 class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
@@ -25,7 +30,9 @@ class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
     public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) throws AuthenticationException {
         try {
             CustomerDTO customerDTO = new ObjectMapper().readValue(request.getInputStream(), CustomerDTO.class);
-            Authentication authentication = new UsernamePasswordAuthenticationToken(customerDTO.getName(), customerDTO.getPassword());
+            List<GrantedAuthority>authorityList = new ArrayList<>();
+            authorityList.add(new SimpleGrantedAuthority("USER"));
+            Authentication authentication = new UsernamePasswordAuthenticationToken(customerDTO.getName(), customerDTO.getPassword(), authorityList);
             return authenticationManager.authenticate(authentication);
 
         } catch (IOException e) {
