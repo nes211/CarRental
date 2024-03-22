@@ -9,6 +9,7 @@ import org.springframework.security.authentication.dao.DaoAuthenticationProvider
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import pl.tdelektro.CarRental.Customer.CustomerRepository;
 
@@ -17,11 +18,9 @@ import pl.tdelektro.CarRental.Customer.CustomerRepository;
 class ApplicationConfig {
 
     private final CustomerRepository customerRepository;
-    private final PasswordEncoder passwordEncoder;
 
     @Bean
     public UserDetailsService userDetailsService() {
-
         return username -> customerRepository
                 .findByEmailAddress(username)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
@@ -31,14 +30,13 @@ class ApplicationConfig {
     public AuthenticationProvider authenticationProvider() {
         DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
         authProvider.setUserDetailsService(userDetailsService());
-        authProvider.setPasswordEncoder(passwordEncoder);
+        authProvider.setPasswordEncoder(new BCryptPasswordEncoder());
         return authProvider;
     }
 
 
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
-
         return config.getAuthenticationManager();
     }
 

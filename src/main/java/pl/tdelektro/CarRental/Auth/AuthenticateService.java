@@ -11,13 +11,12 @@ import pl.tdelektro.CarRental.Customer.Role;
 
 @Service
 @RequiredArgsConstructor
-public class AuthenticateService {
+class AuthenticateService {
 
     private final CustomerRepository customerRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
-
 
     AuthenticationResponse register(RegisterRequest request) {
         var customer = Customer.builder()
