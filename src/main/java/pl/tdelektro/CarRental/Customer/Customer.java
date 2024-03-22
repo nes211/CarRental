@@ -49,11 +49,12 @@ public class Customer implements UserDetails {
         this.name = emailAddress;
         this.emailAddress = emailAddress;
         this.password = password;
+        this.role = Role.USER;
     }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of(new SimpleGrantedAuthority(role.name()));
+        return List.of(new SimpleGrantedAuthority("USER"));
     }
 
     @Override

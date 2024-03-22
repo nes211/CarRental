@@ -11,6 +11,7 @@ import pl.tdelektro.CarRental.Customer.Role;
 
 @Service
 @RequiredArgsConstructor
+
 class AuthenticateService {
 
     private final CustomerRepository customerRepository;

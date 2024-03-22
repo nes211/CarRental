@@ -21,7 +21,6 @@ class CarController {
 
     CarRepository carRepository;
 
-
     @GetMapping
     ResponseEntity<List<CarDTO>> getAvailableCars() {
         List<Car> availableCarList = (List<Car>) carRepository.findAll();

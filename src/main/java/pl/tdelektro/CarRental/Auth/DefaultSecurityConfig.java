@@ -62,7 +62,7 @@ class DefaultSecurityConfig{
                 .authorizeHttpRequests((authorize) -> authorize
                         .requestMatchers("/auth/**").permitAll()
                         .requestMatchers(HttpMethod.GET).hasAnyAuthority("ADMIN", "USER")
-                        .requestMatchers(HttpMethod.POST, "/customer/register").permitAll()
+                        .requestMatchers(HttpMethod.GET,"/car/**", "/customer/**").hasAnyAuthority("ADMIN", "USER")
                         .requestMatchers(HttpMethod.POST, "/car/**", "/customer/**").hasAnyAuthority("ADMIN")
                         .requestMatchers(HttpMethod.PUT).hasAnyAuthority("ADMIN", "USER")
                         .requestMatchers(HttpMethod.DELETE).hasAnyAuthority("ADMIN", "USER")
@@ -71,7 +71,6 @@ class DefaultSecurityConfig{
                     session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authenticationProvider(authenticationProvider)
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
-                .addFilter(authenticationFilter)
                 .httpBasic(Customizer.withDefaults())
                 .formLogin(Customizer.withDefaults());
 
