@@ -7,6 +7,7 @@ import pl.tdelektro.CarRental.Customer.CustomerFacade;
 import pl.tdelektro.CarRental.Inventory.CarDTO;
 import pl.tdelektro.CarRental.Inventory.CarFacade;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -28,7 +29,7 @@ public class ManagementFacade {
     }
 
 
-    public void rentCar(String customerEmail,Da Integer carId) {
+    public void rentCar(String customerEmail, LocalDateTime startRent, LocalDateTime endRent, Integer carId) {
         CustomerDTO customerFromRepo = customerFacade.findCustomerByName(customerEmail);
         CarDTO carToRent = carFacade.findCarById(carId);
         calculateRentalFee();
