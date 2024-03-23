@@ -37,7 +37,7 @@ public class CarDTO {
         this.modelYear = car.getModelYear();
         this.oneDayCost = car.getOneDayCost();
         // TODO: 20.03.2024
-        this.available = true;
+        this.available = car.isAvailable();
     }
 
     Integer getId() {

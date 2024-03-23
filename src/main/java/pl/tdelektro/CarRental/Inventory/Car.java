@@ -23,14 +23,46 @@ class Car {
     private String type;
     private int modelYear;
     private float oneDayCost;
+    private boolean isAvailable;
 
-    Car(Integer id, String make, String model, String type, int modelYear,float oneDayCost) {
+    Car(Integer id, String make, String model, String type, int modelYear,float oneDayCost, boolean isAvailable) {
         this.id = id;
         this.make = make;
         this.model = model;
         this.type = type;
         this.modelYear = modelYear;
         this.oneDayCost = oneDayCost;
+        this.isAvailable = isAvailable;
+    }
+
+    Car setMake(String make) {
+        this.make = make;
+        return this;
+    }
+
+    Car setModel(String model) {
+        this.model = model;
+        return this;
+    }
+
+    Car setType(String type) {
+        this.type = type;
+        return this;
+    }
+
+    Car setModelYear(int modelYear) {
+        this.modelYear = modelYear;
+        return this;
+    }
+
+    Car setOneDayCost(float oneDayCost) {
+        this.oneDayCost = oneDayCost;
+        return this;
+    }
+
+    Car setAvailable(boolean available) {
+        isAvailable = available;
+        return this;
     }
 
     Integer getId() {
@@ -55,5 +87,9 @@ class Car {
 
     float getOneDayCost() {
         return oneDayCost;
+    }
+
+    boolean isAvailable() {
+        return isAvailable;
     }
 }

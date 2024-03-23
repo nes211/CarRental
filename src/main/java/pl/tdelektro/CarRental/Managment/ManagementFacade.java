@@ -1,16 +1,23 @@
 package pl.tdelektro.CarRental.Managment;
 
-import java.util.ArrayList;
+import lombok.AllArgsConstructor;
+import org.springframework.stereotype.Service;
+import pl.tdelektro.CarRental.Customer.CustomerDTO;
+import pl.tdelektro.CarRental.Customer.CustomerFacade;
+import pl.tdelektro.CarRental.Inventory.CarDTO;
+import pl.tdelektro.CarRental.Inventory.CarFacade;
+
 import java.util.List;
 
+@Service
+@AllArgsConstructor
 public class ManagementFacade {
 
 
     private List<ManagementReservation> reservations;
+    private CarFacade carFacade;
+    private CustomerFacade customerFacade;
 
-    public ManagementFacade() {
-        this.reservations = new ArrayList<>();
-    }
 
     public void addReservation(ManagementReservation reservation) {
         reservations.add(reservation);
@@ -21,12 +28,25 @@ public class ManagementFacade {
     }
 
 
-    public void rentCar() {
-        // TODO: 19.03.2024  
+    public void rentCar(String customerEmail,Da Integer carId) {
+        CustomerDTO customerFromRepo = customerFacade.findCustomerByName(customerEmail);
+        CarDTO carToRent = carFacade.findCarById(carId);
+        calculateRentalFee();
+        processingPayment();
+
+
+
+
     }
 
-    public void returnCar() {
-        // TODO: 19.03.2024  
+    public void returnCar(String customerEmail, Integer carId) {
+
+        CustomerDTO customerFromRepo = customerFacade.findCustomerByName(customerEmail);
+        CarDTO carToReturn = carFacade.findCarById(carId);
+
+        generateInvoice();
+
+
     }
 
     public void calculateRentalFee() {

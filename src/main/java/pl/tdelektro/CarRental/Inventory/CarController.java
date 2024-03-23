@@ -29,7 +29,7 @@ class CarController {
         for (int i = 0; i < availableCarList.size(); i++) {
             availableCarDTOList.add(new CarDTO(availableCarList.get(i)));
         }
-
+        System.out.println();
         return new ResponseEntity<>(availableCarDTOList, HttpStatus.OK);
     }
 

@@ -27,7 +27,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @AllArgsConstructor
 class DefaultSecurityConfig{
 
-    private final CustomAuthenticationManager customAuthenticationManager;
+
     private final JwtAuthenticationFilter jwtAuthFilter;
     private final AuthenticationProvider authenticationProvider;
 
@@ -52,13 +52,9 @@ class DefaultSecurityConfig{
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        AuthenticationFilter authenticationFilter = new AuthenticationFilter(customAuthenticationManager);
-        authenticationFilter.setFilterProcessesUrl("/authenticate");
-
 
         http
                 .csrf(csrf -> csrf.disable())
-
                 .authorizeHttpRequests((authorize) -> authorize
                         .requestMatchers("/auth/**").permitAll()
                         .requestMatchers(HttpMethod.GET).hasAnyAuthority("ADMIN", "USER")
@@ -76,5 +72,4 @@ class DefaultSecurityConfig{
 
         return http.build();
     }
-
 }
