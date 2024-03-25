@@ -20,6 +20,7 @@ import java.util.Optional;
 class CarController {
 
     CarRepository carRepository;
+    CarFacade carFacade;
 
     @GetMapping
     ResponseEntity<List<CarDTO>> getAvailableCars() {
@@ -29,16 +30,19 @@ class CarController {
         for (int i = 0; i < availableCarList.size(); i++) {
             availableCarDTOList.add(new CarDTO(availableCarList.get(i)));
         }
-        System.out.println();
         return new ResponseEntity<>(availableCarDTOList, HttpStatus.OK);
     }
 
     @GetMapping("/{id}")
-    ResponseEntity<CarDTO> getCarById(@PathVariable int id) {
-        Optional<Car> car = carRepository.findById(id);
-        CarDTO carDTO = new CarDTO(car.get(
-        ));
-        return new ResponseEntity<>(carDTO, HttpStatus.OK);
+    ResponseEntity<CarDTO> getCarById(@PathVariable int carId) {
+        Optional<Car> car = carRepository.findById(carId);
+        if(car.isPresent()) {
+            return new ResponseEntity<>(new CarDTO(car.get()), HttpStatus.OK);
+        }else{
+            throw new CarNotFoundException(carId);
+        }
+
+
     }
 
     @PostMapping("/addNew")
@@ -47,5 +51,10 @@ class CarController {
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
+    @GetMapping("/test")
+    ResponseEntity<HttpStatus> findMyCustomer(){
+        System.out.println("Service unavailable ");
+        return new ResponseEntity<>(HttpStatus.SERVICE_UNAVAILABLE);
+    }
 
 }

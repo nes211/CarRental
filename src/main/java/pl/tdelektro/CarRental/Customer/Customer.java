@@ -8,14 +8,12 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
-import jakarta.persistence.UniqueConstraint;
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
-import org.hibernate.validator.constraints.UniqueElements;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -28,7 +26,7 @@ import java.util.List;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class Customer implements UserDetails {
+class Customer implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
@@ -37,13 +35,13 @@ public class Customer implements UserDetails {
 
     @Column(name = "name", unique = true)
     @NotBlank
-    String name;
-    String password;
-    String emailAddress;
-    String phoneNumber;
+    private String name;
+    private String password;
+    private String emailAddress;
+    private String phoneNumber;
     @Enumerated(EnumType.STRING)
-    Role role;
-    Float funds;
+    private Role role;
+    private Float funds;
 
     Customer(String emailAddress, String password) {
         this.name = emailAddress;

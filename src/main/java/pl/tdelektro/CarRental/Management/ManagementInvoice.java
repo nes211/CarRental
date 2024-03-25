@@ -1,11 +1,13 @@
-package pl.tdelektro.CarRental.Managment;
+package pl.tdelektro.CarRental.Management;
 
 import com.itextpdf.text.*;
 import com.itextpdf.text.pdf.PdfWriter;
+import org.springframework.stereotype.Service;
 
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 
+@Service
 class ManagementInvoice {
 
     void createInvoice(ManagementReservation managementReservation) throws FileNotFoundException, DocumentException {

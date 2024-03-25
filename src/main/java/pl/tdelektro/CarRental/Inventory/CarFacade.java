@@ -1,7 +1,6 @@
 package pl.tdelektro.CarRental.Inventory;
 
 import lombok.AllArgsConstructor;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import pl.tdelektro.CarRental.Customer.CustomerFacade;
 
@@ -10,8 +9,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
-@AllArgsConstructor
 @Service
+@AllArgsConstructor
 public class CarFacade {
 
     CarRepository carRepository;
@@ -19,19 +18,17 @@ public class CarFacade {
 
 
     public List<CarDTO> findAvailableCars (LocalDateTime startRent, LocalDateTime endRent, Float maxCostPerDay){
-
-        // TODO: 19.03.2024
         return Arrays.asList();
     }
 
     public CarDTO findCarById(Integer carId){
         Optional<Car> carFromRepo = carRepository.findById(carId);
-        return unwrapCar(carFromRepo);
+        return unwrapCar(carFromRepo, carId);
     }
 
-    private CarDTO unwrapCar(Optional<Car> carFromRepo) {
+    private CarDTO unwrapCar(Optional<Car> carFromRepo, int carId) {
         if(carFromRepo.isEmpty()){
-            throw new CarNotFoundException("Car not find in repo. Please select correct car");
+            throw new CarNotFoundException(carId);
         }
         return new CarDTO(carFromRepo.get());
     }
@@ -50,3 +47,4 @@ public class CarFacade {
 
 
 }
+

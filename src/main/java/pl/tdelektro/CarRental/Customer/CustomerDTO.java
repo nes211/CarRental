@@ -1,5 +1,6 @@
 package pl.tdelektro.CarRental.Customer;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -16,12 +17,17 @@ public class CustomerDTO {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
     @JdbcTypeCode(SqlTypes.INTEGER)
+    @JsonIgnore
     private int id;
 
+    @JsonIgnore
     String name;
+    @JsonIgnore
     String password;
     String emailAddress;
+    @JsonIgnore
     Float funds;
+    @JsonIgnore
     String token;
 
     String getToken() {
@@ -38,8 +44,8 @@ public class CustomerDTO {
 
     CustomerDTO(Customer customer) {
         this.name = customer.getName();
-        this.password = customer.getPassword();
         this.emailAddress = customer.getEmailAddress();
+        this.funds = customer.getFunds();
     }
 
     public int getId() {

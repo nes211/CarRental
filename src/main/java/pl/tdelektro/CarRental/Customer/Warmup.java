@@ -5,7 +5,6 @@ import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Service;
 
 @Component("customerWarmup")
 @AllArgsConstructor
@@ -20,17 +19,19 @@ class Warmup implements ApplicationListener<ContextRefreshedEvent> {
         if (customerRepository.findByIdNotNull().isEmpty()) {
 
             customerRepository.save(new Customer.CustomerBuilder()
-                    .name("Dawid")
-                    .emailAddress("dawid@tom.com")
+                    .name("dawid@tdelektro.pl")
+                    .emailAddress("dawid@tdelektro.pl")
                     .password(passwordEncoder.encode("dawid"))
                     .funds(10000.2f)
+                    .role(Role.USER)
                     .build());
 
             customerRepository.save(new Customer.CustomerBuilder()
-                    .name("Tomasz")
+                    .name("tomek@tdelektro.pl")
                     .emailAddress("tom@tdelektro.pl")
                     .password(passwordEncoder.encode("tom"))
                     .funds(10000.2f)
+                    .role(Role.USER)
                     .build());
 
         }

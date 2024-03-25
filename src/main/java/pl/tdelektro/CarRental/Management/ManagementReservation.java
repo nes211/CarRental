@@ -1,5 +1,6 @@
-package pl.tdelektro.CarRental.Managment;
+package pl.tdelektro.CarRental.Management;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -28,17 +29,47 @@ class ManagementReservation {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
     @JdbcTypeCode(SqlTypes.INTEGER)
-    private Long id;
+    private Integer id;
+
     private String reservationId;
+
     @ManyToOne
     @JoinColumn(name = "customer_id")
     private CustomerDTO customer;
+
     @ManyToOne
-    @JoinColumn(name = "car_id")
+    @JoinColumn(name = "car_dto")
     private CarDTO car;
+
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime startDate;
+
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime endDate;
-    private float totalCost;
+
+    private float totalReservationCost;
+
+    //for management controller @ResponseBody
+    private String customerEmail;
+    private Integer carId;
+
+    String getCustomerEmail() {
+        return customerEmail;
+    }
+
+    ManagementReservation setCustomerEmail(String customerEmail) {
+        this.customerEmail = customerEmail;
+        return this;
+    }
+
+    Integer getCarId() {
+        return carId;
+    }
+
+    ManagementReservation setCarId(Integer carId) {
+        this.carId = carId;
+        return this;
+    }
 
     CarDTO getCar() {
         return car;
@@ -56,11 +87,11 @@ class ManagementReservation {
         this.customer = customer;
     }
 
-    Long getId() {
+    Integer getId() {
         return id;
     }
 
-    void setId(Long id) {
+    void setId(Integer id) {
         this.id = id;
     }
 
@@ -87,11 +118,11 @@ class ManagementReservation {
     }
 
     float getTotalCost() {
-        return totalCost;
+        return totalReservationCost;
     }
 
     ManagementReservation setTotalCost(float totalCost) {
-        this.totalCost = totalCost;
+        this.totalReservationCost = totalCost;
         return this;
     }
 }

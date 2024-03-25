@@ -1,7 +1,6 @@
 package pl.tdelektro.CarRental.Customer;
 
 import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -13,7 +12,6 @@ import java.util.Optional;
 
 @Service
 @AllArgsConstructor
-@NoArgsConstructor
 public class CustomerFacade {
 
     CustomerRepository customerRepository;
@@ -21,13 +19,13 @@ public class CustomerFacade {
 
 
     public void addNewCustomer(Customer customer) {
-        Optional<Customer> customerCheck = customerRepository.findByEmailAddress(customer.emailAddress);
+        Optional<Customer> customerCheck = customerRepository.findByEmailAddress(customer.getEmailAddress());
         if (customerCheck.isEmpty()) {
             Customer customerToSave = new Customer.CustomerBuilder()
-                    .name(customer.emailAddress)
-                    .password(bCryptPasswordEncoder.encode(customer.password))
-                    .emailAddress(customer.emailAddress)
-                    .funds(customer.funds)
+                    .name(customer.getEmailAddress())
+                    .password(bCryptPasswordEncoder.encode(customer.getPassword()))
+                    .emailAddress(customer.getEmailAddress())
+                    .funds(customer.getFunds())
                     .build();
             customerRepository.save(customerToSave);
         }
@@ -54,16 +52,16 @@ public class CustomerFacade {
     }
 
     public void findCustomer(Customer customer) {
-        Optional<Customer> optional = customerRepository.findByEmailAddress(customer.emailAddress);
+        Optional<Customer> optional = customerRepository.findByEmailAddress(customer.getEmailAddress());
         if (optional.isEmpty()) {
             throw new UsernameNotFoundException("User not find in repo. Please register yourself");
         }
     }
 
-    public CustomerDTO findCustomerByName(String username) {
-        Optional<Customer> optional = customerRepository.findByName(username);
+    public CustomerDTO findCustomerByName(String customerEmail) {
+        Optional<Customer> optional = customerRepository.findByEmailAddress(customerEmail);
         if (optional.isEmpty()) {
-            throw new UsernameNotFoundException("Customer with name: " + username + " not find in repo. Please register yourself");
+            throw new UsernameNotFoundException("Customer with name: " + customerEmail + " not find in repo. Please register yourself");
         }
         return new CustomerDTO(optional.get());
     }

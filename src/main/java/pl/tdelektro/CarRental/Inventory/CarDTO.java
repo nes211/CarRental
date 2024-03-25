@@ -1,5 +1,6 @@
 package pl.tdelektro.CarRental.Inventory;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -8,15 +9,18 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Table(name = "car_dto")
 @Builder
+@NoArgsConstructor
 @AllArgsConstructor
 public class CarDTO {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
+    @JsonIgnore
     private Integer id;
 
     private String make;
@@ -26,9 +30,6 @@ public class CarDTO {
     private float oneDayCost;
     private boolean available;
 
-    CarDTO() {
-    }
-
 
     public CarDTO (Car car){
         this.make = car.getMake();
@@ -36,11 +37,11 @@ public class CarDTO {
         this.model = car.getModel();
         this.modelYear = car.getModelYear();
         this.oneDayCost = car.getOneDayCost();
-        // TODO: 20.03.2024
+        //todo
         this.available = car.isAvailable();
     }
 
-    Integer getId() {
+    public Integer getId() {
         return id;
     }
 
