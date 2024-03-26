@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 @RestController
 @RequestMapping("/car")
@@ -23,18 +24,12 @@ class CarController {
     CarFacade carFacade;
 
     @GetMapping
-    ResponseEntity<List<CarDTO>> getAvailableCars() {
-        List<Car> availableCarList = (List<Car>) carRepository.findAll();
-        List<CarDTO> availableCarDTOList = new ArrayList<>();
-
-        for (int i = 0; i < availableCarList.size(); i++) {
-            availableCarDTOList.add(new CarDTO(availableCarList.get(i)));
-        }
-        return new ResponseEntity<>(availableCarDTOList, HttpStatus.OK);
+    ResponseEntity<Set<CarDTO>> getAvailableCars() {
+        return new ResponseEntity<>(carFacade.findAvailableCars(), HttpStatus.OK);
     }
 
-    @GetMapping("/{id}")
-    ResponseEntity<CarDTO> getCarById(@PathVariable int carId) {
+    @GetMapping("/{carId}")
+    ResponseEntity<CarDTO> getCarById(@PathVariable Integer carId) {
         Optional<Car> car = carRepository.findById(carId);
         if(car.isPresent()) {
             return new ResponseEntity<>(new CarDTO(car.get()), HttpStatus.OK);

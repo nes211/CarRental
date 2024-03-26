@@ -20,10 +20,9 @@ public class CarFacade {
     CustomerFacade customerFacade;
 
 
-    public Set<CarDTO> findAvailableCars (LocalDateTime startRent, LocalDateTime endRent, Float maxCostPerDay){
+    public Set<CarDTO> findAvailableCars (){
         Set<Car> carSet = carRepository.findByIsAvailableTrue();
         Set<CarDTO> carDtoSet = new HashSet<>();
-
         carSet.forEach(car -> {carDtoSet.add(new CarDTO(car));
         });
         return carDtoSet;
@@ -34,7 +33,7 @@ public class CarFacade {
         return unwrapCar(carFromRepo, carId);
     }
 
-    public void saveCarChanges(Integer carId,String status){
+    public void saveCarStatus(Integer carId,String status){
         carRepository.findById(carId).get().setAvailable(status.contains("ACTIVE"));
     }
 

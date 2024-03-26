@@ -125,8 +125,7 @@ public class ManagementFacade {
             reservationStatus = ReservationStatus.COMPLETED;
         }
 
-        carFacade.saveCarChanges(carDtoId, reservationStatus.toString());
-
+        carFacade.saveCarStatus(carDtoId, reservationStatus.toString());
         return reservationStatus;
     }
 }
