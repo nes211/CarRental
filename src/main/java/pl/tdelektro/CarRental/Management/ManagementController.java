@@ -19,8 +19,7 @@ import java.time.LocalDateTime;
 class ManagementController {
 
     private final ManagementFacade managementFacade;
-    private final CustomerFacade customerFacade;
-    private final CarFacade carFacade;
+
 
     @GetMapping("/rentCar")
     ResponseEntity<ManagementReservationDTO> rentCar(

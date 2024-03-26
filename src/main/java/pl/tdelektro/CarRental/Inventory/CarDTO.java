@@ -6,10 +6,15 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.NoArgsConstructor;
+import pl.tdelektro.CarRental.Management.ManagementReservationDTO;
+
+import java.util.Set;
 
 @Entity
 @Table(name = "car_dto")
@@ -22,14 +27,17 @@ public class CarDTO {
     @Column(name = "id", nullable = false)
     @JsonIgnore
     private Integer id;
-
     private String make;
     private String model;
     private String type;
     private int modelYear;
     private float oneDayCost;
     private boolean available;
+    //private Set<ManagementReservationDTO>managementReservationDtoList;
 
+//    public Set<ManagementReservationDTO> getManagementReservationDtoList() {
+//        return managementReservationDtoList;
+//    }
 
     public CarDTO (Car car){
         this.make = car.getMake();
@@ -37,7 +45,6 @@ public class CarDTO {
         this.model = car.getModel();
         this.modelYear = car.getModelYear();
         this.oneDayCost = car.getOneDayCost();
-        //todo
         this.available = car.isAvailable();
     }
 

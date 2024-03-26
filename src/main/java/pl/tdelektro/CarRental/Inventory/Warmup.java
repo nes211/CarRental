@@ -16,12 +16,14 @@ class Warmup implements ApplicationListener<ContextRefreshedEvent> {
 
         if (carRepository.findByIdNotNull().isEmpty()) {
 
+
             carRepository.save(new Car.CarBuilder()
                     .make("Mercedes")
                     .model("W211T")
                     .modelYear(2005)
                     .oneDayCost(300f)
                     .type("D")
+                    .isAvailable(true)
                     .build());
 
             carRepository.save(new Car.CarBuilder()
@@ -30,6 +32,7 @@ class Warmup implements ApplicationListener<ContextRefreshedEvent> {
                     .modelYear(1990)
                     .oneDayCost(500f)
                     .type("D")
+                    .isAvailable(true)
                     .build());
         }
     }

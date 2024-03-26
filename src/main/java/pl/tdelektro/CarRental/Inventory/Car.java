@@ -4,9 +4,14 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.NoArgsConstructor;
+import pl.tdelektro.CarRental.Management.ManagementReservationDTO;
+
+import java.util.Set;
 
 
 @Builder
@@ -24,6 +29,7 @@ class Car {
     private int modelYear;
     private float oneDayCost;
     private boolean isAvailable;
+    //private Set<ManagementReservationDTO> reservationSet;
 
     Car(Integer id, String make, String model, String type, int modelYear,float oneDayCost, boolean isAvailable) {
         this.id = id;
@@ -34,6 +40,15 @@ class Car {
         this.oneDayCost = oneDayCost;
         this.isAvailable = isAvailable;
     }
+
+//    Set<ManagementReservationDTO> getReservationSet() {
+//        return reservationSet;
+//    }
+
+//    Car setReservationSet(Set<ManagementReservationDTO> reservationSet) {
+//        this.reservationSet = reservationSet;
+//        return this;
+//    }
 
     Car setMake(String make) {
         this.make = make;
