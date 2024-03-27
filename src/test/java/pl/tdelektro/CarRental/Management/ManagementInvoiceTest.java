@@ -45,9 +45,7 @@ public class ManagementInvoiceTest {
 
         outputFile = new File("2024-03-27 test@test.com" + ".pdf");
 
+        //Tests coverage if file exist and correct file name
         assertTrue("Invoice file should exist", outputFile.exists());
-
     }
-
-
 }

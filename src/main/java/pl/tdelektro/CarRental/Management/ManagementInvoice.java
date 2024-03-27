@@ -22,7 +22,7 @@ class ManagementInvoice {
         document.open();
 
         Image image = Image.getInstance("src/main/resources/banner.jpg");
-        image.scaleToFit(325, 265);
+        image.scaleToFit(163, 132);
         document.add(image);
 
         Paragraph invoiceText = new Paragraph("INVOICE");
@@ -32,28 +32,28 @@ class ManagementInvoice {
         document.add(invoiceText);
 
         String[] invoiceData = {
-                "RESERVATION ID: " + managementReservation.getReservationId(),
-                "CUSTOMER: " + managementReservation.getCustomerEmail(),
+                "RESERVATION ID    :   " + managementReservation.getReservationId(),
+                "CUSTOMER              :   " + managementReservation.getCustomerEmail(),
                 " ",
-                "RENTED CAR: " + managementReservation.getCarId().toString(),
-                "RENT START DATE " + managementReservation.getStartDate(),
-                "RENT END DATE " + managementReservation.getEndDate(),
+                "RENTED CAR            :   " + managementReservation.getCarId().toString(),
+                "RENT START DATE  :   " + managementReservation.getStartDate(),
+                "RENT END DATE      :   " + managementReservation.getEndDate(),
                 " ",
-                "TOTAL COST" + managementReservation.getTotalReservationCost()
+                "TOTAL COST            :   " + managementReservation.getTotalReservationCost() + " $"
         };
 
         PdfPTable table = new PdfPTable(1);
         table.setWidthPercentage(100);
         PdfPCell cell = new PdfPCell();
         cell.setBorder(PdfPCell.NO_BORDER);
-        cell.setBorder(PdfPCell.ALIGN_LEFT);
+        cell.setBorder(PdfPCell.ALIGN_RIGHT);
 
 
-        for (int i = 0; i < invoiceText.size() - 1; i++) {
+        for (int i = 0; i < invoiceData.length - 1; i++) {
             Paragraph paragraph = new Paragraph(invoiceData[i]);
             document.add(paragraph);
         }
-        table.addCell(createCell(invoiceData[invoiceText.size()], true));
+        table.addCell(createCell(invoiceData[invoiceData.length-1], true));
 
         document.add(table);
         document.close();
