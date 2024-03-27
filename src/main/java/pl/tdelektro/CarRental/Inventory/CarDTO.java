@@ -16,15 +16,12 @@ import pl.tdelektro.CarRental.Management.ManagementReservationDTO;
 
 import java.util.Set;
 
-@Entity
-@Table(name = "car_dto")
+
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class CarDTO {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id", nullable = false)
+
     @JsonIgnore
     private Integer id;
     private String make;
@@ -33,11 +30,7 @@ public class CarDTO {
     private int modelYear;
     private float oneDayCost;
     private boolean available;
-    //private Set<ManagementReservationDTO>managementReservationDtoList;
 
-//    public Set<ManagementReservationDTO> getManagementReservationDtoList() {
-//        return managementReservationDtoList;
-//    }
 
     public CarDTO (Car car){
         this.make = car.getMake();
@@ -110,5 +103,14 @@ public class CarDTO {
     CarDTO setAvailable(boolean available) {
         this.available = available;
         return this;
+    }
+
+    @Override
+    public String toString() {
+        return
+                "make='" + make + '\'' +
+                ", model='" + model + '\'' +
+                ", oneDayCost=" + oneDayCost
+                ;
     }
 }

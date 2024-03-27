@@ -13,18 +13,13 @@ import lombok.Setter;
 
 import java.time.LocalDateTime;
 
-@Entity
-@Table(name = "reservation_dto")
+
 @NoArgsConstructor
 @Getter
 @Setter
 public class ManagementReservationDTO {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
-    @JsonIgnore
-    private Integer id;
+
     private String reservationId;
     private Integer carId;
     private LocalDateTime startDate;
@@ -45,5 +40,14 @@ public class ManagementReservationDTO {
         this.endDate = endDate;
         this.totalCost = totalCost;
         this.status = status;
+    }
+
+    ManagementReservationDTO(ManagementReservation managementReservation) {
+        this.reservationId = managementReservation.getReservationId();
+        this.carId = managementReservation.getCarId();
+        this.startDate = managementReservation.getStartDate();
+        this.endDate = managementReservation.getEndDate();
+        this.totalCost = managementReservation.getTotalReservationCost();
+        this.status = managementReservation.getStatus().toString();
     }
 }

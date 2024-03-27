@@ -10,16 +10,10 @@ import jakarta.persistence.Table;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
-@Entity
-@Table(name = "customer_dto")
 public class CustomerDTO {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id", nullable = false)
-    @JdbcTypeCode(SqlTypes.INTEGER)
+
     @JsonIgnore
     private int id;
-
     @JsonIgnore
     String name;
     @JsonIgnore

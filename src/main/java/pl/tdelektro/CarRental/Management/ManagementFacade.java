@@ -8,12 +8,14 @@ import pl.tdelektro.CarRental.Customer.CustomerFacade;
 import pl.tdelektro.CarRental.Inventory.CarDTO;
 import pl.tdelektro.CarRental.Inventory.CarFacade;
 
-import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 @Service
 @AllArgsConstructor
@@ -63,21 +65,13 @@ public class ManagementFacade {
                 .status(setReservationStatus(startRent, endRent, carId))
                 .build();
 
-        ManagementReservationDTO managementReservationDTO = new ManagementReservationDTO(
-                reservation.getReservationId(),
-                carId,
-                startRent,
-                endRent,
-                totalRentCost,
-                reservation.getStatus().toString()
-                );
-
         managementReservationRepository.save(reservation);
+        ManagementReservationDTO managementReservationDTO = new ManagementReservationDTO(reservation);
 
         return managementReservationDTO;
     }
 
-    public void returnCar(String customerEmail , Integer carId, String reservationId) throws DocumentException, FileNotFoundException {
+    public void returnCar(String customerEmail, Integer carId, String reservationId) throws DocumentException, IOException {
 
         ManagementReservation reservationEnd = findReservation(reservationId);
         CustomerDTO customerFromRepo = customerFacade.findCustomerByName(customerEmail);
@@ -88,9 +82,9 @@ public class ManagementFacade {
 
     private ManagementReservation findReservation(String reservationId) {
         Optional<ManagementReservation> reservation = managementReservationRepository.findByReservationId(reservationId);
-        if(reservation.isPresent()){
+        if (reservation.isPresent()) {
             return reservation.get();
-        }else{
+        } else {
             throw new ManagementReservationNotFound(reservationId);
         }
 
@@ -108,18 +102,18 @@ public class ManagementFacade {
 
     }
 
-    private void generateInvoice(ManagementReservation reservation) throws DocumentException, FileNotFoundException {
+    private void generateInvoice(ManagementReservation reservation) throws DocumentException, IOException {
 
         managementInvoice.createInvoice(reservation);
 
     }
 
-    private ReservationStatus setReservationStatus(LocalDateTime startRent, LocalDateTime endRent, Integer carDtoId){
+    private ReservationStatus setReservationStatus(LocalDateTime startRent, LocalDateTime endRent, Integer carDtoId) {
         ReservationStatus reservationStatus;
 
-        if(startRent.isBefore(LocalDateTime.now())){
+        if (startRent.isBefore(LocalDateTime.now())) {
             reservationStatus = ReservationStatus.PENDING;
-        } else if(startRent.isBefore(LocalDateTime.now()) && endRent.isAfter(LocalDateTime.now())){
+        } else if (startRent.isBefore(LocalDateTime.now()) && endRent.isAfter(LocalDateTime.now())) {
             reservationStatus = ReservationStatus.ACTIVE;
         } else {
             reservationStatus = ReservationStatus.COMPLETED;
@@ -127,5 +121,32 @@ public class ManagementFacade {
 
         carFacade.saveCarStatus(carDtoId, reservationStatus.toString());
         return reservationStatus;
+    }
+
+    Set<ManagementReservationDTO> getReservations(String status) {
+
+        ReservationStatus reservationStatus = null;
+        switch (status.toUpperCase()) {
+            case "ACTIVE":
+                reservationStatus = ReservationStatus.ACTIVE;
+                break;
+            case "PENDING":
+                reservationStatus = ReservationStatus.PENDING;
+                break;
+            case "COMPLETED":
+                reservationStatus = ReservationStatus.COMPLETED;
+                break;
+        }
+        Set<ManagementReservation> managementReservationSet = managementReservationRepository.findByStatus(reservationStatus);
+        Set<ManagementReservationDTO> managementReservationDTOSet = new HashSet<>();
+
+        if (managementReservationSet.isEmpty()) {
+            return new HashSet<>();
+        } else {
+            for (ManagementReservation reservation : managementReservationSet) {
+                managementReservationDTOSet.add(new ManagementReservationDTO(reservation));
+            }
+        }
+        return managementReservationDTOSet;
     }
 }

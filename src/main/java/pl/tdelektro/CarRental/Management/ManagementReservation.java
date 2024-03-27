@@ -33,7 +33,6 @@ class ManagementReservation {
     private String reservationId;
     private String customerEmail;
 
-
     private Integer carId;
 
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
