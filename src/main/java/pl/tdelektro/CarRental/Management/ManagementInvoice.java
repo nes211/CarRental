@@ -7,26 +7,22 @@ import com.itextpdf.text.Paragraph;
 import com.itextpdf.text.pdf.PdfPCell;
 import com.itextpdf.text.pdf.PdfPTable;
 import com.itextpdf.text.pdf.PdfWriter;
-import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
-import pl.tdelektro.CarRental.Inventory.CarFacade;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
 
 @Service
-@AllArgsConstructor
 class ManagementInvoice {
-
-    CarFacade carFacade;
 
     void createInvoice(ManagementReservation managementReservation) throws IOException, DocumentException {
         Document document = new Document();
-        PdfWriter.getInstance(document, new FileOutputStream(managementReservation.getReservationId()));
+        String fileName = managementReservation.getReservationId().toString() + ".pdf";
+        PdfWriter.getInstance(document, new FileOutputStream(fileName));
         document.open();
 
         Image image = Image.getInstance("src/main/resources/banner.jpg");
-        image.scaleToFit(650, 530);
+        image.scaleToFit(325, 265);
         document.add(image);
 
         Paragraph invoiceText = new Paragraph("INVOICE");
@@ -39,7 +35,7 @@ class ManagementInvoice {
                 "RESERVATION ID: " + managementReservation.getReservationId(),
                 "CUSTOMER: " + managementReservation.getCustomerEmail(),
                 " ",
-                "RENTED CAR: " + carFacade.findCarById(managementReservation.getCarId()).toString(),
+                "RENTED CAR: " + managementReservation.getCarId().toString(),
                 "RENT START DATE " + managementReservation.getStartDate(),
                 "RENT END DATE " + managementReservation.getEndDate(),
                 " ",
@@ -54,7 +50,8 @@ class ManagementInvoice {
 
 
         for (int i = 0; i < invoiceText.size() - 1; i++) {
-            table.addCell(createCell(invoiceData[i], false));
+            Paragraph paragraph = new Paragraph(invoiceData[i]);
+            document.add(paragraph);
         }
         table.addCell(createCell(invoiceData[invoiceText.size()], true));
 
