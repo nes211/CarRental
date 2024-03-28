@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import pl.tdelektro.CarRental.Exception.CustomerNotFoundException;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -44,7 +45,7 @@ public class CustomerFacade {
         List<Customer> customerList = customerRepository.findByIdNotNull();
         List<CustomerDTO> customerDTOList = new ArrayList<>();
         if (customerList.isEmpty()) {
-            return Arrays.asList();
+            throw new CustomerNotFoundException();
         } else {
             for (Customer customer : customerList) {
                 CustomerDTO customerDTO = new CustomerDTO(customer);

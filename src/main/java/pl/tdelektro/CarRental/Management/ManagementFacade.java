@@ -5,6 +5,8 @@ import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import pl.tdelektro.CarRental.Customer.CustomerDTO;
 import pl.tdelektro.CarRental.Customer.CustomerFacade;
+import pl.tdelektro.CarRental.Exception.NotEnoughFoundsException;
+import pl.tdelektro.CarRental.Exception.ReservationNotFoundException;
 import pl.tdelektro.CarRental.Inventory.CarDTO;
 import pl.tdelektro.CarRental.Inventory.CarFacade;
 
@@ -65,7 +67,7 @@ public class ManagementFacade {
         ).collect(Collectors.toList());
 
         if (reservationList.isEmpty()) {
-            return carFacade.findAvailableCars().stream().toList();
+            return carFacade.findAllCars().stream().toList();
         } else {
             return new ArrayList<>();
         }
@@ -117,12 +119,12 @@ public class ManagementFacade {
         generateInvoice(reservationEnd);
     }
 
-    private ManagementReservation findReservation(String reservationId) {
+    private ManagementReservation findReservation(String reservationId) throws ReservationNotFoundException {
         Optional<ManagementReservation> reservation = managementReservationRepository.findByReservationId(reservationId);
         if (reservation.isPresent()) {
             return reservation.get();
         } else {
-            throw new ManagementReservationNotFound(reservationId);
+            throw new ReservationNotFoundException(reservationId);
         }
 
     }
