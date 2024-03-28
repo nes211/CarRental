@@ -2,7 +2,6 @@ package pl.tdelektro.CarRental.Management;
 
 import org.springframework.data.repository.CrudRepository;
 
-import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.Set;
 
@@ -12,6 +11,7 @@ interface ManagementReservationRepository extends CrudRepository<ManagementReser
 
     Set<ManagementReservation> findByStatus(ReservationStatus status);
 
+    Set<ManagementReservation> findByCarIdAndStatusOrStatus(Integer carId, ReservationStatus status, ReservationStatus status1);
 
-
+    Set<ManagementReservation> findByStatusOrStatus(ReservationStatus status, ReservationStatus status1);
 }

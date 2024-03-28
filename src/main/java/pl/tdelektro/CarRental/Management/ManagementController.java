@@ -1,6 +1,7 @@
 package pl.tdelektro.CarRental.Management;
 
 import com.itextpdf.text.DocumentException;
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -10,8 +11,10 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import pl.tdelektro.CarRental.Inventory.CarDTO;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Set;
 
 @RestController
@@ -20,7 +23,6 @@ import java.util.Set;
 class ManagementController {
 
     private final ManagementFacade managementFacade;
-
 
     @PostMapping("/rent")
     ResponseEntity<ManagementReservationDTO> rentCar(
@@ -36,7 +38,7 @@ class ManagementController {
     }
 
     @PostMapping("/return")
-    ResponseEntity<HttpStatus> returnCar(@RequestBody ManagementReservation managementReservation) throws DocumentException, IOException {
+    ResponseEntity<HttpStatus> returnCar(@Valid @RequestBody ManagementReservation managementReservation) throws DocumentException, IOException {
         managementFacade.returnCar(managementReservation.getCustomerEmail(),
                 managementReservation.getCarId(),
                 managementReservation.getReservationId());
@@ -44,11 +46,31 @@ class ManagementController {
         return new ResponseEntity(HttpStatus.NO_CONTENT);
     }
 
-    @GetMapping("/{reservations}")
-    ResponseEntity<Set<ManagementReservationDTO>> getActiveReservations(@PathVariable String reservations) {
-
-        return new ResponseEntity<>(managementFacade.getReservations(reservations.toUpperCase()), HttpStatus.OK);
+    @GetMapping("/find")
+    ResponseEntity<List<CarDTO>> findFilter(@Valid @RequestBody ManagementReservation reservationAvailable){
+        if(reservationAvailable.getCarId()!=null){
+            return new ResponseEntity<>(managementFacade.findAvailableCars
+                    (
+                    reservationAvailable.getCarId(),
+                    reservationAvailable.getStartDate(),
+                    reservationAvailable.getEndDate()
+                    )
+                    ,HttpStatus.OK
+            );
+        }else{
+            return new ResponseEntity<>(managementFacade.findAvailableCars
+                    (
+                    reservationAvailable.getStartDate(),
+                    reservationAvailable.getEndDate()
+                    )
+                    , HttpStatus.OK);
+        }
     }
 
+    @GetMapping("/reservations/{reservationType}")
+    ResponseEntity<Set<ManagementReservationDTO>> getActiveReservations(@PathVariable String reservationType) {
+
+        return new ResponseEntity<>(managementFacade.getReservations(reservationType.toUpperCase()), HttpStatus.OK);
+    }
 
 }

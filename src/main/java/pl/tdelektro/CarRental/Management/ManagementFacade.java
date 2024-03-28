@@ -12,10 +12,12 @@ import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
@@ -27,12 +29,46 @@ public class ManagementFacade {
     private final CustomerFacade customerFacade;
     private final ManagementInvoice managementInvoice;
 
+
     public void addReservation(ManagementReservation reservation) {
         reservations.add(reservation);
     }
 
     public void removeReservation(ManagementReservation reservation) {
         reservations.remove(reservation);
+    }
+
+    public List<CarDTO> findAvailableCars(Integer carId, LocalDateTime startDate, LocalDateTime endDate) {
+
+        Set<ManagementReservation> reservations = managementReservationRepository.findByCarIdAndStatusOrStatus(
+                carId,
+                ReservationStatus.PENDING,
+                ReservationStatus.ACTIVE
+        );
+        return reservationsCheck(reservations, startDate, endDate);
+    }
+
+    public List<CarDTO> findAvailableCars(LocalDateTime startDate, LocalDateTime endDate) {
+        Set<ManagementReservation> reservations = managementReservationRepository.findByStatusOrStatus(
+                ReservationStatus.ACTIVE,
+                ReservationStatus.PENDING
+        );
+        return reservationsCheck(reservations, startDate, endDate);
+    }
+
+    public List<CarDTO> reservationsCheck(Set<ManagementReservation> reservationSet, LocalDateTime startDate, LocalDateTime endDate) {
+        List<ManagementReservation> reservationList = reservations.stream().filter(reservation ->
+                reservation.getStartDate().isBefore(startDate)
+                        && reservation.getEndDate().isBefore(startDate)
+                        && reservation.getStartDate().isBefore(endDate)
+                        && reservation.getEndDate().isBefore(endDate)
+        ).collect(Collectors.toList());
+
+        if (reservationList.isEmpty()) {
+            return carFacade.findAvailableCars().stream().toList();
+        } else {
+            return new ArrayList<>();
+        }
     }
 
     public ManagementReservationDTO rentCar(
@@ -51,6 +87,7 @@ public class ManagementFacade {
             throw new NotEnoughFoundsException("Your account balance is insufficient by"
                     + foundsTotal + ". Please recharge your account.");
         }
+
         processingPayment(customerDTO, foundsTotal);
 
 
@@ -96,10 +133,10 @@ public class ManagementFacade {
 
     }
 
-    public void processingPayment(CustomerDTO customerFromRepo, float founds) {
+    public boolean processingPayment(CustomerDTO customerFromRepo, float founds) {
 
         customerFromRepo.setFunds(customerFromRepo.getFunds() - founds);
-
+        return customerFacade.editCustomer(customerFromRepo);
     }
 
     private void generateInvoice(ManagementReservation reservation) throws DocumentException, IOException {

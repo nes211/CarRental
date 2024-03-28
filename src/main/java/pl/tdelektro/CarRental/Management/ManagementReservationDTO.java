@@ -1,12 +1,5 @@
 package pl.tdelektro.CarRental.Management;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -19,14 +12,12 @@ import java.time.LocalDateTime;
 @Setter
 public class ManagementReservationDTO {
 
-
     private String reservationId;
     private Integer carId;
     private LocalDateTime startDate;
     private LocalDateTime endDate;
     private double totalCost;
     private String status;
-
 
     ManagementReservationDTO(String reservationId,
                              Integer carId,

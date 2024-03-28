@@ -31,10 +31,13 @@ public class CustomerFacade {
         }
     }
 
-    public Customer editCustomer(Customer customer) {
-
-        // TODO: 19.03.2024
-        return new Customer();
+    public boolean editCustomer(CustomerDTO customerDto) {
+        Customer customer = unwrapCustomer(customerRepository.findByEmailAddress(customerDto.emailAddress));
+        customer.setEmailAddress(customerDto.emailAddress);
+        customer.setName(customer.getUsername());
+        customer.setFunds(customerDto.funds);
+        customerRepository.save(customer);
+        return true;
     }
 
     public List<CustomerDTO> getAllCustomers() {
@@ -51,10 +54,12 @@ public class CustomerFacade {
         }
     }
 
-    public void findCustomer(Customer customer) {
+    public Customer findCustomer(Customer customer) {
         Optional<Customer> optional = customerRepository.findByEmailAddress(customer.getEmailAddress());
         if (optional.isEmpty()) {
             throw new UsernameNotFoundException("User not find in repo. Please register yourself");
+        }else{
+            return optional.get();
         }
     }
 
@@ -64,5 +69,13 @@ public class CustomerFacade {
             throw new UsernameNotFoundException("Customer with name: " + customerEmail + " not find in repo. Please register yourself");
         }
         return new CustomerDTO(optional.get());
+    }
+    Customer unwrapCustomer(Optional<Customer> customer){
+        if(customer.isPresent()){
+            return customer.get();
+        }else{
+            throw new UsernameNotFoundException("Customer not found in repository");
+        }
+
     }
 }
