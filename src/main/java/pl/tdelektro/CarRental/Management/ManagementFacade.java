@@ -175,12 +175,13 @@ public class ManagementFacade {
             case "COMPLETED":
                 reservationStatus = ReservationStatus.COMPLETED;
                 break;
+            default: throw new ReservationNotFoundException();
         }
         Set<ManagementReservation> managementReservationSet = managementReservationRepository.findByStatus(reservationStatus);
         Set<ManagementReservationDTO> managementReservationDTOSet = new HashSet<>();
 
         if (managementReservationSet.isEmpty()) {
-            return new HashSet<>();
+            throw new ReservationNotFoundException(status);
         } else {
             for (ManagementReservation reservation : managementReservationSet) {
                 managementReservationDTOSet.add(new ManagementReservationDTO(reservation));

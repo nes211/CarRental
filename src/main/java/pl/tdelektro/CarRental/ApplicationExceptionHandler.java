@@ -18,8 +18,8 @@ import java.util.Arrays;
 class ApplicationExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler({CarNotFoundException.class,
-            NotEnoughFoundsException.class,
             CustomerNotFoundException.class,
+            NotEnoughFoundsException.class,
             ReservationNotFoundException.class}
     )
     public ResponseEntity<ErrorResponse> exceptionHandler(RuntimeException ex) {
