@@ -27,16 +27,19 @@ public class CarFacade {
 
     public CarDTO findCarById(Integer carId) {
         Optional<Car> carFromRepo = carRepository.findById(carId);
+        if (carFromRepo == null) {
+            throw new CarNotFoundException(carId);
+        }
         return unwrapCarToCarDto(carFromRepo, carId);
     }
 
     public void saveCarStatus(Integer carId, String status) {
 
         boolean isAvailable = true;
-        if(status.contains("ACTIVE")){
-            isAvailable= false;
-        }else{
-            isAvailable= true;
+        if (status.contains("ACTIVE")) {
+            isAvailable = false;
+        } else {
+            isAvailable = true;
         }
 
         carRepository.findById(carId).get().setAvailable(isAvailable);
@@ -60,7 +63,7 @@ public class CarFacade {
     }
 
     private CarDTO unwrapCarToCarDto(Optional<Car> carFromRepo, Integer carId) {
-        if (carFromRepo.isEmpty()) {
+        if (carFromRepo == null) {
             throw new CarNotFoundException(carId);
         }
         return new CarDTO(carFromRepo.get());

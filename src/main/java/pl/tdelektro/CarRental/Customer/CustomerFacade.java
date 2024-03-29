@@ -19,6 +19,10 @@ public class CustomerFacade {
     BCryptPasswordEncoder bCryptPasswordEncoder;
 
 
+    //For test purpose
+    public CustomerFacade() {
+    }
+
     public void addNewCustomer(Customer customer) {
         Optional<Customer> customerCheck = customerRepository.findByEmailAddress(customer.getEmailAddress());
         if (customerCheck.isEmpty()) {

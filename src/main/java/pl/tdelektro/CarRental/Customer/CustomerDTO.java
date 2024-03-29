@@ -24,6 +24,20 @@ public class CustomerDTO {
     @JsonIgnore
     String token;
 
+
+    CustomerDTO(Customer customer) {
+        this.name = customer.getName();
+        this.emailAddress = customer.getEmailAddress();
+        this.funds = customer.getFunds();
+    }
+
+    //Constructor for test class, because Customer class is private
+    public CustomerDTO(String name, String emailAddress, Float funds) {
+        this.name = name;
+        this.emailAddress = emailAddress;
+        this.funds = funds;
+    }
+
     String getToken() {
         return token;
     }
@@ -34,12 +48,6 @@ public class CustomerDTO {
     }
 
     CustomerDTO() {
-    }
-
-    CustomerDTO(Customer customer) {
-        this.name = customer.getName();
-        this.emailAddress = customer.getEmailAddress();
-        this.funds = customer.getFunds();
     }
 
     public int getId() {

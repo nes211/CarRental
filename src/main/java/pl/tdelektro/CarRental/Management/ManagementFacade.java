@@ -2,6 +2,7 @@ package pl.tdelektro.CarRental.Management;
 
 import com.itextpdf.text.DocumentException;
 import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
 import org.springframework.stereotype.Service;
 import pl.tdelektro.CarRental.Customer.CustomerDTO;
 import pl.tdelektro.CarRental.Customer.CustomerFacade;
@@ -100,7 +101,7 @@ public class ManagementFacade {
                 .startDate(startRent)
                 .endDate(endRent)
                 .totalReservationCost(totalRentCost)
-                .customerEmail("dawid@tdelektro.pl")
+                .customerEmail(customerEmail)
                 .status(setReservationStatus(startRent, endRent, carId))
                 .build();
 
@@ -119,7 +120,7 @@ public class ManagementFacade {
         generateInvoice(reservationEnd);
     }
 
-    private ManagementReservation findReservation(String reservationId) throws ReservationNotFoundException {
+    public ManagementReservation findReservation(String reservationId) throws ReservationNotFoundException {
         Optional<ManagementReservation> reservation = managementReservationRepository.findByReservationId(reservationId);
         if (reservation.isPresent()) {
             return reservation.get();
