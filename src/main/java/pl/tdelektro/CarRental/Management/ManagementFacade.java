@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 import org.springframework.stereotype.Service;
 import pl.tdelektro.CarRental.Customer.CustomerDTO;
 import pl.tdelektro.CarRental.Customer.CustomerFacade;
+import pl.tdelektro.CarRental.Exception.CarNotFoundException;
 import pl.tdelektro.CarRental.Exception.NotEnoughFoundsException;
 import pl.tdelektro.CarRental.Exception.ReservationNotFoundException;
 import pl.tdelektro.CarRental.Inventory.CarDTO;
@@ -116,6 +117,8 @@ public class ManagementFacade {
         ManagementReservation reservationEnd = findReservation(reservationId);
         CustomerDTO customerFromRepo = customerFacade.findCustomerByName(customerEmail);
         CarDTO carToReturn = carFacade.findCarById(carId);
+        // TODO: 29.03.2024  
+        //if (carToReturn == null) throw new CarNotFoundException(carId);
         setReservationStatus(reservationEnd.getStartDate(), reservationEnd.getEndDate(), carId);
         generateInvoice(reservationEnd);
     }
@@ -142,7 +145,7 @@ public class ManagementFacade {
         return customerFacade.editCustomer(customerFromRepo);
     }
 
-    private void generateInvoice(ManagementReservation reservation) throws DocumentException, IOException {
+    void generateInvoice(ManagementReservation reservation) throws DocumentException, IOException {
 
         managementInvoice.createInvoice(reservation);
 

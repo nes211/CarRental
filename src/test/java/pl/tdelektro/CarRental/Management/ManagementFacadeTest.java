@@ -1,6 +1,5 @@
 package pl.tdelektro.CarRental.Management;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import com.itextpdf.text.DocumentException;
 import org.junit.Before;
 import org.junit.Test;
@@ -20,12 +19,8 @@ import java.util.List;
 import java.util.Optional;
 
 import static junit.framework.TestCase.assertEquals;
-import static junit.framework.TestCase.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 
@@ -33,6 +28,9 @@ public class ManagementFacadeTest {
 
     @Mock
     private List<ManagementReservation> reservations;
+
+    @Mock
+    CarDTO carDto;
 
     @Mock
     private ManagementReservationRepository managementReservationRepository;
@@ -93,7 +91,8 @@ public class ManagementFacadeTest {
         float totalReservationCost = 500f;
         ReservationStatus status = ReservationStatus.COMPLETED;
 
-        assertThrows(ReservationNotFoundException.class, ()-> managementFacade.returnCar(customerEmail, carId,reservationId));
+        assertThrows(ReservationNotFoundException.class, () -> managementFacade.returnCar(customerEmail, carId, reservationId));
+
 
         when(managementReservationRepository.findByReservationId(reservationId)).thenReturn(Optional.ofNullable(new ManagementReservation.ManagementReservationBuilder()
                 .reservationId(reservationId)
@@ -105,11 +104,9 @@ public class ManagementFacadeTest {
                 .status(status)
                 .build())
         );
+        when(carFacade.findCarById(0)).thenThrow(new CarNotFoundException(carId));
 
-        assertDoesNotThrow(()-> managementFacade.returnCar(customerEmail, carId,reservationId));
-        //assertThrows(CarNotFoundException.class, ()-> managementFacade.returnCar(customerEmail, 0,reservationId));
-
-        //verify(managementInvoice, times(1)).createInvoice();
+        assertDoesNotThrow(() -> managementFacade.returnCar(customerEmail, carId, reservationId));
+        assertThrows(CarNotFoundException.class, () -> managementFacade.returnCar(customerEmail, 0, reservationId));
     }
-
 }
