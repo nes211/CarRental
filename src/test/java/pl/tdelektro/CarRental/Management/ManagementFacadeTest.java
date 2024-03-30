@@ -30,9 +30,6 @@ public class ManagementFacadeTest {
     private List<ManagementReservation> reservations;
 
     @Mock
-    CarDTO carDto;
-
-    @Mock
     private ManagementReservationRepository managementReservationRepository;
 
     @Mock
@@ -43,9 +40,6 @@ public class ManagementFacadeTest {
 
     @Mock
     private ManagementInvoice managementInvoice;
-
-    @Mock
-    private ManagementReservationDTO managementReservationDTO;
 
     @InjectMocks
     ManagementFacade managementFacade;
@@ -92,7 +86,6 @@ public class ManagementFacadeTest {
         ReservationStatus status = ReservationStatus.COMPLETED;
 
         assertThrows(ReservationNotFoundException.class, () -> managementFacade.returnCar(customerEmail, carId, reservationId));
-
 
         when(managementReservationRepository.findByReservationId(reservationId)).thenReturn(Optional.ofNullable(new ManagementReservation.ManagementReservationBuilder()
                 .reservationId(reservationId)

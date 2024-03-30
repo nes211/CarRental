@@ -14,11 +14,11 @@ import pl.tdelektro.CarRental.Management.ManagementReservationDTO;
 import java.util.Set;
 
 
-@Builder
 @Entity
 @Table(name = "car")
+@Builder
 @NoArgsConstructor
-public class Car {
+class Car {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -108,3 +108,5 @@ public class Car {
         return isAvailable;
     }
 }
+
+

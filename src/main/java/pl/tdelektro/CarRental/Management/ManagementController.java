@@ -24,6 +24,7 @@ class ManagementController {
 
     private final ManagementFacade managementFacade;
 
+
     @PostMapping("/rent")
     ResponseEntity<ManagementReservationDTO> rentCar(
             @RequestBody ManagementReservation managementReservation) {
@@ -37,8 +38,15 @@ class ManagementController {
                 ), HttpStatus.CREATED);
     }
 
+
+    @PostMapping("/start")
+    ResponseEntity<HttpStatus>startRegisteredReservation(@RequestBody ManagementReservation managementReservation){
+    managementFacade.startReservation(managementReservation);
+    return new ResponseEntity<>(HttpStatus.OK);
+    }
+
     @PostMapping("/return")
-    ResponseEntity<HttpStatus> returnCar(@Valid @RequestBody ManagementReservation managementReservation) throws DocumentException, IOException {
+    ResponseEntity<HttpStatus> returnCar(@RequestBody ManagementReservation managementReservation) throws DocumentException, IOException {
         managementFacade.returnCar(managementReservation.getCustomerEmail(),
                 managementReservation.getCarId(),
                 managementReservation.getReservationId());
@@ -72,5 +80,4 @@ class ManagementController {
 
         return new ResponseEntity<>(managementFacade.getReservations(reservationType.toUpperCase()), HttpStatus.OK);
     }
-
 }

@@ -2,12 +2,11 @@ package pl.tdelektro.CarRental.Management;
 
 import com.itextpdf.text.DocumentException;
 import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
 import org.springframework.stereotype.Service;
 import pl.tdelektro.CarRental.Customer.CustomerDTO;
 import pl.tdelektro.CarRental.Customer.CustomerFacade;
-import pl.tdelektro.CarRental.Exception.CarNotFoundException;
 import pl.tdelektro.CarRental.Exception.NotEnoughFoundsException;
+import pl.tdelektro.CarRental.Exception.ReservationManagementProblem;
 import pl.tdelektro.CarRental.Exception.ReservationNotFoundException;
 import pl.tdelektro.CarRental.Inventory.CarDTO;
 import pl.tdelektro.CarRental.Inventory.CarFacade;
@@ -32,7 +31,6 @@ public class ManagementFacade {
     private final CarFacade carFacade;
     private final CustomerFacade customerFacade;
     private final ManagementInvoice managementInvoice;
-
 
     public void addReservation(ManagementReservation reservation) {
         reservations.add(reservation);
@@ -94,7 +92,6 @@ public class ManagementFacade {
 
         processingPayment(customerDTO, foundsTotal);
 
-
         ManagementReservation reservation = new ManagementReservation.ManagementReservationBuilder()
                 .reservationId(new String(String.valueOf(LocalDate.now() + " " + customerDTO.getName())))
                 .customerEmail(customerEmail)
@@ -107,9 +104,9 @@ public class ManagementFacade {
                 .build();
 
         managementReservationRepository.save(reservation);
-        ManagementReservationDTO managementReservationDTO = new ManagementReservationDTO(reservation);
+        startReservation(reservation);
 
-        return managementReservationDTO;
+        return new ManagementReservationDTO(reservation);
     }
 
     public void returnCar(String customerEmail, Integer carId, String reservationId) throws DocumentException, IOException {
@@ -117,9 +114,9 @@ public class ManagementFacade {
         ManagementReservation reservationEnd = findReservation(reservationId);
         CustomerDTO customerFromRepo = customerFacade.findCustomerByName(customerEmail);
         CarDTO carToReturn = carFacade.findCarById(carId);
-        // TODO: 29.03.2024  
-        //if (carToReturn == null) throw new CarNotFoundException(carId);
         setReservationStatus(reservationEnd.getStartDate(), reservationEnd.getEndDate(), carId);
+        endReservation(reservationEnd);
+        managementReservationRepository.save(reservationEnd);
         generateInvoice(reservationEnd);
     }
 
@@ -130,13 +127,11 @@ public class ManagementFacade {
         } else {
             throw new ReservationNotFoundException(reservationId);
         }
-
     }
 
     public float calculateRentalFee(LocalDateTime startRent, LocalDateTime endRent, float oneDayCost) {
 
         return ChronoUnit.DAYS.between(startRent, endRent) * oneDayCost;
-
     }
 
     public boolean processingPayment(CustomerDTO customerFromRepo, float founds) {
@@ -148,7 +143,6 @@ public class ManagementFacade {
     void generateInvoice(ManagementReservation reservation) throws DocumentException, IOException {
 
         managementInvoice.createInvoice(reservation);
-
     }
 
     private ReservationStatus setReservationStatus(LocalDateTime startRent, LocalDateTime endRent, Integer carDtoId) {
@@ -179,7 +173,8 @@ public class ManagementFacade {
             case "COMPLETED":
                 reservationStatus = ReservationStatus.COMPLETED;
                 break;
-            default: throw new ReservationNotFoundException();
+            default:
+                throw new ReservationNotFoundException();
         }
         Set<ManagementReservation> managementReservationSet = managementReservationRepository.findByStatus(reservationStatus);
         Set<ManagementReservationDTO> managementReservationDTOSet = new HashSet<>();
@@ -192,5 +187,23 @@ public class ManagementFacade {
             }
         }
         return managementReservationDTOSet;
+    }
+
+    void startReservation(ManagementReservation reservation) {
+        //Check because of rest endpoint set
+        ManagementReservation reservationFromRepo = findReservation(reservation.getReservationId());
+        //Reservation can be started 2h before declared in reservation start time
+        if (ChronoUnit.HOURS.between(reservationFromRepo.getStartDate(), LocalDateTime.now()) < 2) {
+            reservationFromRepo.setStatus(ReservationStatus.ACTIVE);
+            managementReservationRepository.save(reservationFromRepo);
+        } else {
+            throw new ReservationManagementProblem("Reservation starts too early. API accepts rent start only 2h before reservation");
+        }
+    }
+
+    void endReservation(ManagementReservation reservation) {
+        ManagementReservation reservationFromRepo = findReservation(reservation.getReservationId());
+        reservationFromRepo.setStatus(ReservationStatus.COMPLETED);
+        managementReservationRepository.save(reservationFromRepo);
     }
 }
