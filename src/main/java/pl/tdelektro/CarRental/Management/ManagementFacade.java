@@ -20,6 +20,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
@@ -58,6 +59,7 @@ public class ManagementFacade {
         return reservationsCheck(reservations, startDate, endDate);
     }
 
+
     public List<CarDTO> reservationsCheck(Set<ManagementReservation> reservationSet, LocalDateTime startDate, LocalDateTime endDate) {
         List<ManagementReservation> reservationList = reservations.stream().filter(reservation ->
                 reservation.getStartDate().isBefore(startDate)
@@ -93,7 +95,10 @@ public class ManagementFacade {
         processingPayment(customerDTO, foundsTotal);
 
         ManagementReservation reservation = new ManagementReservation.ManagementReservationBuilder()
-                .reservationId(new String(String.valueOf(LocalDate.now() + " " + customerDTO.getName())))
+                .reservationId(new String(String.valueOf(
+                        LocalDate.now() + " " +
+                                customerDTO.getName() + " " +
+                                UUID.randomUUID().toString().substring(0, 8))))
                 .customerEmail(customerEmail)
                 .carId(carId)
                 .startDate(startRent)
@@ -145,15 +150,17 @@ public class ManagementFacade {
         managementInvoice.createInvoice(reservation);
     }
 
-    private ReservationStatus setReservationStatus(LocalDateTime startRent, LocalDateTime endRent, Integer carDtoId) {
+    ReservationStatus setReservationStatus(LocalDateTime startRent, LocalDateTime endRent, Integer carDtoId) {
         ReservationStatus reservationStatus;
 
-        if (startRent.isBefore(LocalDateTime.now())) {
-            reservationStatus = ReservationStatus.PENDING;
+        if (startRent.isBefore(LocalDateTime.now()) && endRent.isBefore(LocalDateTime.now())) {
+            reservationStatus = ReservationStatus.COMPLETED;
         } else if (startRent.isBefore(LocalDateTime.now()) && endRent.isAfter(LocalDateTime.now())) {
             reservationStatus = ReservationStatus.ACTIVE;
+        } else if (startRent.isAfter(LocalDateTime.now()) && endRent.isAfter(LocalDateTime.now())) {
+            reservationStatus = ReservationStatus.PENDING;
         } else {
-            reservationStatus = ReservationStatus.COMPLETED;
+            reservationStatus = ReservationStatus.UNKNOWN;
         }
 
         carFacade.saveCarStatus(carDtoId, reservationStatus.toString());
@@ -172,6 +179,9 @@ public class ManagementFacade {
                 break;
             case "COMPLETED":
                 reservationStatus = ReservationStatus.COMPLETED;
+                break;
+            case "UNKNOWN":
+                reservationStatus = ReservationStatus.UNKNOWN;
                 break;
             default:
                 throw new ReservationNotFoundException();

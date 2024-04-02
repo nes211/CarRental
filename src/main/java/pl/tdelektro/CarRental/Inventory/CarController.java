@@ -19,8 +19,8 @@ import java.util.Set;
 @AllArgsConstructor
 class CarController {
 
-    CarRepository carRepository;
-    CarFacade carFacade;
+    private final CarRepository carRepository;
+    private final CarFacade carFacade;
 
     @GetMapping
     ResponseEntity<Set<CarDTO>> getAvailableCars() {
@@ -35,8 +35,6 @@ class CarController {
         }else{
             throw new CarNotFoundException(carId);
         }
-
-
     }
 
     @PostMapping("/addNew")
@@ -50,5 +48,4 @@ class CarController {
         System.out.println("Service unavailable ");
         return new ResponseEntity<>(HttpStatus.SERVICE_UNAVAILABLE);
     }
-
 }

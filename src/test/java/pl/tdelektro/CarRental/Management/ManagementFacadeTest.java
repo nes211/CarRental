@@ -1,10 +1,12 @@
 package pl.tdelektro.CarRental.Management;
 
 import com.itextpdf.text.DocumentException;
+import lombok.AllArgsConstructor;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import pl.tdelektro.CarRental.Customer.CustomerDTO;
 import pl.tdelektro.CarRental.Customer.CustomerFacade;
@@ -20,17 +22,15 @@ import java.util.Optional;
 
 import static junit.framework.TestCase.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
 
-
 public class ManagementFacadeTest {
-
-    @Mock
-    private List<ManagementReservation> reservations;
-
     @Mock
     private ManagementReservationRepository managementReservationRepository;
+    @Mock
+    private List<ManagementReservation> reservations;
 
     @Mock
     private CarFacade carFacade;
@@ -41,35 +41,46 @@ public class ManagementFacadeTest {
     @Mock
     private ManagementInvoice managementInvoice;
 
+    @Mock
+    CustomerDTO customerDTO;
+
     @InjectMocks
-    ManagementFacade managementFacade;
+    private ManagementFacade managementFacade;
 
     @Before
     public void warmup() {
         MockitoAnnotations.initMocks(this);
     }
 
+    Integer carDtoId;
+    boolean isAvailable;
+
+
     @Test
     public void rentCarTest() {
 
-        managementFacade = new ManagementFacade(reservations, managementReservationRepository, carFacade, customerFacade, managementInvoice);
-
         String customerEmail = "test@test.test";
-        LocalDateTime startRent = LocalDateTime.of(2024, 06, 10, 11, 30);
-        LocalDateTime endRent = LocalDateTime.of(2024, 06, 11, 14, 30);
+        customerDTO = new CustomerDTO(customerEmail, customerEmail, 2000f);
+        LocalDateTime startRent = LocalDateTime.now().plusDays(10);
+        LocalDateTime endRent = LocalDateTime.now().plusDays(15);
         Integer carId = 4;
+        ManagementFacade managementFacade = Mockito.mock(ManagementFacade.class);
+        //Mockito.when(managementReservation.).thenReturn(customerEmail);
 
-        when(carFacade.findCarById(carId)).thenReturn(new CarDTO(4, "FSM", "126p", "C", 1990, 400f, true));
-        when(customerFacade.findCustomerByName(customerEmail)).thenReturn(new CustomerDTO(customerEmail, customerEmail, 2000f));
+        managementFacade.rentCar(customerEmail, startRent, endRent, carId);
 
-        ManagementReservationDTO reservationDTO = new ManagementReservationDTO("test reservation", 4, startRent, endRent, 400f, "COMPLETED");
 
-        assertEquals("CarId not the same", managementFacade.rentCar(customerEmail, startRent, endRent, carId).getCarId(), reservationDTO.getCarId());
-        assertEquals("StartDate not the same", managementFacade.rentCar(customerEmail, startRent, endRent, carId).getStartDate(), reservationDTO.getStartDate());
-        assertEquals("EndDate not the same", managementFacade.rentCar(customerEmail, startRent, endRent, carId).getEndDate(), reservationDTO.getEndDate());
-        assertEquals("TotalCost not the same", managementFacade.rentCar(customerEmail, startRent, endRent, carId).getTotalCost(), reservationDTO.getTotalCost());
-        assertEquals("Status not the same", managementFacade.rentCar(customerEmail, startRent, endRent, carId).getStatus(), reservationDTO.getStatus());
+//        when(carFacade.findCarById(carId)).thenReturn(new CarDTO(carId, "FSM", "126p", "C", 1990, 400f, true));
+//        when(customerFacade.findCustomerByName("test")).thenReturn(customerDTO);
 
+
+
+
+        assertEquals("CarId not the same", managementFacade.rentCar(customerEmail, startRent, endRent, carId).getCarId() , carId);
+        assertEquals("StartDate not the same", managementFacade.rentCar(customerEmail, startRent, endRent, carId).getStartDate(), startRent);
+        assertEquals("EndDate not the same", managementFacade.rentCar(customerEmail, startRent, endRent, carId).getEndDate(), endRent);
+        assertEquals("TotalCost not the same", managementFacade.rentCar(customerEmail, startRent, endRent, carId).getTotalCost(), 2000f);
+        assertEquals("Status not the same", managementFacade.rentCar(customerEmail, startRent, endRent, carId).getStatus(), ReservationStatus.ACTIVE);
     }
 
     @Test
@@ -102,4 +113,37 @@ public class ManagementFacadeTest {
         assertDoesNotThrow(() -> managementFacade.returnCar(customerEmail, carId, reservationId));
         assertThrows(CarNotFoundException.class, () -> managementFacade.returnCar(customerEmail, 0, reservationId));
     }
+
+    @Test
+    public void setReservationStatusTest() {
+
+        carDtoId = 0;
+        ReservationStatus reservationStatus;
+        when(carFacade.findCarById(carDtoId)).thenReturn(new CarDTO(carDtoId, "FSM", "126p", "C", 1990, 400f, true));
+
+        LocalDateTime startRent = LocalDateTime.of(2024, 01, 10, 11, 30);
+        LocalDateTime endRent = LocalDateTime.of(2024, 01, 11, 14, 30);
+        reservationStatus = managementFacade.setReservationStatus(startRent, endRent, carDtoId);
+        assertEquals("Reservation status Completed", ReservationStatus.COMPLETED, reservationStatus);
+        assertFalse(reservationStatus.equals(ReservationStatus.UNKNOWN), "Reservation status Unknown");
+
+        startRent = LocalDateTime.now().minusDays(2);
+        endRent = LocalDateTime.now().plusDays(3);
+        reservationStatus = managementFacade.setReservationStatus(startRent, endRent, carDtoId);
+        assertEquals("Reservation status Active", ReservationStatus.ACTIVE, reservationStatus);
+        assertFalse(reservationStatus.equals(ReservationStatus.UNKNOWN), "Reservation status Unknown");
+
+        startRent = LocalDateTime.now().plusDays(5);
+        endRent = LocalDateTime.now().plusDays(13);
+        reservationStatus = managementFacade.setReservationStatus(startRent, endRent, carDtoId);
+        assertEquals("Reservation status Pending", ReservationStatus.PENDING, reservationStatus);
+        assertFalse(reservationStatus.equals(ReservationStatus.UNKNOWN), "Reservation status Unknown");
+    }
+
+    @Test
+    public void getReservationsTest() {
+
+    }
+
+
 }

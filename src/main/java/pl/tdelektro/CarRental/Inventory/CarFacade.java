@@ -13,8 +13,7 @@ import java.util.Set;
 @AllArgsConstructor
 public class CarFacade {
 
-    CarRepository carRepository;
-    CustomerFacade customerFacade;
+    private final CarRepository carRepository;
 
     public Set<CarDTO> findAllCars() {
         Set<Car> carSet = carRepository.findByIsAvailableTrue();
@@ -37,13 +36,12 @@ public class CarFacade {
 
     public void saveCarStatus(Integer carId, String status) {
 
-        boolean isAvailable = true;
+        boolean isAvailable;
         if (status.contains("ACTIVE")) {
             isAvailable = false;
         } else {
             isAvailable = true;
         }
-
         carRepository.findById(carId).get().setAvailable(isAvailable);
     }
 
@@ -70,7 +68,5 @@ public class CarFacade {
         }
         return new CarDTO(carFromRepo.get());
     }
-
-
 }
 

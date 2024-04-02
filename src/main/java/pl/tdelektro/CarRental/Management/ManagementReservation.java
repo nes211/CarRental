@@ -44,6 +44,16 @@ class ManagementReservation {
     private float totalReservationCost;
     private ReservationStatus status ;
 
+    ManagementReservation(String reservationId, String customerEmail, Integer carId, LocalDateTime startDate, LocalDateTime endDate, float totalReservationCost, ReservationStatus status) {
+        this.reservationId = reservationId;
+        this.customerEmail = customerEmail;
+        this.carId = carId;
+        this.startDate = startDate;
+        this.endDate = endDate;
+        this.totalReservationCost = totalReservationCost;
+        this.status = status;
+    }
+
     ReservationStatus getStatus() {
         return status;
     }

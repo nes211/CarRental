@@ -7,7 +7,6 @@ import org.springframework.stereotype.Service;
 import pl.tdelektro.CarRental.Exception.CustomerNotFoundException;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -15,13 +14,8 @@ import java.util.Optional;
 @AllArgsConstructor
 public class CustomerFacade {
 
-    CustomerRepository customerRepository;
-    BCryptPasswordEncoder bCryptPasswordEncoder;
-
-
-    //For test purpose
-    public CustomerFacade() {
-    }
+    private final CustomerRepository customerRepository;
+    private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
     public void addNewCustomer(Customer customer) {
         Optional<Customer> customerCheck = customerRepository.findByEmailAddress(customer.getEmailAddress());
@@ -63,7 +57,7 @@ public class CustomerFacade {
         Optional<Customer> optional = customerRepository.findByEmailAddress(customer.getEmailAddress());
         if (optional.isEmpty()) {
             throw new UsernameNotFoundException("User not find in repo. Please register yourself");
-        }else{
+        } else {
             return optional.get();
         }
     }
@@ -75,10 +69,11 @@ public class CustomerFacade {
         }
         return new CustomerDTO(optional.get());
     }
-    Customer unwrapCustomer(Optional<Customer> customer){
-        if(customer.isPresent()){
+
+    Customer unwrapCustomer(Optional<Customer> customer) {
+        if (customer.isPresent()) {
             return customer.get();
-        }else{
+        } else {
             throw new UsernameNotFoundException("Customer not found in repository");
         }
 
