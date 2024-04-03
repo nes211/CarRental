@@ -3,9 +3,11 @@ package pl.tdelektro.CarRental.Management;
 import com.itextpdf.text.DocumentException;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.mockito.junit.jupiter.MockitoExtension;
 import pl.tdelektro.CarRental.Customer.CustomerDTO;
 import pl.tdelektro.CarRental.Customer.CustomerFacade;
 import pl.tdelektro.CarRental.Exception.CarNotFoundException;
@@ -28,6 +30,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 
+@ExtendWith(MockitoExtension.class)
 public class ManagementFacadeTest {
     @Mock
     private ManagementReservationRepository managementReservationRepository;
