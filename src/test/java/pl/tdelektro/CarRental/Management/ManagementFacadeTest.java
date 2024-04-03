@@ -17,17 +17,14 @@ import pl.tdelektro.CarRental.Inventory.CarFacade;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import static junit.framework.TestCase.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -36,29 +33,22 @@ public class ManagementFacadeTest {
     private ManagementReservationRepository managementReservationRepository;
     @Mock
     private List<ManagementReservation> reservations;
-
     @Mock
     private CarFacade carFacade;
-
     @Mock
     private CustomerFacade customerFacade;
-
     @Mock
     private ManagementInvoice managementInvoice;
-
     @Mock
     CustomerDTO customerDTO;
-
     @InjectMocks
     private ManagementFacade managementFacade;
+    Integer carDtoId;
 
     @Before
     public void warmup() {
         MockitoAnnotations.initMocks(this);
     }
-
-    Integer carDtoId;
-
 
     @Test
     public void rentCarTest() {
@@ -78,7 +68,6 @@ public class ManagementFacadeTest {
                 .thenReturn(
                         new CustomerDTO(customerEmail, customerEmail, 2000f)
                 );
-        //when(managementFacade.startReservation()).thenReturn(managementReservation);
         managementFacade.rentCar(customerEmail, startRent, endRent, carId);
 
         assertEquals(carId, managementFacade.rentCar(customerEmail, startRent, endRent, carId).getCarId());
