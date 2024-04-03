@@ -198,7 +198,7 @@ public class ManagementFacade {
     }
 
     void startReservation(ManagementReservation reservation) {
-        //Checks reservation in DB because rest endpoint has ability to start
+        //Rest endpoint has ability to start
         ManagementReservation reservationFromRepo = findReservation(reservation.getReservationId());
         //Reservation can be started 2h before declared in reservation start time
         if (ChronoUnit.HOURS.between(reservationFromRepo.getStartDate(), LocalDateTime.now()) < 2) {
@@ -208,8 +208,8 @@ public class ManagementFacade {
             throw new ReservationManagementProblem(
                     """
                             Reservation starts too early.
-                            API accepts rent start only 2h before reservation.
-                            If its needed place new reservation
+                            API accepts rent start only 2h before reservation date.
+                            If its needed place new earlier reservation.
                             """);
         }
     }

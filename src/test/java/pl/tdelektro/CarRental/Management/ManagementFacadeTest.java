@@ -15,15 +15,17 @@ import pl.tdelektro.CarRental.Inventory.CarFacade;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import static junit.framework.TestCase.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 
 public class ManagementFacadeTest {
@@ -55,7 +57,6 @@ public class ManagementFacadeTest {
     Integer carDtoId;
 
 
-
     @Test
     public void rentCarTest() {
 
@@ -77,15 +78,15 @@ public class ManagementFacadeTest {
         //when(managementFacade.startReservation()).thenReturn(managementReservation);
         managementFacade.rentCar(customerEmail, startRent, endRent, carId);
 
-        assertEquals("CarId not the same", managementFacade.rentCar(customerEmail, startRent, endRent, carId).getCarId(), carId);
-        assertEquals("StartDate not the same", managementFacade.rentCar(customerEmail, startRent, endRent, carId).getStartDate(), startRent);
-        assertEquals("EndDate not the same", managementFacade.rentCar(customerEmail, startRent, endRent, carId).getEndDate(), endRent);
-        assertEquals("TotalCost not the same", managementFacade.rentCar(customerEmail, startRent, endRent, carId).getTotalCost(), 2000f);
-        assertEquals("Status not the same", managementFacade.rentCar(customerEmail, startRent, endRent, carId).getStatus(), ReservationStatus.PENDING);
+        assertEquals(carId, managementFacade.rentCar(customerEmail, startRent, endRent, carId).getCarId());
+        assertEquals(startRent, managementFacade.rentCar(customerEmail, startRent, endRent, carId).getStartDate());
+        assertEquals(endRent, managementFacade.rentCar(customerEmail, startRent, endRent, carId).getEndDate());
+        assertEquals(2000f, managementFacade.rentCar(customerEmail, startRent, endRent, carId).getTotalCost(), 0.001);
+        assertEquals(ReservationStatus.PENDING.toString(), managementFacade.rentCar(customerEmail, startRent, endRent, carId).getStatus());
     }
 
     @Test
-    public void returnCarTest() throws DocumentException, IOException {
+    public void reservationreturnCarTest() throws DocumentException, IOException {
 
         managementFacade = new ManagementFacade(reservations, managementReservationRepository, carFacade, customerFacade, managementInvoice);
         String reservationId = "testString";
@@ -143,8 +144,57 @@ public class ManagementFacadeTest {
 
     @Test
     public void getReservationsTest() {
+        String[] statusString = {"PENDING", "ACTIVE", "COMPLETED", "UNKNOWN", "ANOTHER_STRING"};
+
+        when(managementReservationRepository.findByStatus(ReservationStatus.PENDING)).thenReturn(Set.of(
+                ManagementReservation.builder()
+                        .reservationId("test reservation")
+                        .startDate(LocalDateTime.now().plusDays(2))
+                        .endDate(LocalDateTime.now().plusDays(5))
+                        .customerEmail("test@test.com")
+                        .carId(5)
+                        .status(ReservationStatus.PENDING)
+                        .build()
+        ));
+
+        when(managementReservationRepository.findByStatus(ReservationStatus.ACTIVE)).thenReturn(Set.of(
+                ManagementReservation.builder()
+                        .reservationId("test reservation")
+                        .startDate(LocalDateTime.now().plusDays(2))
+                        .endDate(LocalDateTime.now().plusDays(5))
+                        .customerEmail("test@test.com")
+                        .carId(5)
+                        .status(ReservationStatus.ACTIVE)
+                        .build()
+        ));
+
+        when(managementReservationRepository.findByStatus(ReservationStatus.COMPLETED)).thenReturn(Set.of(
+                ManagementReservation.builder()
+                        .reservationId("test reservation")
+                        .startDate(LocalDateTime.now().plusDays(2))
+                        .endDate(LocalDateTime.now().plusDays(5))
+                        .customerEmail("test@test.com")
+                        .carId(5)
+                        .status(ReservationStatus.COMPLETED)
+                        .build()
+        ));
+
+        when(managementReservationRepository.findByStatus(ReservationStatus.UNKNOWN)).thenReturn(Set.of(
+                ManagementReservation.builder()
+                        .reservationId("test reservation")
+                        .startDate(LocalDateTime.now().plusDays(2))
+                        .endDate(LocalDateTime.now().plusDays(5))
+                        .customerEmail("test@test.com")
+                        .carId(5)
+                        .status(ReservationStatus.UNKNOWN)
+                        .build()
+        ));
+
+        assertFalse(managementFacade.getReservations(statusString[0]).isEmpty());
+        assertFalse(managementFacade.getReservations(statusString[1]).isEmpty());
+        assertFalse(managementFacade.getReservations(statusString[2]).isEmpty());
+        assertFalse(managementFacade.getReservations(statusString[3]).isEmpty());
+
 
     }
-
-
 }
