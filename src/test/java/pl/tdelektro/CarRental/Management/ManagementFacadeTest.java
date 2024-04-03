@@ -1,12 +1,10 @@
 package pl.tdelektro.CarRental.Management;
 
 import com.itextpdf.text.DocumentException;
-import lombok.AllArgsConstructor;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import pl.tdelektro.CarRental.Customer.CustomerDTO;
 import pl.tdelektro.CarRental.Customer.CustomerFacade;
@@ -24,6 +22,8 @@ import static junit.framework.TestCase.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
 public class ManagementFacadeTest {
@@ -53,34 +53,35 @@ public class ManagementFacadeTest {
     }
 
     Integer carDtoId;
-    boolean isAvailable;
+
 
 
     @Test
     public void rentCarTest() {
 
         String customerEmail = "test@test.test";
-        customerDTO = new CustomerDTO(customerEmail, customerEmail, 2000f);
         LocalDateTime startRent = LocalDateTime.now().plusDays(10);
         LocalDateTime endRent = LocalDateTime.now().plusDays(15);
         Integer carId = 4;
-        ManagementFacade managementFacade = Mockito.mock(ManagementFacade.class);
-        //Mockito.when(managementReservation.).thenReturn(customerEmail);
 
+        when(carFacade.findCarById(carId))
+                .thenReturn(
+                        new CarDTO(carId, "FSM", "126p", "C", 1990, 400f, true)
+                );
+
+        when(customerDTO.getFunds()).thenReturn(2000f);
+        when(customerFacade.findCustomerByName(customerEmail))
+                .thenReturn(
+                        new CustomerDTO(customerEmail, customerEmail, 2000f)
+                );
+        //when(managementFacade.startReservation()).thenReturn(managementReservation);
         managementFacade.rentCar(customerEmail, startRent, endRent, carId);
 
-
-//        when(carFacade.findCarById(carId)).thenReturn(new CarDTO(carId, "FSM", "126p", "C", 1990, 400f, true));
-//        when(customerFacade.findCustomerByName("test")).thenReturn(customerDTO);
-
-
-
-
-        assertEquals("CarId not the same", managementFacade.rentCar(customerEmail, startRent, endRent, carId).getCarId() , carId);
+        assertEquals("CarId not the same", managementFacade.rentCar(customerEmail, startRent, endRent, carId).getCarId(), carId);
         assertEquals("StartDate not the same", managementFacade.rentCar(customerEmail, startRent, endRent, carId).getStartDate(), startRent);
         assertEquals("EndDate not the same", managementFacade.rentCar(customerEmail, startRent, endRent, carId).getEndDate(), endRent);
         assertEquals("TotalCost not the same", managementFacade.rentCar(customerEmail, startRent, endRent, carId).getTotalCost(), 2000f);
-        assertEquals("Status not the same", managementFacade.rentCar(customerEmail, startRent, endRent, carId).getStatus(), ReservationStatus.ACTIVE);
+        assertEquals("Status not the same", managementFacade.rentCar(customerEmail, startRent, endRent, carId).getStatus(), ReservationStatus.PENDING);
     }
 
     @Test

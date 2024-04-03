@@ -104,12 +104,10 @@ public class ManagementFacade {
                 .startDate(startRent)
                 .endDate(endRent)
                 .totalReservationCost(totalRentCost)
-                .customerEmail(customerEmail)
                 .status(setReservationStatus(startRent, endRent, carId))
                 .build();
 
         managementReservationRepository.save(reservation);
-        startReservation(reservation);
 
         return new ManagementReservationDTO(reservation);
     }
@@ -200,14 +198,19 @@ public class ManagementFacade {
     }
 
     void startReservation(ManagementReservation reservation) {
-        //Check because of rest endpoint set
+        //Checks reservation in DB because rest endpoint has ability to start
         ManagementReservation reservationFromRepo = findReservation(reservation.getReservationId());
         //Reservation can be started 2h before declared in reservation start time
         if (ChronoUnit.HOURS.between(reservationFromRepo.getStartDate(), LocalDateTime.now()) < 2) {
             reservationFromRepo.setStatus(ReservationStatus.ACTIVE);
             managementReservationRepository.save(reservationFromRepo);
         } else {
-            throw new ReservationManagementProblem("Reservation starts too early. API accepts rent start only 2h before reservation");
+            throw new ReservationManagementProblem(
+                    """
+                            Reservation starts too early.
+                            API accepts rent start only 2h before reservation.
+                            If its needed place new reservation
+                            """);
         }
     }
 
