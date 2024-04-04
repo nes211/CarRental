@@ -66,7 +66,7 @@ public class ManagementFacade {
                         && reservation.getEndDate().isBefore(startDate)
                         && reservation.getStartDate().isBefore(endDate)
                         && reservation.getEndDate().isBefore(endDate)
-        ).collect(Collectors.toList());
+        ).toList();
 
         if (reservationList.isEmpty()) {
             return carFacade.findAllCars().stream().toList();
@@ -95,10 +95,10 @@ public class ManagementFacade {
         processingPayment(customerDTO, foundsTotal);
 
         ManagementReservation reservation = new ManagementReservation.ManagementReservationBuilder()
-                .reservationId(new String(String.valueOf(
+                .reservationId(
                         LocalDate.now() + " " +
                                 customerDTO.getName() + " " +
-                                UUID.randomUUID().toString().substring(0, 8))))
+                                UUID.randomUUID().toString().substring(0, 8))
                 .customerEmail(customerEmail)
                 .carId(carId)
                 .startDate(startRent)
@@ -126,7 +126,8 @@ public class ManagementFacade {
     public ManagementReservation findReservation(String reservationId) throws ReservationNotFoundException {
         Optional<ManagementReservation> reservation = managementReservationRepository.findByReservationId(reservationId);
         if (reservation.isPresent()) {
-            return reservation.get();
+            ManagementReservation reservationToReturn = reservation.get();
+            return reservationToReturn;
         } else {
             throw new ReservationNotFoundException(reservationId);
         }
