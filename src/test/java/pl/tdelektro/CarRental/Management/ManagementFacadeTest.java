@@ -6,7 +6,6 @@ import org.junit.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
 import pl.tdelektro.CarRental.Customer.CustomerDTO;
@@ -28,7 +27,6 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -167,7 +165,7 @@ public class ManagementFacadeTest {
         assertFalse(managementFacade.getReservations(statusString[1]).isEmpty());
         assertFalse(managementFacade.getReservations(statusString[2]).isEmpty());
         assertFalse(managementFacade.getReservations(statusString[3]).isEmpty());
-        assertThrows(ReservationNotFoundException.class, ()-> managementFacade.getReservations(statusString[4]));
+        assertThrows(ReservationNotFoundException.class, () -> managementFacade.getReservations(statusString[4]));
     }
 
     @Test

@@ -59,7 +59,6 @@ public class ManagementFacade {
         return reservationsCheck(reservations, startDate, endDate);
     }
 
-
     public List<CarDTO> reservationsCheck(Set<ManagementReservation> reservationSet, LocalDateTime startDate, LocalDateTime endDate) {
         List<ManagementReservation> reservationList = reservations.stream().filter(reservation ->
                 reservation.getStartDate().isBefore(startDate)
@@ -115,6 +114,8 @@ public class ManagementFacade {
     public void returnCar(String customerEmail, Integer carId, String reservationId) throws DocumentException, IOException {
 
         ManagementReservation reservationEnd = findReservation(reservationId);
+
+        //Checking that  CustomerDTO and CarDTO exist in repo
         CustomerDTO customerFromRepo = customerFacade.findCustomerByName(customerEmail);
         CarDTO carToReturn = carFacade.findCarById(carId);
         setReservationStatus(reservationEnd.getStartDate(), reservationEnd.getEndDate(), carId);
@@ -150,6 +151,7 @@ public class ManagementFacade {
     }
 
     ReservationStatus setReservationStatus(LocalDateTime startRent, LocalDateTime endRent, Integer carDtoId) {
+
         ReservationStatus reservationStatus;
 
         if (startRent.isBefore(LocalDateTime.now()) && endRent.isBefore(LocalDateTime.now())) {
@@ -199,6 +201,7 @@ public class ManagementFacade {
     }
 
     void startReservation(ManagementReservation reservation) {
+
         //Rest endpoint has ability to start
         ManagementReservation reservationFromRepo = findReservation(reservation.getReservationId());
         //Reservation can be started 2h before declared in reservation start time
