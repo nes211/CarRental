@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import pl.tdelektro.CarRental.Customer.CustomerDTO;
 import pl.tdelektro.CarRental.Customer.CustomerFacade;
+import pl.tdelektro.CarRental.Exception.CarNotAvailableException;
 import pl.tdelektro.CarRental.Exception.NotEnoughFoundsException;
 import pl.tdelektro.CarRental.Exception.ReservationManagementProblem;
 import pl.tdelektro.CarRental.Exception.ReservationNotFoundException;
@@ -85,6 +86,11 @@ public class ManagementFacade {
 
         float totalRentCost = calculateRentalFee(startRent, endRent, carDTO.getOneDayCost());
         float foundsTotal = customerDTO.getFunds() - totalRentCost;
+
+
+        if(!findAvailableCars(carId, startRent, endRent).isEmpty()){
+            throw new CarNotAvailableException(carId, startRent, endRent);
+        }
 
         if (foundsTotal < 0) {
             throw new NotEnoughFoundsException("Your account balance is insufficient by"

@@ -6,6 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
+import pl.tdelektro.CarRental.Exception.CarNotAvailableException;
 import pl.tdelektro.CarRental.Exception.CarNotFoundException;
 import pl.tdelektro.CarRental.Exception.CustomerNotFoundException;
 import pl.tdelektro.CarRental.Exception.ErrorResponse;
@@ -16,8 +17,9 @@ import java.util.Arrays;
 
 @ControllerAdvice
 class ApplicationExceptionHandler extends ResponseEntityExceptionHandler {
-
-    @ExceptionHandler({CarNotFoundException.class,
+    @ExceptionHandler({
+            CarNotFoundException.class,
+            CarNotAvailableException.class,
             CustomerNotFoundException.class,
             NotEnoughFoundsException.class,
             ReservationNotFoundException.class}
@@ -27,6 +29,7 @@ class ApplicationExceptionHandler extends ResponseEntityExceptionHandler {
 
         return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
     }
+
 
 
 }
