@@ -40,9 +40,9 @@ class ManagementController {
 
 
     @PostMapping("/start")
-    ResponseEntity<HttpStatus>startRegisteredReservation(@RequestBody ManagementReservation managementReservation){
-    managementFacade.startReservation(managementReservation);
-    return new ResponseEntity<>(HttpStatus.OK);
+    ResponseEntity<HttpStatus> startRegisteredReservation(@RequestBody ManagementReservation managementReservation) {
+        managementFacade.startReservation(managementReservation);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @PostMapping("/return")
@@ -55,21 +55,22 @@ class ManagementController {
     }
 
     @GetMapping("/find")
-    ResponseEntity<List<CarDTO>> findFilter(@Valid @RequestBody ManagementReservation reservationAvailable){
-        if(reservationAvailable.getCarId()!=null){
+    ResponseEntity<List<CarDTO>> findFilter(@Valid @RequestBody ManagementReservation reservationAvailable) {
+        if (reservationAvailable.getCarId() != null) {
             return new ResponseEntity<>(managementFacade.findAvailableCars
                     (
-                    reservationAvailable.getCarId(),
-                    reservationAvailable.getStartDate(),
-                    reservationAvailable.getEndDate()
+                            reservationAvailable.getCarId(),
+                            reservationAvailable.getStartDate(),
+                            reservationAvailable.getEndDate()
                     )
-                    ,HttpStatus.OK
+                    , HttpStatus.OK
             );
-        }else{
+        } else {
             return new ResponseEntity<>(managementFacade.findAvailableCars
                     (
-                    reservationAvailable.getStartDate(),
-                    reservationAvailable.getEndDate()
+                            reservationAvailable.getCarId(),
+                            reservationAvailable.getStartDate(),
+                            reservationAvailable.getEndDate()
                     )
                     , HttpStatus.OK);
         }

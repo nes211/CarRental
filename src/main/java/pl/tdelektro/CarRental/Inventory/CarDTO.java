@@ -33,6 +33,7 @@ public class CarDTO {
 
 
     public CarDTO (Car car){
+        this.id = car.getId();
         this.make = car.getMake();
         this.type = car.getType();
         this.model = car.getModel();

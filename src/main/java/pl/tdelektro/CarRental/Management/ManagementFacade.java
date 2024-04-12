@@ -24,6 +24,9 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import static java.util.stream.Collectors.*;
+import static java.util.stream.Collectors.toList;
+
 @Service
 @AllArgsConstructor
 public class ManagementFacade {
@@ -42,36 +45,51 @@ public class ManagementFacade {
         reservations.remove(reservation);
     }
 
-    public List<CarDTO> findAvailableCars(Integer carId, LocalDateTime startDate, LocalDateTime endDate) {
+    public boolean isCarAvailable(Integer carId, LocalDateTime startDate, LocalDateTime endDate) {
 
         Set<ManagementReservation> reservations = managementReservationRepository.findByCarIdAndStatusOrStatus(
                 carId,
                 ReservationStatus.PENDING,
                 ReservationStatus.ACTIVE
         );
-        return reservationsCheck(reservations, startDate, endDate);
+
+        boolean findStatus = reservationsCheck(reservations, startDate, endDate)
+                .stream().anyMatch(carDTO -> carDTO.getId() == carId);
+        return findStatus;
     }
 
-    public List<CarDTO> findAvailableCars(LocalDateTime startDate, LocalDateTime endDate) {
+    public List<CarDTO> findAvailableCars(Integer carId, LocalDateTime startDate, LocalDateTime endDate) {
         Set<ManagementReservation> reservations = managementReservationRepository.findByStatusOrStatus(
                 ReservationStatus.ACTIVE,
                 ReservationStatus.PENDING
         );
-        return reservationsCheck(reservations, startDate, endDate);
+
+        return reservationsCheck(reservations, startDate, endDate)
+                .stream()
+                .filter(carDTO -> carDTO.getId() == carId)
+                .toList();
     }
 
     public List<CarDTO> reservationsCheck(Set<ManagementReservation> reservationSet, LocalDateTime startDate, LocalDateTime endDate) {
-        List<ManagementReservation> reservationList = reservations.stream().filter(reservation ->
-                reservation.getStartDate().isBefore(startDate)
-                        && reservation.getEndDate().isBefore(startDate)
-                        && reservation.getStartDate().isBefore(endDate)
-                        && reservation.getEndDate().isBefore(endDate)
-        ).toList();
+        List<ManagementReservation> reservationList = new ArrayList<>();
+        reservationSet.stream()
+                .filter(reservation ->
+                        ((reservation.getStartDate().isBefore(startDate) ||
+                                reservation.getStartDate().isEqual(startDate))
+                                    && (reservation.getEndDate().isBefore(startDate) || reservation.getEndDate().isEqual(startDate))
+                                    && (reservation.getStartDate().isBefore(endDate) || reservation.getStartDate().isEqual(endDate))
+                                    && (reservation.getEndDate().isBefore(endDate) || reservation.getEndDate().isEqual(endDate))) == false
+                ).forEach(managementReservation -> reservationList.add(managementReservation));
 
         if (reservationList.isEmpty()) {
             return carFacade.findAllCars().stream().toList();
         } else {
-            return new ArrayList<>();
+            List<CarDTO>listOfAvailableCars = new ArrayList<>();
+            carFacade.findAllCars().stream().forEach(car -> listOfAvailableCars.add(car));
+//            reservationList.stream().forEach(reservation -> {
+//                listOfAvailableCars.stream().filter(carToRemove -> carToRemove.getId() == reservation.getCarId()).forEach(thisCar ->listOfAvailableCars.remove(thisCar));
+//            });
+            return listOfAvailableCars;
         }
     }
 
@@ -87,8 +105,9 @@ public class ManagementFacade {
         float totalRentCost = calculateRentalFee(startRent, endRent, carDTO.getOneDayCost());
         float foundsTotal = customerDTO.getFunds() - totalRentCost;
 
+        Boolean carIsAvailable = isCarAvailable(carId, startRent, endRent);
 
-        if(!findAvailableCars(carId, startRent, endRent).isEmpty()){
+        if (!carIsAvailable) {
             throw new CarNotAvailableException(carId, startRent, endRent);
         }
 
