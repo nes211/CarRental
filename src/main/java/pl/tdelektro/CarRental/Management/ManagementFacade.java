@@ -2,6 +2,7 @@ package pl.tdelektro.CarRental.Management;
 
 import com.itextpdf.text.DocumentException;
 import lombok.AllArgsConstructor;
+import org.springframework.data.relational.core.sql.In;
 import org.springframework.stereotype.Service;
 import pl.tdelektro.CarRental.Customer.CustomerDTO;
 import pl.tdelektro.CarRental.Customer.CustomerFacade;
@@ -76,21 +77,30 @@ public class ManagementFacade {
                 .filter(reservation ->
                         ((reservation.getStartDate().isBefore(startDate) ||
                                 reservation.getStartDate().isEqual(startDate))
-                                    && (reservation.getEndDate().isBefore(startDate) || reservation.getEndDate().isEqual(startDate))
-                                    && (reservation.getStartDate().isBefore(endDate) || reservation.getStartDate().isEqual(endDate))
-                                    && (reservation.getEndDate().isBefore(endDate) || reservation.getEndDate().isEqual(endDate))) == false
+                                && (reservation.getEndDate().isBefore(startDate) || reservation.getEndDate().isEqual(startDate))
+                                && (reservation.getStartDate().isBefore(endDate) || reservation.getStartDate().isEqual(endDate))
+                                && (reservation.getEndDate().isBefore(endDate) || reservation.getEndDate().isEqual(endDate))) == false
                 ).forEach(managementReservation -> reservationList.add(managementReservation));
 
         if (reservationList.isEmpty()) {
             return carFacade.findAllCars().stream().toList();
         } else {
-            List<CarDTO>listOfAvailableCars = new ArrayList<>();
-            carFacade.findAllCars().stream().forEach(car -> listOfAvailableCars.add(car));
-//            reservationList.stream().forEach(reservation -> {
-//                listOfAvailableCars.stream().filter(carToRemove -> carToRemove.getId() == reservation.getCarId()).forEach(thisCar ->listOfAvailableCars.remove(thisCar));
-//            });
-            return listOfAvailableCars;
+            Set<CarDTO> setOfAvailableCars = carFacade.findAllCars().stream().collect(toSet());
+            Set<Integer> carSetFromReservation = new HashSet<>();
+
+            reservationList.stream().forEach(carFromReservation -> {
+                carSetFromReservation.add(carFromReservation.getCarId());
+            });
+            for(CarDTO car : setOfAvailableCars){
+                for (int valueFromReservation : carSetFromReservation){
+                    if(car.getId() == valueFromReservation){
+                        setOfAvailableCars.remove(car);
+                    }
+                }
+            }
+            return setOfAvailableCars.stream().toList();
         }
+
     }
 
     public ManagementReservationDTO rentCar(
