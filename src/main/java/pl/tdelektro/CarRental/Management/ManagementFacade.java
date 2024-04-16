@@ -115,18 +115,19 @@ public class ManagementFacade {
         float totalRentCost = calculateRentalFee(startRent, endRent, carDTO.getOneDayCost());
         float foundsTotal = customerDTO.getFunds() - totalRentCost;
 
+        if (foundsTotal < 0) {
+            throw new NotEnoughFoundsException("Your account balance is insufficient by"
+                    + foundsTotal + ". Please recharge your account.");
+        }
+
         Boolean carIsAvailable = isCarAvailable(carId, startRent, endRent);
 
         if (!carIsAvailable) {
             throw new CarNotAvailableException(carId, startRent, endRent);
         }
 
-        if (foundsTotal < 0) {
-            throw new NotEnoughFoundsException("Your account balance is insufficient by"
-                    + foundsTotal + ". Please recharge your account.");
-        }
 
-        processingPayment(customerDTO, foundsTotal);
+        processingPayment(customerDTO, totalRentCost);
 
         ManagementReservation reservation = new ManagementReservation.ManagementReservationBuilder()
                 .reservationId(
@@ -150,7 +151,7 @@ public class ManagementFacade {
 
         ManagementReservation reservationEnd = findReservation(reservationId);
 
-        //Checking that  CustomerDTO and CarDTO exist in repo
+        //Checking that  CustomerDTO and CarDTO exist in repo only for exceptions
         CustomerDTO customerFromRepo = customerFacade.findCustomerByName(customerEmail);
         CarDTO carToReturn = carFacade.findCarById(carId);
         setReservationStatus(reservationEnd.getStartDate(), reservationEnd.getEndDate(), carId);
@@ -174,9 +175,9 @@ public class ManagementFacade {
         return ChronoUnit.DAYS.between(startRent, endRent) * oneDayCost;
     }
 
-    public boolean processingPayment(CustomerDTO customerFromRepo, float founds) {
-
-        customerFromRepo.setFunds(customerFromRepo.getFunds() - founds);
+    public boolean processingPayment(CustomerDTO customerFromRepo, float rentCost) {
+        float moneyToSave = customerFromRepo.getFunds() - rentCost;
+        customerFromRepo.setFunds(moneyToSave);
         return customerFacade.editCustomer(customerFromRepo);
     }
 
@@ -247,8 +248,8 @@ public class ManagementFacade {
             throw new ReservationManagementProblem(
                     """
                             Reservation starts too early.
-                            API accepts rent start only 2h before reservation date.
-                            If its needed place new earlier reservation.
+                            API accepts start rent only 2h before reservation date.
+                            If its needed edit reservation.
                             """);
         }
     }

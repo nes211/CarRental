@@ -1,14 +1,6 @@
 package pl.tdelektro.CarRental.Customer;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
-import org.hibernate.annotations.JdbcTypeCode;
-import org.hibernate.type.SqlTypes;
 
 public class CustomerDTO {
 
@@ -23,7 +15,6 @@ public class CustomerDTO {
     Float funds;
     @JsonIgnore
     String token;
-
 
     CustomerDTO(Customer customer) {
         this.name = customer.getName();
@@ -45,9 +36,6 @@ public class CustomerDTO {
     CustomerDTO setToken(String token) {
         this.token = token;
         return this;
-    }
-
-    CustomerDTO() {
     }
 
     public int getId() {
