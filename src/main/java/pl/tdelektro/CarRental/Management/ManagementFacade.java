@@ -2,7 +2,6 @@ package pl.tdelektro.CarRental.Management;
 
 import com.itextpdf.text.DocumentException;
 import lombok.AllArgsConstructor;
-import org.springframework.data.relational.core.sql.In;
 import org.springframework.stereotype.Service;
 import pl.tdelektro.CarRental.Customer.CustomerDTO;
 import pl.tdelektro.CarRental.Customer.CustomerFacade;
@@ -25,8 +24,7 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-import static java.util.stream.Collectors.*;
-import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.toSet;
 
 @Service
 @AllArgsConstructor
