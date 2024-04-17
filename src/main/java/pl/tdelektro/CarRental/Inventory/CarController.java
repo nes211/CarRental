@@ -27,16 +27,6 @@ class CarController {
         return new ResponseEntity<>(carFacade.findAllCars(), HttpStatus.OK);
     }
 
-    @GetMapping("/{carId}")
-    ResponseEntity<CarDTO> getCarById(@PathVariable Integer carId) {
-        Optional<Car> car = carRepository.findById(carId);
-        if(car.isPresent()) {
-            return new ResponseEntity<>(new CarDTO(car.get()), HttpStatus.OK);
-        }else{
-            throw new CarNotFoundException(carId);
-        }
-    }
-
     @PostMapping("/addNew")
     ResponseEntity addNewCar(@RequestBody Car car) {
         carRepository.save(car);

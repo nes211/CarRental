@@ -27,6 +27,8 @@ class AuthenticateService {
                 .role(Role.USER)
                 .build();
 
+        customerRepository.save(customer);
+
         var jwtToken = jwtService.generateToken(customer);
 
         return AuthenticationResponse.builder()

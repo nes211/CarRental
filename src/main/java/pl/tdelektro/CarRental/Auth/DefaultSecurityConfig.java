@@ -57,8 +57,12 @@ class DefaultSecurityConfig{
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests((authorize) -> authorize
                         .requestMatchers("/auth/**").permitAll()
+                        .requestMatchers("/authenticate/**").permitAll()
+                        .requestMatchers("/authenticate").permitAll()
                         .requestMatchers(HttpMethod.GET).hasAnyAuthority("ADMIN", "USER")
+                        .requestMatchers(HttpMethod.GET).hasAnyRole("ADMIN", "USER")
                         .requestMatchers(HttpMethod.GET,"/car/**", "/customer/**").hasAnyAuthority("ADMIN", "USER")
+                        .requestMatchers(HttpMethod.GET,"/car/**", "/customer/**").hasAnyRole("ADMIN", "USER")
                         .requestMatchers(HttpMethod.POST, "/car/**", "/customer/**").hasAnyAuthority("ADMIN")
                         .requestMatchers(HttpMethod.PUT).hasAnyAuthority("ADMIN", "USER")
                         .requestMatchers(HttpMethod.DELETE).hasAnyAuthority("ADMIN", "USER")

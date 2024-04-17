@@ -98,7 +98,6 @@ public class ManagementFacade {
             }
             return setOfAvailableCars.stream().toList();
         }
-
     }
 
     public ManagementReservationDTO rentCar(
@@ -123,7 +122,6 @@ public class ManagementFacade {
         if (!carIsAvailable) {
             throw new CarNotAvailableException(carId, startRent, endRent);
         }
-
 
         processingPayment(customerDTO, totalRentCost);
 

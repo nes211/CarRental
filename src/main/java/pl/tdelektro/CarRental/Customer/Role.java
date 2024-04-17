@@ -1,6 +1,6 @@
 package pl.tdelektro.CarRental.Customer;
 
-enum Role {
+public enum Role {
     USER,
     ADMIN
 }
