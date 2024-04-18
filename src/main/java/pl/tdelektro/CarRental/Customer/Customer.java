@@ -21,6 +21,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -43,20 +44,24 @@ public class Customer implements UserDetails {
     @Email
     private String emailAddress;
     private String phoneNumber;
-    @Enumerated(EnumType.STRING)
-    private Role role;
+    //@Enumerated(EnumType.STRING)
+    private String role;
+    Collection<? extends GrantedAuthority> authorities;
     private Float funds;
 
     Customer(String emailAddress, String password) {
         this.name = emailAddress;
         this.emailAddress = emailAddress;
         this.password = password;
-        this.role = Role.USER;
+        this.role = "ROLE_USER";
+        List<GrantedAuthority> auths = new ArrayList<>();
+        auths.add(new SimpleGrantedAuthority("ROLE_USER"));
+        this.authorities = auths;
     }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of(new SimpleGrantedAuthority("USER"));
+        return List.of(new SimpleGrantedAuthority("ROLE_USER"));
     }
 
     @Override

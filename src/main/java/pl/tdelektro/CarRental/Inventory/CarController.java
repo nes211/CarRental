@@ -3,6 +3,7 @@ package pl.tdelektro.CarRental.Inventory;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -22,6 +23,7 @@ class CarController {
     private final CarRepository carRepository;
     private final CarFacade carFacade;
 
+    @PreAuthorize("hasAuthority('USER')")
     @GetMapping
     ResponseEntity<Set<CarDTO>> getAvailableCars() {
         return new ResponseEntity<>(carFacade.findAllCars(), HttpStatus.OK);

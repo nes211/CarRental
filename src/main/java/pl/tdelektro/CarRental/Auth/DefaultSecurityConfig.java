@@ -10,6 +10,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationEventPublisher;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.DefaultAuthenticationEventPublisher;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -37,14 +38,6 @@ class DefaultSecurityConfig{
     }
 
     @Bean
-    @ConditionalOnMissingBean(UserDetailsService.class)
-    InMemoryUserDetailsManager inMemoryUserDetailsManager() {
-        String generatedPassword = passwordEncoder().encode("user");
-        return new InMemoryUserDetailsManager(User.withUsername("user")
-                .password(generatedPassword).roles("USER").build());
-    }
-
-    @Bean
     @ConditionalOnMissingBean(AuthenticationEventPublisher.class)
     DefaultAuthenticationEventPublisher defaultAuthenticationEventPublisher(ApplicationEventPublisher delegate) {
         return new DefaultAuthenticationEventPublisher(delegate);
@@ -57,13 +50,8 @@ class DefaultSecurityConfig{
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests((authorize) -> authorize
                         .requestMatchers("/auth/**").permitAll()
-                        .requestMatchers("/authenticate/**").permitAll()
-                        .requestMatchers("/authenticate").permitAll()
-                        .requestMatchers(HttpMethod.GET).hasAnyAuthority("ADMIN", "USER")
-                        .requestMatchers(HttpMethod.GET).hasAnyRole("ADMIN", "USER")
-                        .requestMatchers(HttpMethod.GET,"/car/**", "/customer/**").hasAnyAuthority("ADMIN", "USER")
                         .requestMatchers(HttpMethod.GET,"/car/**", "/customer/**").hasAnyRole("ADMIN", "USER")
-                        .requestMatchers(HttpMethod.POST, "/car/**", "/customer/**").hasAnyAuthority("ADMIN")
+                        .requestMatchers(HttpMethod.POST, "/car/**", "/customer/**").hasAnyRole("ADMIN", "USER")
                         .requestMatchers(HttpMethod.PUT).hasAnyAuthority("ADMIN", "USER")
                         .requestMatchers(HttpMethod.DELETE).hasAnyAuthority("ADMIN", "USER")
                         .anyRequest().authenticated())
