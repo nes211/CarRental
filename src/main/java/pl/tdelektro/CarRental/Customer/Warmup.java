@@ -6,6 +6,8 @@ import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
+import java.util.Collections;
+
 @Component("customerWarmup")
 @AllArgsConstructor
 class Warmup implements ApplicationListener<ContextRefreshedEvent> {
@@ -33,8 +35,6 @@ class Warmup implements ApplicationListener<ContextRefreshedEvent> {
                     .funds(10000.2f)
                     .role("ROLE_USER")
                     .build());
-
         }
-
     }
 }

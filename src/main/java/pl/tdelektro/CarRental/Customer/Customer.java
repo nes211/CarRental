@@ -23,7 +23,9 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @Table(name = "customer")
@@ -46,22 +48,28 @@ public class Customer implements UserDetails {
     private String phoneNumber;
     //@Enumerated(EnumType.STRING)
     private String role;
-    Collection<? extends GrantedAuthority> authorities;
+    private Collection<? extends GrantedAuthority> authorities;
     private Float funds;
 
     Customer(String emailAddress, String password) {
         this.name = emailAddress;
         this.emailAddress = emailAddress;
         this.password = password;
-        this.role = "ROLE_USER";
+        this.role ="USER";
         List<GrantedAuthority> auths = new ArrayList<>();
+        auths.add(new SimpleGrantedAuthority("USER"));
         auths.add(new SimpleGrantedAuthority("ROLE_USER"));
         this.authorities = auths;
     }
 
+    public Customer setAuthorities(Collection<? extends GrantedAuthority> authorities) {
+        this.authorities = authorities;
+        return this;
+    }
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of(new SimpleGrantedAuthority("ROLE_USER"));
+        return List.of(new SimpleGrantedAuthority("ADMIN"));
     }
 
     @Override

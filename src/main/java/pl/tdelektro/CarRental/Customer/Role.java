@@ -1,10 +1,21 @@
 //package pl.tdelektro.CarRental.Customer;
 //
-//public enum Role {
-//    USER("ROLE_USER"),
-//    ADMIN("ROLE_ADMIN");
+//import org.springframework.security.core.GrantedAuthority;
 //
-//    Role(String value) {
-//       this.value = value;
+//public class Role implements GrantedAuthority {
+//    Role(String authority) {
+//        this.authority = authority;
+//    }
+//
+//    private String authority;
+//
+//    Role setAuthority(String authority) {
+//        this.authority = authority;
+//        return this;
+//    }
+//
+//    @Override
+//    public String getAuthority() {
+//        return ;
 //    }
 //}

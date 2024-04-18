@@ -8,6 +8,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationEventPublisher;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.DefaultAuthenticationEventPublisher;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -43,6 +44,12 @@ class DefaultSecurityConfig{
         return new DefaultAuthenticationEventPublisher(delegate);
     }
 
+//    @Bean
+//    public AuthenticationManager authManager(UserDetailsService)
+//
+//
+
+
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
@@ -50,8 +57,8 @@ class DefaultSecurityConfig{
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests((authorize) -> authorize
                         .requestMatchers("/auth/**").permitAll()
-                        .requestMatchers(HttpMethod.GET,"/car/**", "/customer/**").hasAnyRole("ADMIN", "USER")
-                        .requestMatchers(HttpMethod.POST, "/car/**", "/customer/**").hasAnyRole("ADMIN", "USER")
+                        .requestMatchers(HttpMethod.GET,"/car/**", "/customer/**").hasAnyAuthority("ADMIN", "USER")
+                        .requestMatchers(HttpMethod.POST, "/car/**", "/customer/**").hasAnyAuthority("ADMIN", "USER")
                         .requestMatchers(HttpMethod.PUT).hasAnyAuthority("ADMIN", "USER")
                         .requestMatchers(HttpMethod.DELETE).hasAnyAuthority("ADMIN", "USER")
                         .anyRequest().authenticated())
@@ -64,4 +71,5 @@ class DefaultSecurityConfig{
 
         return http.build();
     }
+
 }

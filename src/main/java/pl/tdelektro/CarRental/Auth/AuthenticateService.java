@@ -11,8 +11,9 @@ import pl.tdelektro.CarRental.Customer.Customer;
 import pl.tdelektro.CarRental.Customer.CustomerRepository;
 
 import java.util.ArrayList;
-import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
@@ -23,15 +24,18 @@ class AuthenticateService {
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
     List<GrantedAuthority> auths = new ArrayList<>();
+    Set<String> roleSet = new HashSet<>();
 
     AuthenticationResponse register(RegisterRequest request) {
         auths.add(new SimpleGrantedAuthority("USER"));
+        auths.add(new SimpleGrantedAuthority("ROLE_USER"));
+
         var customer = Customer.builder()
                 .name(request.getName())
                 .emailAddress(request.getEmailAddress())
                 .password(passwordEncoder.encode(request.getPassword()))
-                .role("ROLE_USER")
-                .authorities(Collections.singleton(new SimpleGrantedAuthority("ROLE_USER")))
+                .role("USER")
+                .authorities(auths)
                 .build();
 
         customerRepository.save(customer);
