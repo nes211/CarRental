@@ -29,7 +29,6 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @AllArgsConstructor
 class DefaultSecurityConfig{
 
-
     private final JwtAuthenticationFilter jwtAuthFilter;
     private final AuthenticationProvider authenticationProvider;
 
@@ -44,12 +43,6 @@ class DefaultSecurityConfig{
         return new DefaultAuthenticationEventPublisher(delegate);
     }
 
-//    @Bean
-//    public AuthenticationManager authManager(UserDetailsService)
-//
-//
-
-
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
@@ -59,8 +52,8 @@ class DefaultSecurityConfig{
                         .requestMatchers("/auth/**").permitAll()
                         .requestMatchers(HttpMethod.GET,"/car/**", "/customer/**").hasAnyAuthority("ADMIN", "USER")
                         .requestMatchers(HttpMethod.POST, "/car/**", "/customer/**").hasAnyAuthority("ADMIN", "USER")
-                        .requestMatchers(HttpMethod.PUT).hasAnyAuthority("ADMIN", "USER")
-                        .requestMatchers(HttpMethod.DELETE).hasAnyAuthority("ADMIN", "USER")
+                        .requestMatchers(HttpMethod.PUT).hasAuthority("ADMIN")
+                        .requestMatchers(HttpMethod.DELETE).hasAuthority("ADMIN")
                         .anyRequest().authenticated())
                 .sessionManagement(session->
                     session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
@@ -68,8 +61,6 @@ class DefaultSecurityConfig{
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
                 .httpBasic(Customizer.withDefaults())
                 .formLogin(Customizer.withDefaults());
-
         return http.build();
     }
-
 }

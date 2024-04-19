@@ -25,7 +25,7 @@ class Warmup implements ApplicationListener<ContextRefreshedEvent> {
                     .emailAddress("dawid@tdelektro.pl")
                     .password(passwordEncoder.encode("dawid"))
                     .funds(10000.2f)
-                    .role("ROLE_USER")
+                    .role(Role.USER)
                     .build());
 
             customerRepository.save(new Customer.CustomerBuilder()
@@ -33,7 +33,7 @@ class Warmup implements ApplicationListener<ContextRefreshedEvent> {
                     .emailAddress("tom@tdelektro.pl")
                     .password(passwordEncoder.encode("tom"))
                     .funds(10000.2f)
-                    .role("ROLE_USER")
+                    .role(Role.USER)
                     .build());
         }
     }

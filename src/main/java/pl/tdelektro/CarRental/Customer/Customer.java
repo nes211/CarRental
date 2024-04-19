@@ -12,6 +12,7 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -30,6 +31,7 @@ import java.util.Set;
 @Entity
 @Table(name = "customer")
 @Builder
+@Data
 @AllArgsConstructor
 @NoArgsConstructor
 public class Customer implements UserDetails {
@@ -46,19 +48,19 @@ public class Customer implements UserDetails {
     @Email
     private String emailAddress;
     private String phoneNumber;
-    //@Enumerated(EnumType.STRING)
-    private String role;
+    @Enumerated(EnumType.STRING)
+    private Role role;
     private Collection<? extends GrantedAuthority> authorities;
     private Float funds;
 
-    Customer(String emailAddress, String password) {
+    Customer(String emailAddress, String password, Role role) {
         this.name = emailAddress;
         this.emailAddress = emailAddress;
         this.password = password;
-        this.role ="USER";
+        this.role = role;
         List<GrantedAuthority> auths = new ArrayList<>();
-        auths.add(new SimpleGrantedAuthority("USER"));
-        auths.add(new SimpleGrantedAuthority("ROLE_USER"));
+        auths.add(new SimpleGrantedAuthority(role.name()));
+
         this.authorities = auths;
     }
 
@@ -69,7 +71,7 @@ public class Customer implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of(new SimpleGrantedAuthority("ADMIN"));
+        return List.of(new SimpleGrantedAuthority(role.name()));
     }
 
     @Override
