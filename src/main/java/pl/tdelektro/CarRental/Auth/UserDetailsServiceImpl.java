@@ -5,17 +5,15 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Component;
-import pl.tdelektro.CarRental.Customer.CustomerRepository;
+import pl.tdelektro.CarRental.Customer.CustomerFacade;
 
 @Component
 @AllArgsConstructor
-public class UserDetailsServiceImpl implements UserDetailsService {
-    CustomerRepository customerRepository;
+class UserDetailsServiceImpl implements UserDetailsService {
+    CustomerFacade customerFacade;
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        return customerRepository
-                .findByEmailAddress(username)
-                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+        return customerFacade.findCustomerForUserDetails(username);
     }
 }

@@ -23,7 +23,6 @@ class CarController {
     private final CarRepository carRepository;
     private final CarFacade carFacade;
 
-
     @GetMapping
     ResponseEntity<Set<CarDTO>> getAvailableCars() {
         return new ResponseEntity<>(carFacade.findAllCars(), HttpStatus.OK);

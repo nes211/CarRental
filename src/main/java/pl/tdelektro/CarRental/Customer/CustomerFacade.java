@@ -1,6 +1,7 @@
 package pl.tdelektro.CarRental.Customer;
 
 import lombok.AllArgsConstructor;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -9,22 +10,25 @@ import pl.tdelektro.CarRental.Exception.CustomerNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Supplier;
 
 @Service
 @AllArgsConstructor
 public class CustomerFacade {
 
     private final CustomerRepository customerRepository;
-    private final BCryptPasswordEncoder bCryptPasswordEncoder;
+    //private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
     public void addNewCustomer(Customer customer) {
         Optional<Customer> customerCheck = customerRepository.findByEmailAddress(customer.getEmailAddress());
         if (customerCheck.isEmpty()) {
             Customer customerToSave = new Customer.CustomerBuilder()
                     .name(customer.getEmailAddress())
-                    .password(bCryptPasswordEncoder.encode(customer.getPassword()))
+                    .password(new BCryptPasswordEncoder().encode(customer.getPassword()))
                     .emailAddress(customer.getEmailAddress())
                     .funds(customer.getFunds())
+                    .role(customer.getRole())
+                    .authorities(customer.getAuthorities())
                     .build();
             customerRepository.save(customerToSave);
         }
@@ -62,6 +66,11 @@ public class CustomerFacade {
         }
     }
 
+    public UserDetails findCustomerForUserDetails(String emailAddress) {
+        return customerRepository.findByEmailAddress(emailAddress)
+                .orElseThrow(()-> new CustomerNotFoundException("Customer with " + emailAddress +"not found in repo"));
+    }
+
     public CustomerDTO findCustomerByName(String customerEmail) {
         Optional<Customer> optional = customerRepository.findByEmailAddress(customerEmail);
         if (optional.isEmpty()) {
@@ -77,5 +86,16 @@ public class CustomerFacade {
             throw new UsernameNotFoundException("Customer not found in repository");
         }
 
+    }
+
+    public Customer addNewCustomerWithData(String name, String emailAddress, String password, String role) {
+        var customer = Customer.builder()
+                .name(name)
+                .emailAddress(emailAddress)
+                .password(password)
+                .role(role)
+                .build();
+        customerRepository.save(customer);
+        return customer;
     }
 }

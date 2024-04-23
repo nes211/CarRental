@@ -34,7 +34,7 @@ import java.util.Set;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class Customer implements UserDetails {
+class Customer implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
@@ -48,19 +48,18 @@ public class Customer implements UserDetails {
     @Email
     private String emailAddress;
     private String phoneNumber;
-    @Enumerated(EnumType.STRING)
-    private Role role;
+    //@Enumerated(EnumType.STRING)
+    private String role;
     private Collection<? extends GrantedAuthority> authorities;
     private Float funds;
 
-    Customer(String emailAddress, String password, Role role) {
+    Customer(String emailAddress, String password, String role) {
         this.name = emailAddress;
         this.emailAddress = emailAddress;
         this.password = password;
         this.role = role;
         List<GrantedAuthority> auths = new ArrayList<>();
-        auths.add(new SimpleGrantedAuthority(role.name()));
-
+        auths.add(new SimpleGrantedAuthority(role));
         this.authorities = auths;
     }
 
@@ -71,7 +70,7 @@ public class Customer implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of(new SimpleGrantedAuthority(role.name()));
+        return List.of(new SimpleGrantedAuthority(role));
     }
 
     @Override
