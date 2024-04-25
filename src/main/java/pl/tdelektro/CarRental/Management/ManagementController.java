@@ -24,7 +24,6 @@ class ManagementController {
 
     private final ManagementFacade managementFacade;
 
-
     @PostMapping("/rent")
     ResponseEntity<ManagementReservationDTO> rentCar(
             @RequestBody ManagementReservation managementReservation) {
@@ -37,7 +36,6 @@ class ManagementController {
                         managementReservation.getCarId()
                 ), HttpStatus.CREATED);
     }
-
 
     @PostMapping("/start")
     ResponseEntity<HttpStatus> startRegisteredReservation(@RequestBody ManagementReservation managementReservation) {

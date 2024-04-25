@@ -6,6 +6,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import pl.tdelektro.CarRental.Customer.Customer;
 import pl.tdelektro.CarRental.Customer.CustomerFacade;
 
 @Service
@@ -18,6 +19,8 @@ class AuthenticateService {
     private final AuthenticationManager authenticationManager;
 
     AuthenticationResponse register(RegisterRequest request) {
+
+        //customerFacade.findCustomer(new Customer(request.getName(), request.getEmailAddress(), request.getPassword()));
         var customer = customerFacade.addNewCustomerWithData(
                 request.getName(),
                 request.getEmailAddress(),

@@ -17,7 +17,6 @@ import java.util.function.Supplier;
 public class CustomerFacade {
 
     private final CustomerRepository customerRepository;
-    //private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
     public void addNewCustomer(Customer customer) {
         Optional<Customer> customerCheck = customerRepository.findByEmailAddress(customer.getEmailAddress());
@@ -34,6 +33,22 @@ public class CustomerFacade {
         }
     }
 
+    //Second add new Customer because auth service doesn't have access to class Customer
+    public Customer addNewCustomerWithData(String name, String emailAddress, String password, String role) {
+        var customer = Customer.builder()
+                .name(name)
+                .emailAddress(emailAddress)
+                .password(password)
+                .role(role)
+                .build();
+        customerRepository.save(customer);
+        return customer;
+    }
+
+    public void addNewCustomerForTest(Customer customer){
+        customerRepository.save(customer);
+    }
+
     public boolean editCustomer(CustomerDTO customerDto) {
         Customer customer = unwrapCustomer(customerRepository.findByEmailAddress(customerDto.emailAddress));
         customer.setEmailAddress(customerDto.emailAddress);
@@ -41,6 +56,10 @@ public class CustomerFacade {
         customer.setFunds(customerDto.funds);
         customerRepository.save(customer);
         return true;
+    }
+
+    public void deleteCustomer (Customer customer){
+        customerRepository.delete(customer);
     }
 
     public List<CustomerDTO> getAllCustomers() {
@@ -66,11 +85,6 @@ public class CustomerFacade {
         }
     }
 
-    public UserDetails findCustomerForUserDetails(String emailAddress) {
-        return customerRepository.findByEmailAddress(emailAddress)
-                .orElseThrow(()-> new CustomerNotFoundException("Customer with " + emailAddress +"not found in repo"));
-    }
-
     public CustomerDTO findCustomerByName(String customerEmail) {
         Optional<Customer> optional = customerRepository.findByEmailAddress(customerEmail);
         if (optional.isEmpty()) {
@@ -79,23 +93,16 @@ public class CustomerFacade {
         return new CustomerDTO(optional.get());
     }
 
+    public UserDetails findCustomerForUserDetails(String emailAddress) {
+        return customerRepository.findByEmailAddress(emailAddress)
+                .orElseThrow(()-> new CustomerNotFoundException("Customer with " + emailAddress +"not found in repo"));
+    }
+
     Customer unwrapCustomer(Optional<Customer> customer) {
         if (customer.isPresent()) {
             return customer.get();
         } else {
             throw new UsernameNotFoundException("Customer not found in repository");
         }
-
-    }
-
-    public Customer addNewCustomerWithData(String name, String emailAddress, String password, String role) {
-        var customer = Customer.builder()
-                .name(name)
-                .emailAddress(emailAddress)
-                .password(password)
-                .role(role)
-                .build();
-        customerRepository.save(customer);
-        return customer;
     }
 }

@@ -11,7 +11,6 @@ public class CustomerDTO {
     @JsonIgnore
     String password;
     String emailAddress;
-    @JsonIgnore
     Float funds;
     @JsonIgnore
     String token;

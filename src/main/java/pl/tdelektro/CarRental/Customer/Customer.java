@@ -2,8 +2,6 @@ package pl.tdelektro.CarRental.Customer;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -13,9 +11,7 @@ import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
-import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 import org.springframework.security.core.GrantedAuthority;
@@ -24,9 +20,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 @Entity
 @Table(name = "customer")
@@ -34,7 +28,7 @@ import java.util.Set;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-class Customer implements UserDetails {
+public class Customer implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
@@ -48,12 +42,11 @@ class Customer implements UserDetails {
     @Email
     private String emailAddress;
     private String phoneNumber;
-    //@Enumerated(EnumType.STRING)
     private String role;
     private Collection<? extends GrantedAuthority> authorities;
     private Float funds;
 
-    Customer(String emailAddress, String password, String role) {
+private Customer(String emailAddress, String password, String role) {
         this.name = emailAddress;
         this.emailAddress = emailAddress;
         this.password = password;
@@ -61,6 +54,7 @@ class Customer implements UserDetails {
         List<GrantedAuthority> auths = new ArrayList<>();
         auths.add(new SimpleGrantedAuthority(role));
         this.authorities = auths;
+        this.funds = 0.0f;
     }
 
     public Customer setAuthorities(Collection<? extends GrantedAuthority> authorities) {
