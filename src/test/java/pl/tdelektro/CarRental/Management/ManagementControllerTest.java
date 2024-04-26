@@ -1,80 +1,59 @@
 package pl.tdelektro.CarRental.Management;
 
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
-import io.jsonwebtoken.io.Decoders;
-import io.jsonwebtoken.security.Keys;
 import io.restassured.RestAssured;
+import io.restassured.http.ContentType;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.junit4.SpringRunner;
-import pl.tdelektro.CarRental.Customer.CustomerFacade;
-
-import java.security.Key;
-import java.util.Date;
-import java.util.HashMap;
+import pl.tdelektro.CarRental.Auth.AuthGeneration;
 
 import static io.restassured.RestAssured.given;
 
 @RunWith(SpringRunner.class)
-@SpringBootTest
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class ManagementControllerTest {
 
-    @Autowired
-    private CustomerFacade customerFacade;
-    @Autowired
-    PasswordEncoder passwordEncoder;
-    private String authToken;
 
-
-    private static final String SECRET_KEY = "4ecb24cec525eccd07ef06c6d410ab3cb6847445d0f53ea7a26e09297b8fd4ab";
+    AuthGeneration authGeneration = new AuthGeneration();
 
     @Before
     public void warmup() {
-        customerFacade.addNewCustomerWithData(
-                "test@test.test",
-                "test@test.test",
-                passwordEncoder.encode("test"),
-                "USER");
-        authToken = Jwts.builder()
-                .setSubject("test@test.test")
-                .setClaims(new HashMap<>())
-                .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 24))
-                .signWith(getSignInKey(), SignatureAlgorithm.HS256)
-                .compact();
-        System.out.println(authToken);
         RestAssured.baseURI = "http://localhost:8080";
+        //authGeneration.warmup();
+        //authGeneration.generateTokenForTests();
     }
 
-//    @After
-//    public void clearTestData() {
-//        customerFacade.deleteCustomer((Customer) customerFacade.findCustomerForUserDetails("test@test.test"));
-//    }
-
-
-    private Key getSignInKey() {
-        byte[] keyBytes = Decoders.BASE64.decode(SECRET_KEY);
-        return Keys.hmacShaKeyFor(keyBytes);
+    @After
+    public void clearTempData(){
+        authGeneration.clearTestData();
     }
+
 
     @Test
-    public void serverIsWorking() {
+    public void testWithoutAuth() {
         RestAssured.basePath = "management/rent";
         given().when().get().then().log().all().statusCode(401);
     }
 
     @Test
-    public void getRentCar() {
-        //RestAssured.baseURI = "http://localhost:8080";
-        given().header("Authorization", "Barer " + authToken)
+    public void testWithAuth() {
+        String requestJson = "{\n" +
+                "    \"customerEmail\":\"tom@tdelektro.pl\",\n" +
+                "    \"startDate\":\"2024-05-05 10:22:00\",\n" +
+                "    \"endDate\":\"2024-05-11 10:22:00\",\n" +
+                "    \"carId\":\"5\"\n" +
+                "}";
+
+
+        given().header("Authorization", "Barer " + authGeneration.authToken)
+                .contentType(ContentType.JSON)
+                .body(requestJson)
                 .when()
-                .get("management/rent")
+                .post("management/rent")
                 .then()
-                .statusCode(200);
+                .statusCode(401);
     }
 }

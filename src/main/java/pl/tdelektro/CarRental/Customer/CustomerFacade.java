@@ -41,12 +41,12 @@ public class CustomerFacade {
                 .password(password)
                 .role(role)
                 .build();
-        customerRepository.save(customer);
+        if(customerRepository.findByEmailAddress(emailAddress).isEmpty()) {
+            customerRepository.save(customer);
+        }else{
+            throw new CustomerNotFoundException(customer.getUsername(), customer.getName());
+        }
         return customer;
-    }
-
-    public void addNewCustomerForTest(Customer customer){
-        customerRepository.save(customer);
     }
 
     public boolean editCustomer(CustomerDTO customerDto) {
