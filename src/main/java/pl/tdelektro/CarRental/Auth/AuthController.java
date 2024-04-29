@@ -21,8 +21,14 @@ class AuthController {
         return new ResponseEntity<AuthenticationResponse>(authenticateService.register(request), HttpStatus.OK);
     }
 
+    @PostMapping("/register/admin")
+    ResponseEntity<AuthenticationResponse> registerAdmin(@RequestBody RegisterRequest request) {
+        return new ResponseEntity<AuthenticationResponse>(authenticateService.registerAdmin(request), HttpStatus.OK);
+    }
+
+
     @PostMapping("/authenticate")
-    ResponseEntity<AuthenticationResponse> authenticateCustomer(@RequestBody AuthenticationRequest request) {
+    ResponseEntity<AuthenticationResponse> authenticate(@RequestBody AuthenticationRequest request) {
         return new ResponseEntity<AuthenticationResponse>(authenticateService.authenticate(request), HttpStatus.OK);
     }
 

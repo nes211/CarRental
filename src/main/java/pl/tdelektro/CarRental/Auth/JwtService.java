@@ -16,7 +16,7 @@ import java.util.Map;
 import java.util.function.Function;
 @Service
 class JwtService {
-@Value("${SECRET_KEY}")
+    @Value("${SECRET_KEY}")
     private String SECRET_KEY;
 
     String extractEmailAddress(String token) {

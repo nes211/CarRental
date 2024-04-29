@@ -33,7 +33,7 @@ public class CustomerFacade {
         }
     }
 
-    //Second add new Customer because auth service doesn't have access to class Customer
+    //Second methode add new Customer because auth service doesn't have access to class Customer
     public Customer addNewCustomerWithData(String name, String emailAddress, String password, String role) {
         var customer = Customer.builder()
                 .name(name)

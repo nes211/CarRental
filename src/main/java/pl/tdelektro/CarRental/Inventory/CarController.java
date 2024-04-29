@@ -3,6 +3,7 @@ package pl.tdelektro.CarRental.Inventory;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -34,6 +35,12 @@ class CarController {
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
+    @DeleteMapping("/{carId}")
+    ResponseEntity deleteCar(@PathVariable Integer carId) {
+        Car car = carRepository.findById(carId).get();
+        carRepository.delete(car);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
     @GetMapping("/{carId}")
     ResponseEntity<CarDTO> findCar(@PathVariable Integer carId) throws Throwable {
         CarDTO car = new CarDTO(carRepository.findById(carId)

@@ -50,7 +50,7 @@ public class CarFacade {
     }
 
 
-    private void removeCar(Integer carId) {
+    public void removeCar(Integer carId) {
         carRepository.delete(unwrapCar(carId));
     }
 

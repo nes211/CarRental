@@ -29,10 +29,8 @@ class Car {
     private int modelYear;
     private float oneDayCost;
     private boolean isAvailable;
-    //private Set<ManagementReservationDTO> reservationSet;
 
-    Car(Integer id, String make, String model, String type, int modelYear,float oneDayCost, boolean isAvailable) {
-        this.id = id;
+    Car(Integer cadId, String make, String model, String type, int modelYear,float oneDayCost, boolean isAvailable) {
         this.make = make;
         this.model = model;
         this.type = type;
@@ -40,15 +38,6 @@ class Car {
         this.oneDayCost = oneDayCost;
         this.isAvailable = isAvailable;
     }
-
-//    Set<ManagementReservationDTO> getReservationSet() {
-//        return reservationSet;
-//    }
-
-//    Car setReservationSet(Set<ManagementReservationDTO> reservationSet) {
-//        this.reservationSet = reservationSet;
-//        return this;
-//    }
 
     Car setMake(String make) {
         this.make = make;

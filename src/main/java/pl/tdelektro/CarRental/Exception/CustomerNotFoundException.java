@@ -1,7 +1,5 @@
 package pl.tdelektro.CarRental.Exception;
 
-import pl.tdelektro.CarRental.Customer.Customer;
-
 public class CustomerNotFoundException extends RuntimeException{
     public CustomerNotFoundException(){
         super("There is no customer in repository");

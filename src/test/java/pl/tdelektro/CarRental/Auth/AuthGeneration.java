@@ -9,15 +9,7 @@ import io.restassured.http.ContentType;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.junit4.SpringRunner;
-import pl.tdelektro.CarRental.Customer.Customer;
-import pl.tdelektro.CarRental.Customer.CustomerFacade;
 
 import java.security.Key;
 import java.util.Date;
