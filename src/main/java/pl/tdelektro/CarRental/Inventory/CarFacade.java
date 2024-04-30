@@ -2,7 +2,6 @@ package pl.tdelektro.CarRental.Inventory;
 
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
-import pl.tdelektro.CarRental.Customer.CustomerFacade;
 import pl.tdelektro.CarRental.Exception.CarNotFoundException;
 
 import java.util.HashSet;
@@ -15,7 +14,7 @@ public class CarFacade {
 
     private final CarRepository carRepository;
 
-    public Set<CarDTO> findAllCars() {
+    public Set<CarDTO> findAvailableCars() {
         Set<Car> carSet = carRepository.findByIsAvailableTrue();
         Set<CarDTO> carDtoSet = new HashSet<>();
         carSet.forEach(car -> {
@@ -67,6 +66,14 @@ public class CarFacade {
             throw new CarNotFoundException(carId);
         }
         return new CarDTO(carFromRepo.get());
+    }
+
+    Set<CarDTO> findAllCars() {
+        Set<CarDTO> carDtoSet = new HashSet<>();
+        carRepository.findAll().forEach(car -> {
+            carDtoSet.add(new CarDTO(car));
+        });
+        return carDtoSet;
     }
 }
 

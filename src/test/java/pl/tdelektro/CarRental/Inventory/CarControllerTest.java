@@ -6,6 +6,8 @@ import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
+import io.restassured.response.Response;
+import jakarta.transaction.Transactional;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -29,11 +31,8 @@ import static org.hamcrest.Matchers.notNullValue;
 
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, classes = CarRentalApplication.class)
+@Transactional
 public class CarControllerTest {
-    @Autowired
-    CarRepository carRepository;
-    @Autowired
-    CarFacade carFacade;
 
     private static String SECRET_KEY;
     private static String customerToken;
@@ -57,16 +56,23 @@ public class CarControllerTest {
 
     }
 
-    @After()
-    public void cleanData() {
-        int carId = carRepository.findByMake("test").getId();
-        if (carId != 0) {
-            carFacade.removeCar(carId);
-
-
-        }
-
-    }
+//    @After()
+//    public void cleanData() {
+//
+//        Set carResponse = RestAssured
+//                .given()
+//                .header("Authorization", "Bearer " + adminToken)
+//                .log().all()
+//                .get().then().statusCode(200)
+//                .extract()
+//                .body()
+//                .jsonPath()
+//                .getObject("$",Set.class);
+//
+//        for(Object car : carResponse) {
+//            System.out.println(car);
+//        }
+//    }
 
 
     public String generateJwt(String user) {
@@ -86,8 +92,7 @@ public class CarControllerTest {
     }
 
     @Test
-    public void getCarWithIdTest() {
-        RestAssured.given().header("Authorization", "Bearer " + customerToken)
+    public void getCarWithIdTest() {RestAssured.given().header("Authorization", "Bearer " + customerToken)
                 .log()
                 .all()
                 .get("/car/5")
@@ -110,10 +115,8 @@ public class CarControllerTest {
                 .get("/car")
                 .then()
                 .statusCode(200)
-                .extract()
-                .body()
-                .jsonPath()
-                .getObject("$", Set.class);
+                .extract().jsonPath().getObject("$", Set.class)
+                ;
 
         assertThat(carSet, notNullValue());
     }

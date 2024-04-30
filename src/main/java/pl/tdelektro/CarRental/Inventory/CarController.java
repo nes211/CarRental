@@ -26,6 +26,11 @@ class CarController {
 
     @GetMapping
     ResponseEntity<Set<CarDTO>> getAvailableCars() {
+        return new ResponseEntity<>(carFacade.findAvailableCars(), HttpStatus.OK);
+    }
+
+    @GetMapping("/all")
+    ResponseEntity<Set<CarDTO>> getAllCarsFromRepo() {
         return new ResponseEntity<>(carFacade.findAllCars(), HttpStatus.OK);
     }
 
