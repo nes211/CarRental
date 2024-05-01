@@ -27,6 +27,7 @@ public class CarDTO {
     private String make;
     private String model;
     private String type;
+    private String registration;
     private int modelYear;
     private float oneDayCost;
     private boolean available;
@@ -37,9 +38,14 @@ public class CarDTO {
         this.make = car.getMake();
         this.type = car.getType();
         this.model = car.getModel();
+        this.registration = car.getRegistration();
         this.modelYear = car.getModelYear();
         this.oneDayCost = car.getOneDayCost();
         this.available = car.isAvailable();
+    }
+
+    public String getRegistration() {
+        return registration;
     }
 
     public Integer getId() {

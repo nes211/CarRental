@@ -1,5 +1,7 @@
 package pl.tdelektro.CarRental.Inventory;
 
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
@@ -11,7 +13,6 @@ import jakarta.transaction.Transactional;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import pl.tdelektro.CarRental.CarRentalApplication;
 
@@ -23,6 +24,7 @@ import java.io.IOException;
 import java.security.Key;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Set;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -56,23 +58,52 @@ public class CarControllerTest {
 
     }
 
-//    @After()
-//    public void cleanData() {
-//
-//        Set carResponse = RestAssured
-//                .given()
-//                .header("Authorization", "Bearer " + adminToken)
-//                .log().all()
-//                .get().then().statusCode(200)
-//                .extract()
-//                .body()
-//                .jsonPath()
-//                .getObject("$",Set.class);
-//
-//        for(Object car : carResponse) {
+    @After()
+    public void cleanData() throws IOException {
+
+
+        Response response = RestAssured
+                .given()
+                .header("Authorization", "Bearer " + adminToken)
+                .log().all()
+                .when()
+                .get("/car/all");
+        String responseString = response.getBody().asString();
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        List<CarDTO> carList = objectMapper.readValue((JsonParser) response, objectMapper.getTypeFactory().constructCollectionType(List.class, CarDTO.class));
+
+        for (int i = 0; i < carList.size(); i++) {
+            String testRegistration = carList.get(i).getMake();
+            String testMake = carList.get(i).getMake();
+            if (testRegistration.equals("") || testMake.equals("test")) {
+                String carPath = "/car/" + carList.get(i).getRegistration();
+                RestAssured
+                        .given()
+                        .header("Authorization", "Bearer " + adminToken)
+                        .when()
+                        .delete(carPath)
+                        .then()
+                        .statusCode(204);
+
+            }
+        }
+
+
+//        for(CarDTO car : carResponse){
 //            System.out.println(car);
+//            if(car.getRegistration().equals("test") || car.getRegistration().equals("")){
+//                String carPath = "/car/"+car.getRegistration();
+//                RestAssured
+//                        .given()
+//                        .header("Authorization", "Bearer "+adminToken)
+//                        .when()
+//                        .delete(carPath)
+//                        .then()
+//                        .statusCode(204);
+//            }
 //        }
-//    }
+    }
 
 
     public String generateJwt(String user) {
@@ -92,50 +123,46 @@ public class CarControllerTest {
     }
 
     @Test
-    public void getCarWithIdTest() {RestAssured.given().header("Authorization", "Bearer " + customerToken)
+    public void getCarWithIdTest() {
+        RestAssured
+                .given()
+                .header("Authorization", "Bearer " + customerToken)
                 .log()
                 .all()
                 .get("/car/5")
                 .then()
                 .body("model", equalTo("1500 GLE"))
-                .statusCode(200)
-        ;
+                .statusCode(200);
     }
 
     @Test
     public void getAvailableCarsTest() {
-        // Set base URI and port for RestAssured
-        RestAssured.baseURI = "http://localhost";
-        RestAssured.port = 8080;
-
-        // Perform POST request and validate response
         Set carSet = RestAssured.given().header("Authorization", "Bearer " + customerToken)
                 .log().all()
                 .when()
                 .get("/car")
                 .then()
                 .statusCode(200)
-                .extract().jsonPath().getObject("$", Set.class)
-                ;
+                .extract()
+                .jsonPath()
+                .getObject("$", Set.class);
 
         assertThat(carSet, notNullValue());
     }
 
     @Test
     public void addNewCarTest() {
-
         String carJson = """
                 {
                 "make" : "test",
                 "model" : "test",
                 "type" : "test",
+                "registration" : "RE5PECT",
                 "modelYear" : "1900",
                 "odeDayCost" : "2",
                 "isAvailable" : "true"
                 }
                 """;
-
-//Object object = new Car(0, "Test", "Test", "E", 1990, 200, true );
         RestAssured
                 .given()
                 .log()
@@ -146,9 +173,5 @@ public class CarControllerTest {
                 .post("/car/addNew")
                 .then()
                 .statusCode(201);
-
-
     }
-
-
 }

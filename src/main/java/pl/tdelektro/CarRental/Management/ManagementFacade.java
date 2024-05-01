@@ -81,9 +81,9 @@ public class ManagementFacade {
                 ).forEach(managementReservation -> reservationList.add(managementReservation));
 
         if (reservationList.isEmpty()) {
-            return carFacade.findAllCars().stream().toList();
+            return carFacade.findAvailableCars().stream().toList();
         } else {
-            Set<CarDTO> setOfAvailableCars = carFacade.findAllCars().stream().collect(toSet());
+            Set<CarDTO> setOfAvailableCars = carFacade.findAvailableCars().stream().collect(toSet());
             Set<Integer> carSetFromReservation = new HashSet<>();
 
             reservationList.stream().forEach(carFromReservation -> {

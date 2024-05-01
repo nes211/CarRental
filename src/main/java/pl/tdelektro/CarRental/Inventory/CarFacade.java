@@ -25,7 +25,6 @@ public class CarFacade {
 
     public CarDTO findCarById(Integer carId) {
         Optional<Car> carFromRepo = carRepository.findById(carId);
-
         //Null check for test purpose
         if (carFromRepo.get() == null) {
             throw new CarNotFoundException(carId);
@@ -68,7 +67,7 @@ public class CarFacade {
         return new CarDTO(carFromRepo.get());
     }
 
-    Set<CarDTO> findAllCars() {
+    public Set<CarDTO> findAllCars() {
         Set<CarDTO> carDtoSet = new HashSet<>();
         carRepository.findAll().forEach(car -> {
             carDtoSet.add(new CarDTO(car));

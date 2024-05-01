@@ -22,4 +22,6 @@ interface CarRepository extends CrudRepository<Car, Integer> {
     Car findByMake(String make);
 
     long deleteByMake(String make);
+
+    Car findByRegistration(String registration);
 }

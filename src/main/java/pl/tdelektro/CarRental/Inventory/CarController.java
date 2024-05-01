@@ -40,9 +40,9 @@ class CarController {
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
-    @DeleteMapping("/{carId}")
-    ResponseEntity deleteCar(@PathVariable Integer carId) {
-        Car car = carRepository.findById(carId).get();
+    @DeleteMapping("/{registrationNumber}")
+    ResponseEntity deleteCar(@PathVariable String registration) {
+        Car car = carRepository.findByRegistration(registration);
         carRepository.delete(car);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }

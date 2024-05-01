@@ -63,7 +63,7 @@ public class ManagementFacadeTest {
 
         when(carFacade.findCarById(carId))
                 .thenReturn(
-                        new CarDTO(carId, "FSM", "126p", "C", 1990, 400f, true)
+                        new CarDTO(carId, "FSM", "126p", "C","G3TTER", 1990, 400f, true)
                 );
 
         when(customerDTO.getFunds()).thenReturn(2000f);
@@ -116,7 +116,7 @@ public class ManagementFacadeTest {
 
         carDtoId = 0;
         ReservationStatus reservationStatus;
-        when(carFacade.findCarById(carDtoId)).thenReturn(new CarDTO(carDtoId, "FSM", "126p", "C", 1990, 400f, true));
+        when(carFacade.findCarById(carDtoId)).thenReturn(new CarDTO(carDtoId, "FSM", "126p", "C","MALUSZEK", 1990, 400f, true));
 
         LocalDateTime startRent = LocalDateTime.of(2024, 01, 10, 11, 30);
         LocalDateTime endRent = LocalDateTime.of(2024, 01, 11, 14, 30);

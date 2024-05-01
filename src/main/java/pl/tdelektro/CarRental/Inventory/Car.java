@@ -26,17 +26,23 @@ class Car {
     private String make;
     private String model;
     private String type;
+    private String registration;
     private int modelYear;
     private float oneDayCost;
     private boolean isAvailable;
 
-    Car(Integer cadId, String make, String model, String type, int modelYear,float oneDayCost, boolean isAvailable) {
+    Car(Integer cadId, String make, String model, String registration, String type, int modelYear,float oneDayCost, boolean isAvailable) {
         this.make = make;
         this.model = model;
         this.type = type;
+        this.registration = registration;
         this.modelYear = modelYear;
         this.oneDayCost = oneDayCost;
         this.isAvailable = isAvailable;
+    }
+
+    String getRegistration() {
+        return registration;
     }
 
     Car setMake(String make) {
