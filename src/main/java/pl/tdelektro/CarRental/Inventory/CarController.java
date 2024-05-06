@@ -40,7 +40,7 @@ class CarController {
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
-    @DeleteMapping("/{registrationNumber}")
+    @DeleteMapping("/{registration}")
     ResponseEntity deleteCar(@PathVariable String registration) {
         Car car = carRepository.findByRegistration(registration);
         carRepository.delete(car);

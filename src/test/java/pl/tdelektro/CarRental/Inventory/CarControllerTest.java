@@ -1,7 +1,5 @@
 package pl.tdelektro.CarRental.Inventory;
 
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
@@ -10,8 +8,8 @@ import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import io.restassured.response.Response;
 import jakarta.transaction.Transactional;
-import org.junit.After;
-import org.junit.Before;
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import pl.tdelektro.CarRental.CarRentalApplication;
@@ -36,18 +34,25 @@ import static org.hamcrest.Matchers.notNullValue;
 @Transactional
 public class CarControllerTest {
 
+    private static String DB_NAME = "37931948_tom";
     private static String SECRET_KEY;
+    private static String JDBC_URL;
+    private static String USER;
+    private static String PASSWORD;
+    private static String FILE_PATH = "src/test/resources/backup.sql";
     private static String customerToken;
     private static String adminToken;
 
 
-    @Before
-    public void warmUp() throws FileNotFoundException {
-        FileInputStream fileInputStream = new FileInputStream("src/test/resources/test.properties");
+    @BeforeClass
+    public static void warmUp() throws FileNotFoundException {
         try {
             FileReader fr = new FileReader("src/test/resources/test.properties");
             BufferedReader br = new BufferedReader(fr);
             SECRET_KEY = br.readLine();
+            JDBC_URL = br.readLine();
+            USER = br.readLine();
+            PASSWORD = br.readLine();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -55,29 +60,21 @@ public class CarControllerTest {
         RestAssured.port = 8080;
         customerToken = generateJwt("test@test.test");
         adminToken = generateJwt("admin@admin.admin");
-
+        createBackup();
     }
 
-    @After()
-    public void cleanData() throws IOException {
-
-
-        Response response = RestAssured
-                .given()
+    @AfterClass()
+    public static void cleanData() throws IOException {
+        Response response = RestAssured.given()
                 .header("Authorization", "Bearer " + adminToken)
-                .log().all()
-                .when()
                 .get("/car/all");
-        String responseString = response.getBody().asString();
+        List<CarDTO> carDTOList = response.jsonPath().getList("$", CarDTO.class);
 
-        ObjectMapper objectMapper = new ObjectMapper();
-        List<CarDTO> carList = objectMapper.readValue((JsonParser) response, objectMapper.getTypeFactory().constructCollectionType(List.class, CarDTO.class));
-
-        for (int i = 0; i < carList.size(); i++) {
-            String testRegistration = carList.get(i).getMake();
-            String testMake = carList.get(i).getMake();
-            if (testRegistration.equals("") || testMake.equals("test")) {
-                String carPath = "/car/" + carList.get(i).getRegistration();
+        for (int i = 0; i < carDTOList.size(); i++) {
+            String testRegistration = carDTOList.get(i).getRegistration();
+            String testMake = carDTOList.get(i).getMake();
+            if (testRegistration == null || testRegistration.equals("") || testMake.equals("test")) {
+                String carPath = "/car/" + carDTOList.get(i).getRegistration();
                 RestAssured
                         .given()
                         .header("Authorization", "Bearer " + adminToken)
@@ -85,28 +82,12 @@ public class CarControllerTest {
                         .delete(carPath)
                         .then()
                         .statusCode(204);
-
             }
         }
-
-
-//        for(CarDTO car : carResponse){
-//            System.out.println(car);
-//            if(car.getRegistration().equals("test") || car.getRegistration().equals("")){
-//                String carPath = "/car/"+car.getRegistration();
-//                RestAssured
-//                        .given()
-//                        .header("Authorization", "Bearer "+adminToken)
-//                        .when()
-//                        .delete(carPath)
-//                        .then()
-//                        .statusCode(204);
-//            }
-//        }
     }
 
 
-    public String generateJwt(String user) {
+    public static String generateJwt(String user) {
         String jwt = Jwts.builder()
                 .setClaims(new HashMap<>())
                 .setSubject(user)
@@ -117,9 +98,50 @@ public class CarControllerTest {
         return jwt;
     }
 
-    private Key signInKey() {
+    private static Key signInKey() {
         byte[] keyBytes = Decoders.BASE64.decode(SECRET_KEY);
         return Keys.hmacShaKeyFor(keyBytes);
+    }
+
+    public static void createBackup() {
+        Process process = null;
+        try {
+            process = Runtime.getRuntime().exec("mysqldump --host=" + JDBC_URL
+                    + " --user=" + USER
+                    + " --password=" + PASSWORD
+                    + " --result-file" + FILE_PATH);
+            int exitCode = process.waitFor();
+            if (exitCode == 0) {
+                System.out.println("Backup created successfully");
+            } else {
+                System.out.println("Error during backup");
+            }
+        } catch (IOException e) {
+            System.out.println("No file created");
+        } catch (InterruptedException e) {
+            System.out.println("No file created");
+        }
+    }
+
+    public static void restoreBackup() {
+        Process process = null;
+        try {
+            process = Runtime.getRuntime().exec("mysql --host=" + JDBC_URL
+                    + " --user=" + USER
+                    + " --password=" + PASSWORD
+                    + " " + DB_NAME
+                    + " < " + FILE_PATH);
+            int exitCode = process.waitFor();
+            if (exitCode == 0) {
+                System.out.println("Backup restored successfully");
+            } else {
+                System.out.println("Error during restore backup");
+            }
+        } catch (InterruptedException e) {
+            System.out.println("DB not restored from copy");
+        } catch (IOException e) {
+            System.out.println("DB not restored from copy");
+        }
     }
 
     @Test

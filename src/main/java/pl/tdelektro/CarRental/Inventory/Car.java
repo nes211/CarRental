@@ -1,18 +1,20 @@
 package pl.tdelektro.CarRental.Inventory;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.NoArgsConstructor;
+import org.hibernate.validator.constraints.UniqueElements;
 import pl.tdelektro.CarRental.Management.ManagementReservationDTO;
 
 import java.util.Set;
-
 
 @Entity
 @Table(name = "car")
@@ -26,6 +28,7 @@ class Car {
     private String make;
     private String model;
     private String type;
+    @Column(unique = true, nullable = false)
     private String registration;
     private int modelYear;
     private float oneDayCost;
@@ -43,6 +46,11 @@ class Car {
 
     String getRegistration() {
         return registration;
+    }
+
+    Car setRegistration(String registration) {
+        this.registration = registration;
+        return this;
     }
 
     Car setMake(String make) {
