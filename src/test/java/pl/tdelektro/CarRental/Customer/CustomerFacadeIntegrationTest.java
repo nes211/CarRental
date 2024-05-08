@@ -1,21 +1,20 @@
 package pl.tdelektro.CarRental.Customer;
 
-import org.junit.AfterClass;
-import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestMethodOrder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import pl.tdelektro.CarRental.CarRentalApplication;
-import pl.tdelektro.CarRental.CarRentalApplicationTests;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertSame;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import java.util.List;
 
+import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest(classes = CarRentalApplication.class)
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class CustomerFacadeIntegrationTest {
 
     @Autowired
@@ -28,6 +27,7 @@ public class CustomerFacadeIntegrationTest {
     private String name = "testName";
     private String newName = "newTestName";
     private String customerEmail = "test@test.test";
+    private String newCustomerEmail = "test2@test.test";
     private String password = "test";
     private String newPassword = "newTest";
     private String role = "USER";
@@ -35,9 +35,8 @@ public class CustomerFacadeIntegrationTest {
     private Customer customer = new Customer(customerEmail, password, role);
 
     @Test
-    @Order(1)
+    @Order(0)
     public void addCustomerTest() {
-
         customerFacade.addNewCustomer(customer);
 
         assertTrue(customerRepository.findByEmailAddress(customerEmail).isPresent());
@@ -47,43 +46,96 @@ public class CustomerFacadeIntegrationTest {
     }
 
     @Test
+    @Order(1)
+    public void addNewCustomerWithDataTest() {
+        Customer newCustomer = customerFacade.addNewCustomerWithData(
+                        newName,
+                        newCustomerEmail,
+                        passwordEncoder.encode(newPassword),
+                        role);
+
+        assertTrue(customerRepository.findByEmailAddress(newCustomerEmail).isPresent());
+        assertEquals(customerRepository.findByEmailAddress(newCustomerEmail).get().getName(), newName);
+        assertEquals(customerRepository.findByEmailAddress(newCustomerEmail).get().getEmailAddress(), newCustomerEmail);
+        assertTrue(passwordEncoder.matches(
+                newPassword,
+                customerRepository.findByEmailAddress(newCustomerEmail).get().getPassword()));
+
+    }
+
+    @Test
     @Order(2)
     public void editCustomerWithDataTest() {
-
-
-
-
+        String testName = "Kazik";
+        Customer customer = customerRepository.findByEmailAddress(newCustomerEmail).get();
+        CustomerDTO customerDTO = new CustomerDTO(customer);
+        customerDTO.setName(testName);
+        assertTrue(customerFacade.editCustomer(customerDTO));
+        CustomerDTO customerDTOWithWrongEmail = new CustomerDTO("Pawel", "pawel@pawel.com", 0f);
+        assertThrows(RuntimeException.class,()->customerFacade.editCustomer(customerDTOWithWrongEmail));
+        assertEquals(testName, customerRepository.findByEmailAddress(newCustomerEmail).get().getName());
     }
 
     @Test
     @Order(3)
-    public void editCustomerTest() {
+    public void getAllCustomersTest() {
+        List<CustomerDTO> customerList = customerFacade.getAllCustomers();
+        assertNotNull(customerList);
+        customerList.stream().forEach(customerDTO-> {
+            assertNotNull(customerDTO.name);
+            assertNotNull(customerDTO.emailAddress);
+            assertNull(customerDTO.password);
+            assertTrue(customerDTO.funds>=0);
+        });
     }
 
     @Test
     @Order(4)
-    public void getAllCustomers() {
+    public void findCustomerTest() {
+        Customer customerToCheck = customerFacade.findCustomer(customer);
+        assertTrue(customerToCheck.getEmailAddress().matches(customer.getEmailAddress()));
     }
 
     @Test
     @Order(5)
-    public void findCustomer() {
+    public void findCustomerByNameTest() {
+        CustomerDTO customerToCheck = customerFacade.findCustomerByName(customerEmail);
+        assertFalse(customerToCheck.getEmailAddress().isEmpty());
     }
 
     @Test
     @Order(6)
-    public void findCustomerByName() {
+    public void deleteCustomerTest() {
+        customerFacade.deleteCustomer(name);
+        customerFacade.deleteCustomer(newName);
+        customerFacade.deleteCustomer("Kazik");
+        List<CustomerDTO> customerDTOList = customerFacade.getAllCustomers();
+        List<CustomerDTO> needEmplyList = customerDTOList.stream().filter(object -> {
+            if(object.getName().contains(name)){
+                return true;
+            }else return false;
+        }).toList();
+
+
+
+
+
+
+
+        assertTrue(needEmplyList.isEmpty());
     }
+
+
 
     @Test
     @Order(7)
-    public void deleteCustomerTest() {
+    public void checkData() {
+
+        List<CustomerDTO> customerDtoList = customerFacade.getAllCustomers();
+        customerDtoList.stream().dropWhile(customer->{
+            if(customer.getName().equals(name)){
+                return true;
+            }else return false;
+        });
     }
-
-    @Test
-    @Order(8)
-    public void checkData(){
-
-    }
-
 }

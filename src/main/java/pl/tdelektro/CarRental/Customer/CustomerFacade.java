@@ -41,6 +41,7 @@ public class CustomerFacade {
                 .emailAddress(emailAddress)
                 .password(password)
                 .role(role)
+                .funds(0f)
                 .build();
         if(customerRepository.findByEmailAddress(emailAddress).isEmpty()) {
             customerRepository.save(customer);
@@ -53,14 +54,15 @@ public class CustomerFacade {
     public boolean editCustomer(CustomerDTO customerDto) {
         Customer customer = unwrapCustomer(customerRepository.findByEmailAddress(customerDto.emailAddress));
         customer.setEmailAddress(customerDto.emailAddress);
-        customer.setName(customer.getUsername());
+        customer.setName(customerDto.name);
         customer.setFunds(customerDto.funds);
         customerRepository.save(customer);
         return true;
     }
 
-    public void deleteCustomer (Customer customer){
-        customerRepository.delete(customer);
+    public void deleteCustomer (String customerName){
+        customerRepository.deleteByName(customerName);
+
     }
 
     public List<CustomerDTO> getAllCustomers() {

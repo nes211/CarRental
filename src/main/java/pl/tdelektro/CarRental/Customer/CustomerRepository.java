@@ -10,4 +10,6 @@ interface CustomerRepository extends CrudRepository<Customer, Integer> {
     List<Customer> findByIdNotNull();
 
     Optional<Customer> findByEmailAddress(String emailAddress);
+
+    long deleteByName(String name);
 }
