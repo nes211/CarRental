@@ -10,13 +10,12 @@ import io.restassured.response.Response;
 import jakarta.transaction.Transactional;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
+import org.junit.FixMethodOrder;
 import org.junit.Test;
+import org.junit.runners.MethodSorters;
 import org.springframework.boot.test.context.SpringBootTest;
-import pl.tdelektro.CarRental.CarRentalApplication;
 
 import java.io.BufferedReader;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.security.Key;
@@ -30,8 +29,9 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.notNullValue;
 
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, classes = CarRentalApplication.class)
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @Transactional
+@FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class CarControllerTest {
 
     private static String DB_NAME = "37931948_tom";
@@ -45,7 +45,7 @@ public class CarControllerTest {
 
 
     @BeforeClass
-    public static void warmUp() throws FileNotFoundException {
+    public static void warmUp() {
         try {
             FileReader fr = new FileReader("src/test/resources/test.properties");
             BufferedReader br = new BufferedReader(fr);
@@ -64,7 +64,7 @@ public class CarControllerTest {
     }
 
     @AfterClass()
-    public static void cleanData() throws IOException {
+    public static void cleanData(){
         Response response = RestAssured.given()
                 .header("Authorization", "Bearer " + adminToken)
                 .get("/car/all");
@@ -73,7 +73,7 @@ public class CarControllerTest {
         for (int i = 0; i < carDTOList.size(); i++) {
             String testRegistration = carDTOList.get(i).getRegistration();
             String testMake = carDTOList.get(i).getMake();
-            if (testRegistration == null || testRegistration.equals("") || testMake.equals("test")) {
+            if (testRegistration.equals("") || testMake.equals("test")) {
                 String carPath = "/car/" + carDTOList.get(i).getRegistration();
                 RestAssured
                         .given()
@@ -84,6 +84,7 @@ public class CarControllerTest {
                         .statusCode(204);
             }
         }
+        restoreBackup();
     }
 
 
@@ -195,5 +196,29 @@ public class CarControllerTest {
                 .post("/car/addNew")
                 .then()
                 .statusCode(201);
+    }
+    @Test
+    public void addSecondSameCarTest() {
+        String carJson = """
+                {
+                "make" : "test",
+                "model" : "test",
+                "type" : "test",
+                "registration" : "RE5PECT",
+                "modelYear" : "1900",
+                "odeDayCost" : "2",
+                "isAvailable" : "true"
+                }
+                """;
+        RestAssured
+                .given()
+                .log()
+                .all()
+                .header("Authorization", "Bearer " + adminToken)
+                .contentType(ContentType.JSON)
+                .body(carJson)
+                .post("/car/addNew")
+                .then()
+                .statusCode(409);
     }
 }

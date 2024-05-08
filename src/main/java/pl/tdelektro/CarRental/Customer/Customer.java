@@ -46,7 +46,7 @@ class Customer implements UserDetails {
     private Collection<? extends GrantedAuthority> authorities;
     private Float funds;
 
-private Customer(String emailAddress, String password, String role) {
+public Customer(String emailAddress, String password, String role) {
         this.name = emailAddress;
         this.emailAddress = emailAddress;
         this.password = password;

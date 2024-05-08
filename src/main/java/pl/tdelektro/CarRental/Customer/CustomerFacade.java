@@ -1,6 +1,7 @@
 package pl.tdelektro.CarRental.Customer;
 
 import lombok.AllArgsConstructor;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -16,7 +17,7 @@ import java.util.function.Supplier;
 @AllArgsConstructor
 public class CustomerFacade {
 
-    private final CustomerRepository customerRepository;
+    private CustomerRepository customerRepository;
 
     public void addNewCustomer(Customer customer) {
         Optional<Customer> customerCheck = customerRepository.findByEmailAddress(customer.getEmailAddress());

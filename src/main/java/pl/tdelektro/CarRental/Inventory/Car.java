@@ -11,6 +11,7 @@ import jakarta.persistence.UniqueConstraint;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.NaturalId;
 import org.hibernate.validator.constraints.UniqueElements;
 import pl.tdelektro.CarRental.Management.ManagementReservationDTO;
 
@@ -29,6 +30,7 @@ class Car {
     private String model;
     private String type;
     @Column(unique = true, nullable = false)
+    @NaturalId
     private String registration;
     private int modelYear;
     private float oneDayCost;
