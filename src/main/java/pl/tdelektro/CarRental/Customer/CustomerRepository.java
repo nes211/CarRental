@@ -1,5 +1,6 @@
 package pl.tdelektro.CarRental.Customer;
 
+import jakarta.transaction.Transactional;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
@@ -11,5 +12,6 @@ interface CustomerRepository extends CrudRepository<Customer, Integer> {
 
     Optional<Customer> findByEmailAddress(String emailAddress);
 
-    long deleteByName(String name);
+    @Transactional
+    long deleteByEmailAddress(String emailAddress);
 }

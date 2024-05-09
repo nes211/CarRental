@@ -60,8 +60,8 @@ public class CustomerFacade {
         return true;
     }
 
-    public void deleteCustomer (String customerName){
-        customerRepository.deleteByName(customerName);
+    public void deleteCustomer (String customerEmail){
+        customerRepository.deleteByEmailAddress(customerEmail);
 
     }
 

@@ -11,7 +11,12 @@ import pl.tdelektro.CarRental.CarRentalApplication;
 
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @SpringBootTest(classes = CarRentalApplication.class)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
@@ -34,6 +39,12 @@ public class CustomerFacadeIntegrationTest {
 
     private Customer customer = new Customer(customerEmail, password, role);
 
+//    @BeforeClass
+//    public static void checkBeforeTest(){
+//
+//    }
+
+
     @Test
     @Order(0)
     public void addCustomerTest() {
@@ -49,10 +60,10 @@ public class CustomerFacadeIntegrationTest {
     @Order(1)
     public void addNewCustomerWithDataTest() {
         Customer newCustomer = customerFacade.addNewCustomerWithData(
-                        newName,
-                        newCustomerEmail,
-                        passwordEncoder.encode(newPassword),
-                        role);
+                newName,
+                newCustomerEmail,
+                passwordEncoder.encode(newPassword),
+                role);
 
         assertTrue(customerRepository.findByEmailAddress(newCustomerEmail).isPresent());
         assertEquals(customerRepository.findByEmailAddress(newCustomerEmail).get().getName(), newName);
@@ -60,7 +71,6 @@ public class CustomerFacadeIntegrationTest {
         assertTrue(passwordEncoder.matches(
                 newPassword,
                 customerRepository.findByEmailAddress(newCustomerEmail).get().getPassword()));
-
     }
 
     @Test
@@ -72,7 +82,7 @@ public class CustomerFacadeIntegrationTest {
         customerDTO.setName(testName);
         assertTrue(customerFacade.editCustomer(customerDTO));
         CustomerDTO customerDTOWithWrongEmail = new CustomerDTO("Pawel", "pawel@pawel.com", 0f);
-        assertThrows(RuntimeException.class,()->customerFacade.editCustomer(customerDTOWithWrongEmail));
+        assertThrows(RuntimeException.class, () -> customerFacade.editCustomer(customerDTOWithWrongEmail));
         assertEquals(testName, customerRepository.findByEmailAddress(newCustomerEmail).get().getName());
     }
 
@@ -81,11 +91,11 @@ public class CustomerFacadeIntegrationTest {
     public void getAllCustomersTest() {
         List<CustomerDTO> customerList = customerFacade.getAllCustomers();
         assertNotNull(customerList);
-        customerList.stream().forEach(customerDTO-> {
+        customerList.stream().forEach(customerDTO -> {
             assertNotNull(customerDTO.name);
             assertNotNull(customerDTO.emailAddress);
             assertNull(customerDTO.password);
-            assertTrue(customerDTO.funds>=0);
+            assertTrue(customerDTO.funds >= 0);
         });
     }
 
@@ -106,25 +116,16 @@ public class CustomerFacadeIntegrationTest {
     @Test
     @Order(6)
     public void deleteCustomerTest() {
-        customerFacade.deleteCustomer(name);
-        customerFacade.deleteCustomer(newName);
-        customerFacade.deleteCustomer("Kazik");
+        customerFacade.deleteCustomer(customerEmail);
+        customerFacade.deleteCustomer(newCustomerEmail);
         List<CustomerDTO> customerDTOList = customerFacade.getAllCustomers();
         List<CustomerDTO> needEmplyList = customerDTOList.stream().filter(object -> {
-            if(object.getName().contains(name)){
+            if (object.getEmailAddress().contains(customerEmail) || object.getEmailAddress().contains(newCustomerEmail)) {
                 return true;
-            }else return false;
+            } else return false;
         }).toList();
-
-
-
-
-
-
-
         assertTrue(needEmplyList.isEmpty());
     }
-
 
 
     @Test
@@ -132,10 +133,10 @@ public class CustomerFacadeIntegrationTest {
     public void checkData() {
 
         List<CustomerDTO> customerDtoList = customerFacade.getAllCustomers();
-        customerDtoList.stream().dropWhile(customer->{
-            if(customer.getName().equals(name)){
+        customerDtoList.stream().dropWhile(customer -> {
+            if (customer.getName().equals(name)) {
                 return true;
-            }else return false;
+            } else return false;
         });
     }
 }
