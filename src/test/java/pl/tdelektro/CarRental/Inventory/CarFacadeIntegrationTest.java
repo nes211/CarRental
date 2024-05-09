@@ -62,7 +62,7 @@ public class CarFacadeIntegrationTest {
     public void findAvailableCarsTest() {
         Set<CarDTO> carSet = carFacade.findAvailableCars();
         assertFalse(carSet.isEmpty());
-        assertTrue(carSet.stream().allMatch(carDTO -> carDTO.isAvailable()));
+        assertTrue(carSet.stream().allMatch(CarDTO::isAvailable));
         assertTrue(carRepository.existsByRegistration(testCar1.getRegistration()));
         assertTrue(carRepository.existsByRegistration(testCar2.getRegistration()));
     }
@@ -72,9 +72,7 @@ public class CarFacadeIntegrationTest {
     public void findCarByIdTest() {
         Set<Car> carSet = carRepository.findAll();
 
-        carSet.stream().forEach(car -> {
-            assertTrue(carFacade.findCarById(car.getId()).getId().equals(car.getId()));
-        });
+        carSet.stream().forEach(car -> assertEquals(carFacade.findCarById(car.getId()).getId(), car.getId()));
         assertThrows(RuntimeException.class, () -> carFacade.findCarById(-1));
     }
 
