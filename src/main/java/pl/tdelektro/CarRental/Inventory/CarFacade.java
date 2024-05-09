@@ -14,6 +14,11 @@ public class CarFacade {
 
     private final CarRepository carRepository;
 
+    public boolean addNewCar(Car car) {
+        carRepository.save(car);
+        return true;
+    }
+
     public Set<CarDTO> findAvailableCars() {
         Set<Car> carSet = carRepository.findByIsAvailableTrue();
         Set<CarDTO> carDtoSet = new HashSet<>();
@@ -32,24 +37,28 @@ public class CarFacade {
         return unwrapCarToCarDto(carFromRepo, carId);
     }
 
-    public void saveCarStatus(Integer carId, String status) {
+    //Management status Active means that car is in use so isAvailable is set to false
+    public void saveCarStatus(Integer carId, String managementStatus) {
 
         boolean isAvailable;
-        if (status.contains("ACTIVE")) {
+        if (managementStatus.matches("ACTIVE")) {
             isAvailable = false;
         } else {
             isAvailable = true;
         }
-        carRepository.findById(carId).get().setAvailable(isAvailable);
+        carRepository.save(carRepository.findById(carId).get().setAvailable(isAvailable));
     }
-
-    private void addNewCar(Car car) {
-        carRepository.save(car);
-    }
-
 
     public void removeCar(Integer carId) {
         carRepository.delete(unwrapCar(carId));
+    }
+
+    public Set<CarDTO> findAllCars() {
+        Set<CarDTO> carDtoSet = new HashSet<>();
+        carRepository.findAll().forEach(car -> {
+            carDtoSet.add(new CarDTO(car));
+        });
+        return carDtoSet;
     }
 
     private Car unwrapCar(Integer carId) {
@@ -65,14 +74,6 @@ public class CarFacade {
             throw new CarNotFoundException(carId);
         }
         return new CarDTO(carFromRepo.get());
-    }
-
-    public Set<CarDTO> findAllCars() {
-        Set<CarDTO> carDtoSet = new HashSet<>();
-        carRepository.findAll().forEach(car -> {
-            carDtoSet.add(new CarDTO(car));
-        });
-        return carDtoSet;
     }
 }
 

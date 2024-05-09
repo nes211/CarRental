@@ -5,17 +5,10 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
-import jakarta.persistence.UniqueConstraint;
-import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.NaturalId;
-import org.hibernate.validator.constraints.UniqueElements;
-import pl.tdelektro.CarRental.Management.ManagementReservationDTO;
-
-import java.util.Set;
 
 @Entity
 @Table(name = "car")
@@ -36,7 +29,7 @@ class Car {
     private float oneDayCost;
     private boolean isAvailable;
 
-    Car(Integer cadId, String make, String model, String registration, String type, int modelYear,float oneDayCost, boolean isAvailable) {
+    Car(Integer cadId, String make, String model, String type, String registration, int modelYear, float oneDayCost, boolean isAvailable) {
         this.make = make;
         this.model = model;
         this.type = type;
