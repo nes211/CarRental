@@ -22,7 +22,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.toSet;
 
@@ -30,11 +29,11 @@ import static java.util.stream.Collectors.toSet;
 @AllArgsConstructor
 public class ManagementFacade {
 
-    private final List<ManagementReservation> reservations;
-    private final ManagementReservationRepository managementReservationRepository;
-    private final CarFacade carFacade;
-    private final CustomerFacade customerFacade;
-    private final ManagementInvoice managementInvoice;
+    private List<ManagementReservation> reservations;
+    private ManagementReservationRepository managementReservationRepository;
+    private CarFacade carFacade;
+    private CustomerFacade customerFacade;
+    private ManagementInvoice managementInvoice;
 
     public void addReservation(ManagementReservation reservation) {
         reservations.add(reservation);
@@ -89,9 +88,9 @@ public class ManagementFacade {
             reservationList.stream().forEach(carFromReservation -> {
                 carSetFromReservation.add(carFromReservation.getCarId());
             });
-            for(CarDTO car : setOfAvailableCars){
-                for (int valueFromReservation : carSetFromReservation){
-                    if(car.getId() == valueFromReservation){
+            for (CarDTO car : setOfAvailableCars) {
+                for (int valueFromReservation : carSetFromReservation) {
+                    if (car.getId() == valueFromReservation) {
                         setOfAvailableCars.remove(car);
                     }
                 }

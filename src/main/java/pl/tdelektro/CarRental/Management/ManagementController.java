@@ -22,7 +22,7 @@ import java.util.Set;
 @AllArgsConstructor
 class ManagementController {
 
-    private final ManagementFacade managementFacade;
+    private ManagementFacade managementFacade;
 
     @PostMapping("/rent")
     ResponseEntity<ManagementReservationDTO> rentCar(
