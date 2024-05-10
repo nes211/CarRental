@@ -29,11 +29,11 @@ import static java.util.stream.Collectors.toSet;
 @AllArgsConstructor
 public class ManagementFacade {
 
-    private final List<ManagementReservation> reservations;
-    private final ManagementReservationRepository managementReservationRepository;
-    private final CarFacade carFacade;
-    private final CustomerFacade customerFacade;
-    private final ManagementInvoice managementInvoice;
+    private List<ManagementReservation> reservations;
+    private ManagementReservationRepository managementReservationRepository;
+    private CarFacade carFacade;
+    private CustomerFacade customerFacade;
+    private ManagementInvoice managementInvoice;
 
     void addReservation(ManagementReservation reservation) {
         reservations.add(reservation);

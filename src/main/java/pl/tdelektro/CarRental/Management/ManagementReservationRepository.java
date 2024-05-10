@@ -8,7 +8,6 @@ import java.util.Set;
 interface ManagementReservationRepository extends CrudRepository<ManagementReservation, String> {
 
     Optional<ManagementReservation> findByReservationId(String reservationId);
-    Set<ManagementReservation> findAllReservations();
 
     Set<ManagementReservation> findByStatus(ReservationStatus status);
 
