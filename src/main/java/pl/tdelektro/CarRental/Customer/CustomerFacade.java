@@ -1,7 +1,6 @@
 package pl.tdelektro.CarRental.Customer;
 
 import lombok.AllArgsConstructor;
-import org.springframework.context.annotation.ComponentScan;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -11,7 +10,6 @@ import pl.tdelektro.CarRental.Exception.CustomerNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.function.Supplier;
 
 @Service
 @AllArgsConstructor

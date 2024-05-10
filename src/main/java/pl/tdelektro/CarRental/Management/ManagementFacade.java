@@ -22,7 +22,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.toSet;
 
@@ -36,11 +35,11 @@ public class ManagementFacade {
     private final CustomerFacade customerFacade;
     private final ManagementInvoice managementInvoice;
 
-    public void addReservation(ManagementReservation reservation) {
+    void addReservation(ManagementReservation reservation) {
         reservations.add(reservation);
     }
 
-    public void removeReservation(ManagementReservation reservation) {
+    void removeReservation(ManagementReservation reservation) {
         reservations.remove(reservation);
     }
 
@@ -177,12 +176,12 @@ public class ManagementFacade {
         return customerFacade.editCustomer(customerFromRepo);
     }
 
-    void generateInvoice(ManagementReservation reservation) throws DocumentException, IOException {
+    private void generateInvoice(ManagementReservation reservation) throws DocumentException, IOException {
 
         managementInvoice.createInvoice(reservation);
     }
 
-    ReservationStatus setReservationStatus(LocalDateTime startRent, LocalDateTime endRent, Integer carDtoId) {
+    public ReservationStatus setReservationStatus(LocalDateTime startRent, LocalDateTime endRent, Integer carDtoId) {
 
         ReservationStatus reservationStatus;
 
@@ -200,7 +199,7 @@ public class ManagementFacade {
         return reservationStatus;
     }
 
-    Set<ManagementReservationDTO> getReservations(String status) {
+    public Set<ManagementReservationDTO> getReservations(String status) {
 
         ReservationStatus reservationStatus = null;
         switch (status.toUpperCase()) {
@@ -232,7 +231,7 @@ public class ManagementFacade {
         return managementReservationDTOSet;
     }
 
-    void startReservation(ManagementReservation reservation) {
+   public void startReservation(ManagementReservation reservation) {
 
         //Rest endpoint has ability to start
         ManagementReservation reservationFromRepo = findReservation(reservation.getReservationId());
@@ -250,7 +249,7 @@ public class ManagementFacade {
         }
     }
 
-    void endReservation(ManagementReservation reservation) {
+    public void endReservation(ManagementReservation reservation) {
         ManagementReservation reservationFromRepo = findReservation(reservation.getReservationId());
         reservationFromRepo.setStatus(ReservationStatus.COMPLETED);
         managementReservationRepository.save(reservationFromRepo);

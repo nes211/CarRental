@@ -6,8 +6,6 @@ import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
-import java.util.Collections;
-
 @Component("customerWarmup")
 @AllArgsConstructor
 class Warmup implements ApplicationListener<ContextRefreshedEvent> {
