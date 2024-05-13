@@ -104,8 +104,16 @@ public class ManagementFacadeIntegrationTest {
 
     @Test
     public void isCarAvailableTest() {
+        Set<ManagementReservation> allReservations = managementReservationRepository.findAll();
+        ManagementReservation reservation = allReservations.stream().findFirst().get();
 
-
+        assertFalse(managementFacade.isCarAvailable(
+                reservation.getCarId(),
+                reservation.getStartDate(),
+                reservation.getEndDate()));
+        assertTrue(managementFacade.isCarAvailable(reservation.getCarId(),
+                reservation.getStartDate().plusYears(10),
+                reservation.getEndDate().plusYears(10).plusDays(10)));
     }
 
     @Test

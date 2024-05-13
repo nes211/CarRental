@@ -92,8 +92,7 @@ public class ManagementFacade {
         List<ManagementReservation> reservationList = new ArrayList<>();
         reservationSet.stream()
                 .filter(reservation ->
-                        ((reservation.getStartDate().isBefore(startDate) ||
-                                reservation.getStartDate().isEqual(startDate))
+                        ((reservation.getStartDate().isBefore(startDate) || reservation.getStartDate().isEqual(startDate))
                                 && (reservation.getEndDate().isBefore(startDate) || reservation.getEndDate().isEqual(startDate))
                                 && (reservation.getStartDate().isBefore(endDate) || reservation.getStartDate().isEqual(endDate))
                                 && (reservation.getEndDate().isBefore(endDate) || reservation.getEndDate().isEqual(endDate))) == false
@@ -108,14 +107,15 @@ public class ManagementFacade {
             reservationList.stream().forEach(carFromReservation -> {
                 carSetFromReservation.add(carFromReservation.getCarId());
             });
+            Set<CarDTO> availableCars = new HashSet<>();
             for (CarDTO car : setOfAvailableCars) {
                 for (int valueFromReservation : carSetFromReservation) {
                     if (car.getId() == valueFromReservation) {
-                        setOfAvailableCars.remove(car);
                     }
+                    else{availableCars.add(car);}
                 }
             }
-            return setOfAvailableCars.stream().toList();
+            return availableCars.stream().toList();
         }
     }
 
