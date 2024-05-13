@@ -2,11 +2,12 @@ package pl.tdelektro.CarRental.Management;
 
 import jakarta.transaction.Transactional;
 import org.springframework.data.repository.CrudRepository;
-import org.springframework.lang.NonNull;
 
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Stream;
 
+@Transactional
 interface ManagementReservationRepository extends CrudRepository<ManagementReservation, String> {
 
     Optional<ManagementReservation> findByReservationId(String reservationId);
@@ -19,6 +20,14 @@ interface ManagementReservationRepository extends CrudRepository<ManagementReser
 
     long deleteByReservationId(String reservationId);
 
+    boolean existsByReservationId(String s);
+
     @Override
     Set<ManagementReservation> findAll();
+
+    Stream<ManagementReservation> findByReservationIdOrderByReservationIdAsc(String reservationId);
+
+    boolean existsByCustomerEmail(String customerEmail);
+
+    long deleteByCustomerEmail(String customerEmail);
 }

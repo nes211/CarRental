@@ -35,12 +35,32 @@ public class ManagementFacade {
     private CustomerFacade customerFacade;
     private ManagementInvoice managementInvoice;
 
-    public void addReservation(ManagementReservation reservation) {
-        reservations.add(reservation);
+    public boolean addReservation(ManagementReservation reservation) {
+        if (checkReservationBeforeAdd(reservation)) {
+            managementReservationRepository.save(reservation);
+            return true;
+        } else throw new ReservationManagementProblem("Incorrect input data");
     }
 
-    public void removeReservation(ManagementReservation reservation) {
-        reservations.remove(reservation);
+    private boolean checkReservationBeforeAdd(ManagementReservation reservation) {
+        if (isCarAvailable(
+                reservation.getCarId(),
+                reservation.getStartDate(),
+                reservation.getEndDate())
+        ) {
+            managementReservationRepository.save(reservation);
+            reservations.add(reservation);
+            return true;
+
+        } else return false;
+    }
+
+    public boolean removeReservation(ManagementReservation reservation) {
+        if (managementReservationRepository.findByReservationId(reservation.getReservationId()).isPresent()) {
+            managementReservationRepository.deleteByReservationId(reservation.getReservationId());
+            reservations.remove(reservation);
+            return true;
+        } else throw new ReservationNotFoundException(reservation.getReservationId());
     }
 
     public boolean isCarAvailable(Integer carId, LocalDateTime startDate, LocalDateTime endDate) {

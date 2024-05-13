@@ -5,5 +5,6 @@ enum ReservationStatus {
     ACTIVE,
     COMPLETED,
     UNKNOWN,
-    REGISTERED
+    REGISTERED,
+    REJECTED
 }

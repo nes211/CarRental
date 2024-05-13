@@ -12,6 +12,12 @@ import org.springframework.boot.test.context.SpringBootTest;
 import java.time.LocalDateTime;
 import java.util.Set;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+
 @SpringBootTest
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class ManagementFacadeIntegrationTest {
@@ -21,7 +27,6 @@ public class ManagementFacadeIntegrationTest {
 
     @Autowired
     private ManagementReservationRepository managementReservationRepository;
-
 
 
     private final long yearsInPlus = 100;
@@ -39,7 +44,7 @@ public class ManagementFacadeIntegrationTest {
 
         Set<ManagementReservation> reservations = managementReservationRepository.findAll();
 
-        randomCarId = reservations.stream().findFirst().get().getId();
+        randomCarId = reservations.stream().findFirst().get().getCarId();
         ManagementReservation reservation = ManagementReservation.builder()
                 .reservationId(reservationId)
                 .customerEmail(customerEmail)
@@ -53,22 +58,47 @@ public class ManagementFacadeIntegrationTest {
         managementReservationRepository.save(reservation);
     }
 
-
-
     @AfterEach
     public void cleanup() {
-        managementReservationRepository.deleteByReservationId(reservationId);
+        if(managementReservationRepository.existsByCustomerEmail(customerEmail)) {
+            managementReservationRepository.deleteByCustomerEmail(customerEmail);
+        }
     }
 
     @Test
     @Order(0)
     public void addReservationTest() {
 
+        ManagementReservation newReservation = ManagementReservation.builder()
+                .reservationId(reservationId2)
+                .customerEmail(customerEmail)
+                .carId(randomCarId)
+                .startDate(LocalDateTime.now().plusYears(yearsInPlus))
+                .endDate(LocalDateTime.now().plusYears(yearsInPlus).plusDays(daysInPlus))
+                .totalReservationCost(oneDayCost * daysInPlus)
+                .status(status)
+                .build();
+
+        assertTrue(managementFacade.addReservation(newReservation));
+        ManagementReservation reservationForTests = managementReservationRepository.findByReservationId(reservationId2).get();
+
+        assertTrue(managementReservationRepository.existsByReservationId(reservationId2));
+        assertNotEquals(reservationId, reservationForTests.getReservationId());
+        assertEquals(oneDayCost * daysInPlus, reservationForTests.getTotalReservationCost());
+        assertFalse(reservationForTests.getCarId()<0);
+        assertFalse(reservationForTests.getEndDate().isBefore(LocalDateTime.now()));
+
     }
 
     @Test
     @Order(1)
     public void removeReservationTest() {
+        Set<ManagementReservation> allReservations = managementReservationRepository.findAll();
+
+        ManagementReservation reservationToRemove = allReservations
+                .stream().filter(reservation -> reservation.getReservationId().equals(reservationId)).findFirst().get();
+        assertTrue(managementFacade.removeReservation(reservationToRemove));
+        assertFalse(managementReservationRepository.existsByReservationId(reservationId));
 
     }
 
