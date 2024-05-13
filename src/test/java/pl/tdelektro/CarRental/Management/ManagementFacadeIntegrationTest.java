@@ -22,8 +22,6 @@ public class ManagementFacadeIntegrationTest {
     @Autowired
     private ManagementReservationRepository managementReservationRepository;
 
-//    @Autowired
-//    private ManagementReservation managementReservation;
 
 
     private final long yearsInPlus = 100;
@@ -65,22 +63,6 @@ public class ManagementFacadeIntegrationTest {
     @Test
     @Order(0)
     public void addReservationTest() {
-
-//        warmup();
-//        //Set<ManagementReservation> reservations = managementReservationRepository.findAllReservations();
-//        ManagementReservation testReservation = managementReservation.builder()
-//                .reservationId(reservationId2)
-//                .customerEmail(customerEmail)
-//                .carId(randomCarId)
-//                .startDate(LocalDateTime.now().plusYears(yearsInPlus + 1))
-//                .endDate(LocalDateTime.now().plusYears(yearsInPlus + 1).plusDays(5))
-//                .totalReservationCost(5)
-//                .status(ReservationStatus.valueOf(status))
-//                .build();
-//        managementFacade.addReservation(testReservation);
-//
-//        assertTrue(managementReservationRepository.findByReservationId(reservationId2).isPresent());
-//
 
     }
 

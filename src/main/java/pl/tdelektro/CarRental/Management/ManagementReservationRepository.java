@@ -1,5 +1,6 @@
 package pl.tdelektro.CarRental.Management;
 
+import jakarta.transaction.Transactional;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.lang.NonNull;
 
