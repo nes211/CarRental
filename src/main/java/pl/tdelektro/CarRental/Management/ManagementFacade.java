@@ -76,7 +76,7 @@ public class ManagementFacade {
         return findStatus;
     }
 
-    public List<CarDTO> findAvailableCars(Integer carId, LocalDateTime startDate, LocalDateTime endDate) {
+    public List<CarDTO> findAvailableCars(LocalDateTime startDate, LocalDateTime endDate) {
         Set<ManagementReservation> reservations = managementReservationRepository.findByStatusOrStatus(
                 ReservationStatus.ACTIVE,
                 ReservationStatus.PENDING
@@ -84,7 +84,6 @@ public class ManagementFacade {
 
         return reservationsCheck(reservations, startDate, endDate)
                 .stream()
-                .filter(carDTO -> carDTO.getId() == carId)
                 .toList();
     }
 

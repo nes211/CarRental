@@ -8,8 +8,11 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import pl.tdelektro.CarRental.Inventory.CarDTO;
+import pl.tdelektro.CarRental.Inventory.CarFacade;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -24,6 +27,9 @@ public class ManagementFacadeIntegrationTest {
 
     @Autowired
     private ManagementFacade managementFacade;
+
+    @Autowired
+    private CarFacade carFacade;
 
     @Autowired
     private ManagementReservationRepository managementReservationRepository;
@@ -60,7 +66,7 @@ public class ManagementFacadeIntegrationTest {
 
     @AfterEach
     public void cleanup() {
-        if(managementReservationRepository.existsByCustomerEmail(customerEmail)) {
+        if (managementReservationRepository.existsByCustomerEmail(customerEmail)) {
             managementReservationRepository.deleteByCustomerEmail(customerEmail);
         }
     }
@@ -85,7 +91,7 @@ public class ManagementFacadeIntegrationTest {
         assertTrue(managementReservationRepository.existsByReservationId(reservationId2));
         assertNotEquals(reservationId, reservationForTests.getReservationId());
         assertEquals(oneDayCost * daysInPlus, reservationForTests.getTotalReservationCost());
-        assertFalse(reservationForTests.getCarId()<0);
+        assertFalse(reservationForTests.getCarId() < 0);
         assertFalse(reservationForTests.getEndDate().isBefore(LocalDateTime.now()));
 
     }
@@ -118,6 +124,16 @@ public class ManagementFacadeIntegrationTest {
 
     @Test
     public void findAvailableCarsTest() {
+
+        Set<ManagementReservation> allReservations = managementReservationRepository.findAll();
+        ManagementReservation reservation = allReservations.stream().findAny().get();
+        List<CarDTO> allCars = carFacade.findAllCars().stream().toList();
+        List<CarDTO> availableCars = managementFacade.findAvailableCars(
+                reservation.getStartDate(),
+                reservation.getEndDate()
+        );
+        assertTrue(allCars.size() >= availableCars.size());
+
 
 
     }

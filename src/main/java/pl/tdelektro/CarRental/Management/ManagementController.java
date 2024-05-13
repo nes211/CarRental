@@ -57,7 +57,6 @@ class ManagementController {
         if (reservationAvailable.getCarId() != null) {
             return new ResponseEntity<>(managementFacade.findAvailableCars
                     (
-                            reservationAvailable.getCarId(),
                             reservationAvailable.getStartDate(),
                             reservationAvailable.getEndDate()
                     )
@@ -66,7 +65,6 @@ class ManagementController {
         } else {
             return new ResponseEntity<>(managementFacade.findAvailableCars
                     (
-                            reservationAvailable.getCarId(),
                             reservationAvailable.getStartDate(),
                             reservationAvailable.getEndDate()
                     )
