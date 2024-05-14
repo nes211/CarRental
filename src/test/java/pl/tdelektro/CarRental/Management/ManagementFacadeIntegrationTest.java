@@ -1,5 +1,6 @@
 package pl.tdelektro.CarRental.Management;
 
+import com.itextpdf.text.DocumentException;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.MethodOrderer;
@@ -13,6 +14,7 @@ import pl.tdelektro.CarRental.Customer.CustomerFacade;
 import pl.tdelektro.CarRental.Inventory.CarDTO;
 import pl.tdelektro.CarRental.Inventory.CarFacade;
 
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Set;
@@ -53,6 +55,7 @@ public class ManagementFacadeIntegrationTest {
     @BeforeEach
     public void warmup() {
 
+        addCustomerWithFounds();
         Set<ManagementReservation> reservations = managementReservationRepository.findAll();
 
         randomCarId = reservations.stream().findFirst().get().getCarId();
@@ -66,7 +69,6 @@ public class ManagementFacadeIntegrationTest {
                 .status(status)
                 .build();
         managementReservationRepository.save(reservation);
-        addCustomerWithFounds();
     }
 
     @AfterEach
@@ -162,6 +164,14 @@ public class ManagementFacadeIntegrationTest {
 
     @Test
     public void returnCarTest() {
+
+        try {
+            managementFacade.returnCar(customerEmail,randomCarId, reservationId);
+        } catch (DocumentException e) {
+            throw new RuntimeException(e);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
 
     }
 
