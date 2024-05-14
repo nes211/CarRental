@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import pl.tdelektro.CarRental.Customer.CustomerDTO;
 import pl.tdelektro.CarRental.Customer.CustomerFacade;
+import pl.tdelektro.CarRental.Exception.ReservationNotFoundException;
 import pl.tdelektro.CarRental.Inventory.CarDTO;
 import pl.tdelektro.CarRental.Inventory.CarFacade;
 
@@ -210,42 +211,13 @@ public class ManagementFacadeIntegrationTest {
     @Test
     public void findReservationTest() {
 
-
-    }
-
-    @Test
-    public void calculateRentalFeeTest() {
-
-    }
-
-    @Test
-    public void processingPaymentTest() {
-
-    }
-
-    @Test
-    public void generateInvoiceTest() {
-
-    }
-
-    @Test
-    public void setReservationStatusTest() {
-
-    }
-
-    @Test
-    public void getReservationsTest() {
-
-    }
-
-    @Test
-    public void startReservationTest() {
-
-    }
-
-    @Test
-    public void endReservationTest() {
-
+        ManagementReservation reservation = managementFacade.findReservation(reservationId);
+        assertTrue(reservation.getReservationId().equals(reservationId));
+        try {
+            managementFacade.findReservation("test");
+        } catch (ReservationNotFoundException e) {
+            assertTrue(true);
+        }
     }
 
     private void addCustomerWithFounds() {
