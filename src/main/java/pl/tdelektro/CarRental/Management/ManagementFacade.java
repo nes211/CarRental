@@ -65,6 +65,8 @@ public class ManagementFacade {
 
     public boolean isCarAvailable(Integer carId, LocalDateTime startDate, LocalDateTime endDate) {
 
+        checkInputData(carId, startDate, endDate);
+
         Set<ManagementReservation> reservations = managementReservationRepository.findByCarIdAndStatusOrStatus(
                 carId,
                 ReservationStatus.PENDING,
@@ -76,7 +78,16 @@ public class ManagementFacade {
         return findStatus;
     }
 
+    private void checkInputData(Integer carId, LocalDateTime startDate, LocalDateTime endDate) {
+        carFacade.findCarById(carId);
+        if(endDate.isBefore(startDate))
+            throw new ReservationManagementProblem("End rent date is before start date");
+        if (ChronoUnit.MINUTES.between(startDate, endDate) <=120)
+            throw new ReservationManagementProblem("Rental time too short. Lower than 120 minutes");
+    }
+
     public List<CarDTO> findAvailableCars(LocalDateTime startDate, LocalDateTime endDate) {
+        
         Set<ManagementReservation> reservations = managementReservationRepository.findByStatusOrStatus(
                 ReservationStatus.ACTIVE,
                 ReservationStatus.PENDING
@@ -88,6 +99,7 @@ public class ManagementFacade {
     }
 
     public List<CarDTO> reservationsCheck(Set<ManagementReservation> reservationSet, LocalDateTime startDate, LocalDateTime endDate) {
+
         List<ManagementReservation> reservationList = new ArrayList<>();
         reservationSet.stream()
                 .filter(reservation ->
