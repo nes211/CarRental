@@ -183,11 +183,9 @@ public class ManagementFacade {
         ManagementReservation reservationEnd = findReservation(reservationId);
 
         //Checking that  CustomerDTO and CarDTO exist in repo only for exceptions
-        CustomerDTO customerFromRepo = customerFacade.findCustomerByName(customerEmail);
-        CarDTO carToReturn = carFacade.findCarById(carId);
-        setReservationStatus(reservationEnd.getStartDate(), reservationEnd.getEndDate(), carId);
+        customerFacade.findCustomerByName(customerEmail);
+        carFacade.findCarById(carId);
         endReservation(reservationEnd);
-        managementReservationRepository.save(reservationEnd);
         generateInvoice(reservationEnd);
     }
 
@@ -286,8 +284,7 @@ public class ManagementFacade {
     }
 
     void endReservation(ManagementReservation reservation) {
-        ManagementReservation reservationFromRepo = findReservation(reservation.getReservationId());
-        reservationFromRepo.setStatus(ReservationStatus.COMPLETED);
-        managementReservationRepository.save(reservationFromRepo);
+        reservation.setStatus(ReservationStatus.COMPLETED);
+        managementReservationRepository.save(reservation);
     }
 }

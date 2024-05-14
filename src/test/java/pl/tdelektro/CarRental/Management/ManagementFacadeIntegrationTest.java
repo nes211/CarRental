@@ -17,6 +17,7 @@ import pl.tdelektro.CarRental.Inventory.CarFacade;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -164,15 +165,46 @@ public class ManagementFacadeIntegrationTest {
 
     @Test
     public void returnCarTest() {
+        ManagementReservation reservation = null;
+        Optional<ManagementReservation> optional = managementReservationRepository.findByReservationId(reservationId);
+        if (optional.isPresent()) {
+            reservation = optional.get();
+        }
 
         try {
-            managementFacade.returnCar(customerEmail,randomCarId, reservationId);
+            managementFacade.returnCar("2" + customerEmail, randomCarId, reservationId);
+        } catch (RuntimeException e) {
+            assertTrue(true);
+        } catch (DocumentException e) {
+        } catch (IOException e) {
+        }
+        try {
+            managementFacade.returnCar(customerEmail, -1, reservationId);
+        } catch (RuntimeException e) {
+            assertTrue(true);
+        } catch (DocumentException e) {
+        } catch (IOException e) {
+        }
+        try {
+            managementFacade.returnCar(customerEmail, randomCarId, "test" + reservationId);
+        } catch (RuntimeException e) {
+            assertTrue(true);
+        } catch (DocumentException e) {
+        } catch (IOException e) {
+        }
+
+
+        try {
+            managementFacade.returnCar(customerEmail, randomCarId, reservationId);
         } catch (DocumentException e) {
             throw new RuntimeException(e);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-
+        assertFalse(reservation.getStatus().equals(managementReservationRepository.findByReservationId(reservationId).get().getStatus()));
+        assertTrue(
+                managementReservationRepository.findByReservationId(reservationId).get().getStatus()
+                        .equals(ReservationStatus.COMPLETED));
     }
 
     @Test
