@@ -86,6 +86,11 @@ public class ManagementFacade {
             throw new ReservationManagementProblem("Rental time too short. Lower than 120 minutes");
     }
 
+
+
+
+
+
     public List<CarDTO> findAvailableCars(LocalDateTime startDate, LocalDateTime endDate) {
         
         Set<ManagementReservation> reservations = managementReservationRepository.findByStatusOrStatus(

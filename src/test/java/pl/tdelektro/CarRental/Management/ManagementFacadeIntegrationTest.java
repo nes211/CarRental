@@ -8,6 +8,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import pl.tdelektro.CarRental.Customer.CustomerDTO;
+import pl.tdelektro.CarRental.Customer.CustomerFacade;
 import pl.tdelektro.CarRental.Inventory.CarDTO;
 import pl.tdelektro.CarRental.Inventory.CarFacade;
 
@@ -32,8 +34,10 @@ public class ManagementFacadeIntegrationTest {
     private CarFacade carFacade;
 
     @Autowired
-    private ManagementReservationRepository managementReservationRepository;
+    CustomerFacade customerFacade;
 
+    @Autowired
+    private ManagementReservationRepository managementReservationRepository;
 
     private final long yearsInPlus = 100;
     private final long daysInPlus = 10;
@@ -44,6 +48,7 @@ public class ManagementFacadeIntegrationTest {
     private final String reservationId2 = "2id123456test";
 
     private int randomCarId = 0;
+
 
     @BeforeEach
     public void warmup() {
@@ -60,15 +65,18 @@ public class ManagementFacadeIntegrationTest {
                 .totalReservationCost(oneDayCost * daysInPlus)
                 .status(status)
                 .build();
-
         managementReservationRepository.save(reservation);
+        addCustomerWithFounds();
     }
 
     @AfterEach
     public void cleanup() {
+
         if (managementReservationRepository.existsByCustomerEmail(customerEmail)) {
             managementReservationRepository.deleteByCustomerEmail(customerEmail);
         }
+        if (customerFacade.findCustomerByName(customerEmail).getName().equals(customerEmail))
+            customerFacade.deleteCustomer(customerEmail);
     }
 
     @Test
@@ -99,6 +107,7 @@ public class ManagementFacadeIntegrationTest {
     @Test
     @Order(1)
     public void removeReservationTest() {
+
         Set<ManagementReservation> allReservations = managementReservationRepository.findAll();
 
         ManagementReservation reservationToRemove = allReservations
@@ -110,6 +119,7 @@ public class ManagementFacadeIntegrationTest {
 
     @Test
     public void isCarAvailableTest() {
+
         Set<ManagementReservation> allReservations = managementReservationRepository.findAll();
         ManagementReservation reservation = allReservations.stream().findFirst().get();
 
@@ -134,17 +144,19 @@ public class ManagementFacadeIntegrationTest {
         );
         assertTrue(allCars.size() >= availableCars.size());
 
-
-
-    }
-
-    @Test
-    public void reservationsCheckTest() {
-
     }
 
     @Test
     public void rentCarTest() {
+
+        ManagementReservationDTO reservationDTO = managementFacade.rentCar(
+                customerEmail,
+                LocalDateTime.now().plusYears(yearsInPlus),
+                LocalDateTime.now().plusYears(yearsInPlus).plusDays(daysInPlus),
+                randomCarId);
+        assertEquals(reservationDTO.getCarId(), randomCarId);
+        float totalCost = carFacade.findCarById(randomCarId).getOneDayCost() * daysInPlus;
+        assertEquals(reservationDTO.getTotalCost(), totalCost);
 
     }
 
@@ -194,5 +206,11 @@ public class ManagementFacadeIntegrationTest {
 
     }
 
+    private void addCustomerWithFounds() {
 
+        customerFacade.addNewCustomerWithData(customerEmail, customerEmail, customerEmail, "USER");
+        CustomerDTO customerDTO = customerFacade.findCustomerByName(customerEmail);
+        customerDTO.setFunds(8000f);
+        customerFacade.editCustomer(customerDTO);
+    }
 }
