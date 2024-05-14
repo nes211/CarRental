@@ -15,6 +15,7 @@ import pl.tdelektro.CarRental.Exception.ReservationNotFoundException;
 import pl.tdelektro.CarRental.Inventory.CarDTO;
 import pl.tdelektro.CarRental.Inventory.CarFacade;
 
+import java.io.File;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -206,6 +207,13 @@ public class ManagementFacadeIntegrationTest {
         assertTrue(
                 managementReservationRepository.findByReservationId(reservationId).get().getStatus()
                         .equals(ReservationStatus.COMPLETED));
+
+        File generatedInvoice = new File(reservationId + ".pdf");
+        assertTrue(generatedInvoice.exists());
+
+        generatedInvoice.delete();
+        assertFalse(generatedInvoice.exists());
+
     }
 
     @Test
