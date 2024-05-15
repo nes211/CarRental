@@ -7,6 +7,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import pl.tdelektro.CarRental.Customer.CustomerDTO;
 import pl.tdelektro.CarRental.Customer.CustomerFacade;
@@ -17,6 +18,8 @@ import pl.tdelektro.CarRental.Inventory.CarFacade;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -25,15 +28,30 @@ import static junit.framework.TestCase.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 public class ManagementFacadeTest {
-    @Mock
-    private ManagementReservationRepository managementReservationRepository;
+
+    private final long yearsInPlus = 100;
+    private final long daysInPlus = 10;
+    private final long oneDayCost = 10;
+
+    private LocalDateTime startReservation = LocalDateTime.now().plusYears(yearsInPlus);
+    private LocalDateTime endReservation = LocalDateTime.now().plusYears(yearsInPlus).plusDays(daysInPlus);
+
+    private final ReservationStatus status = ReservationStatus.REGISTERED;
+    private final String customerEmail = "test@test.test";
+    private final String reservationId = "id123456test";
+    private int randomCarId = 5;
+
     @Mock
     private List<ManagementReservation> reservations;
     @Mock
@@ -44,13 +62,62 @@ public class ManagementFacadeTest {
     private ManagementInvoice managementInvoice;
     @Mock
     private CustomerDTO customerDTO;
+    @Mock
+    private ManagementReservationRepository managementReservationRepository;
+    @Mock
+    private ManagementReservation reservation;
+    @Spy
     @InjectMocks
     private ManagementFacade managementFacade;
     Integer carDtoId;
 
+
     @Before
     public void warmup() {
         MockitoAnnotations.initMocks(this);
+    }
+
+
+    @Test
+    public void addReservationWithValidDataTest() {
+
+        reservation = new ManagementReservation();
+        reservation.setCarId(randomCarId);
+        reservation.setStartDate(startReservation);
+        reservation.setEndDate(endReservation);
+        reservation.setStatus(ReservationStatus.REGISTERED);
+
+        doReturn(true).when(managementFacade).checkReservationBeforeAdd(reservation);
+        boolean result = managementFacade.addReservation(reservation);
+        assertTrue(result);
+        verify(managementFacade, times(1)).checkReservationBeforeAdd(reservation);
+        verify(managementReservationRepository,times(0)).save(any(ManagementReservation.class));
+
+    }
+
+    @Test
+    public void checkReservationBeforeAddTest() {
+
+    }
+
+    @Test
+    public void removeReservationTest() {
+
+    }
+
+    @Test
+    public void isCarAvailableTest() {
+
+    }
+
+    @Test
+    public void checkInputDataTest() {
+
+    }
+
+    @Test
+    public void findAvailableCarsTest() {
+
     }
 
     @Test
@@ -63,7 +130,7 @@ public class ManagementFacadeTest {
 
         when(carFacade.findCarById(carId))
                 .thenReturn(
-                        new CarDTO(carId, "FSM", "126p", "C","G3TTER", 1990, 400f, true)
+                        new CarDTO(carId, "FSM", "126p", "C", "G3TTER", 1990, 400f, true)
                 );
 
         when(customerDTO.getFunds()).thenReturn(2000f);
@@ -116,12 +183,13 @@ public class ManagementFacadeTest {
 
         carDtoId = 0;
         ReservationStatus reservationStatus;
-        when(carFacade.findCarById(carDtoId)).thenReturn(new CarDTO(carDtoId, "FSM", "126p", "C","MALUSZEK", 1990, 400f, true));
+        when(carFacade.findCarById(carDtoId)).thenReturn(new CarDTO(carDtoId, "FSM", "126p", "C", "MALUSZEK", 1990, 400f, true));
 
-        LocalDateTime startRent = LocalDateTime.of(2024, 01, 10, 11, 30);
-        LocalDateTime endRent = LocalDateTime.of(2024, 01, 11, 14, 30);
+        LocalDateTime startRent = LocalDateTime.of(2024, 1, 10, 11, 30);
+        LocalDateTime endRent = LocalDateTime.of(2024, 1, 11, 14, 30);
         reservationStatus = managementFacade.setReservationStatus(startRent, endRent, carDtoId);
         assertEquals("Reservation status Completed", ReservationStatus.COMPLETED, reservationStatus);
+
         assertFalse(reservationStatus.equals(ReservationStatus.UNKNOWN), "Reservation status Unknown");
 
         startRent = LocalDateTime.now().minusDays(2);

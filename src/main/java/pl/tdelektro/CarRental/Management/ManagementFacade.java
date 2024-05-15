@@ -37,12 +37,11 @@ public class ManagementFacade {
 
     public boolean addReservation(ManagementReservation reservation) {
         if (checkReservationBeforeAdd(reservation)) {
-            managementReservationRepository.save(reservation);
             return true;
         } else throw new ReservationManagementProblem("Incorrect input data");
     }
 
-    private boolean checkReservationBeforeAdd(ManagementReservation reservation) {
+    public boolean checkReservationBeforeAdd(ManagementReservation reservation) {
         if (isCarAvailable(
                 reservation.getCarId(),
                 reservation.getStartDate(),
@@ -52,7 +51,9 @@ public class ManagementFacade {
             reservations.add(reservation);
             return true;
 
-        } else return false;
+        } else {
+            return false;
+        }
     }
 
     public boolean removeReservation(ManagementReservation reservation) {
@@ -78,29 +79,22 @@ public class ManagementFacade {
         return findStatus;
     }
 
-    private void checkInputData(Integer carId, LocalDateTime startDate, LocalDateTime endDate) {
+    void checkInputData(Integer carId, LocalDateTime startDate, LocalDateTime endDate) {
         carFacade.findCarById(carId);
-        if(endDate.isBefore(startDate))
+        if (endDate.isBefore(startDate))
             throw new ReservationManagementProblem("End rent date is before start date");
-        if (ChronoUnit.MINUTES.between(startDate, endDate) <=120)
+        if (ChronoUnit.MINUTES.between(startDate, endDate) <= 120)
             throw new ReservationManagementProblem("Rental time too short. Lower than 120 minutes");
     }
 
-
-
-
-
-
     public List<CarDTO> findAvailableCars(LocalDateTime startDate, LocalDateTime endDate) {
-        
+
         Set<ManagementReservation> reservations = managementReservationRepository.findByStatusOrStatus(
                 ReservationStatus.ACTIVE,
                 ReservationStatus.PENDING
         );
 
-        return reservationsCheck(reservations, startDate, endDate)
-                .stream()
-                .toList();
+        return reservationsCheck(reservations, startDate, endDate);
     }
 
     public List<CarDTO> reservationsCheck(Set<ManagementReservation> reservationSet, LocalDateTime startDate, LocalDateTime endDate) {
@@ -127,8 +121,9 @@ public class ManagementFacade {
             for (CarDTO car : setOfAvailableCars) {
                 for (int valueFromReservation : carSetFromReservation) {
                     if (car.getId() == valueFromReservation) {
+                    } else {
+                        availableCars.add(car);
                     }
-                    else{availableCars.add(car);}
                 }
             }
             return availableCars.stream().toList();

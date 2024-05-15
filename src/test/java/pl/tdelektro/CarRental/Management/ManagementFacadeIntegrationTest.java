@@ -50,7 +50,6 @@ public class ManagementFacadeIntegrationTest {
     private final ReservationStatus status = ReservationStatus.REGISTERED;
     private final String customerEmail = "test@test.test";
     private final String reservationId = "id123456test";
-    private final String reservationId2 = "2id123456test";
 
     private int randomCarId = 0;
 
@@ -88,6 +87,7 @@ public class ManagementFacadeIntegrationTest {
     @Order(0)
     public void addReservationTest() {
 
+        String reservationId2 = "2id123456test";
         ManagementReservation newReservation = ManagementReservation.builder()
                 .reservationId(reservationId2)
                 .customerEmail(customerEmail)
@@ -177,24 +177,23 @@ public class ManagementFacadeIntegrationTest {
             managementFacade.returnCar("2" + customerEmail, randomCarId, reservationId);
         } catch (RuntimeException e) {
             assertTrue(true);
-        } catch (DocumentException e) {
-        } catch (IOException e) {
+        } catch (DocumentException ignored) {
+        } catch (IOException ignored) {
         }
         try {
             managementFacade.returnCar(customerEmail, -1, reservationId);
         } catch (RuntimeException e) {
             assertTrue(true);
-        } catch (DocumentException e) {
-        } catch (IOException e) {
+        } catch (DocumentException ignored) {
+        } catch (IOException ignored) {
         }
         try {
             managementFacade.returnCar(customerEmail, randomCarId, "test" + reservationId);
         } catch (RuntimeException e) {
             assertTrue(true);
-        } catch (DocumentException e) {
-        } catch (IOException e) {
+        } catch (DocumentException ignored) {
+        } catch (IOException ignored) {
         }
-
 
         try {
             managementFacade.returnCar(customerEmail, randomCarId, reservationId);
@@ -220,7 +219,7 @@ public class ManagementFacadeIntegrationTest {
     public void findReservationTest() {
 
         ManagementReservation reservation = managementFacade.findReservation(reservationId);
-        assertTrue(reservation.getReservationId().equals(reservationId));
+        assertEquals(reservationId, reservation.getReservationId());
         try {
             managementFacade.findReservation("test");
         } catch (ReservationNotFoundException e) {
