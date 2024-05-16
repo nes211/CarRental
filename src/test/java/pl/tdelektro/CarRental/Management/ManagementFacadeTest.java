@@ -32,6 +32,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -75,17 +76,18 @@ public class ManagementFacadeTest {
     @Before
     public void warmup() {
         MockitoAnnotations.initMocks(this);
+        reservation = new ManagementReservation();
+        reservation.setCarId(randomCarId);
+        reservation.setStartDate(startReservation);
+        reservation.setEndDate(endReservation);
+        reservation.setStatus(ReservationStatus.REGISTERED);
+
     }
 
 
     @Test
     public void addReservationWithValidDataTest() {
 
-        reservation = new ManagementReservation();
-        reservation.setCarId(randomCarId);
-        reservation.setStartDate(startReservation);
-        reservation.setEndDate(endReservation);
-        reservation.setStatus(ReservationStatus.REGISTERED);
 
         doReturn(true).when(managementFacade).checkReservationBeforeAdd(reservation);
         boolean result = managementFacade.addReservation(reservation);
@@ -97,12 +99,37 @@ public class ManagementFacadeTest {
 
     @Test
     public void checkReservationBeforeAddTest() {
+        doReturn(true)
+                .when(managementFacade).isCarAvailable(
+                        reservation.getCarId(),
+                        reservation.getStartDate(),
+                        reservation.getEndDate()
+                );
+    boolean result = managementFacade.checkReservationBeforeAdd(reservation);
+    assertTrue(result);
+    verify(managementReservationRepository, times(1)).save(reservation);
+    verify(reservations, times(1)).add(reservation);
+    }
 
+
+    @Test
+    public void removeReservationSuccessTest() {
+    doReturn(Optional.of(reservation)).when(managementReservationRepository).findByReservationId(reservation.getReservationId());
+
+    assertTrue(managementFacade.removeReservation(reservation));
+    verify(reservations,times(1)).remove(any());
+    verify(managementReservationRepository, times(1))
+            .deleteByReservationId(reservation.getReservationId());
     }
 
     @Test
-    public void removeReservationTest() {
+    public void removeReservationExceptionTest() {
+    doReturn(null).when(managementReservationRepository).findByReservationId(reservation.getReservationId());
 
+    assertThrows(ReservationNotFoundException.class, ()-> managementFacade.removeReservation(reservation));
+    verify(reservations,times(1)).remove(any());
+    verify(managementReservationRepository, times(1))
+            .deleteByReservationId(reservation.getReservationId());
     }
 
     @Test
