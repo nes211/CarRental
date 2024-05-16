@@ -19,10 +19,12 @@ import pl.tdelektro.CarRental.Inventory.CarFacade;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import static junit.framework.TestCase.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
@@ -88,7 +90,6 @@ public class ManagementFacadeTest {
     @Test
     public void addReservationWithValidDataTest() {
 
-
         doReturn(true).when(managementFacade).checkReservationBeforeAdd(reservation);
         boolean result = managementFacade.addReservation(reservation);
         assertTrue(result);
@@ -134,11 +135,78 @@ public class ManagementFacadeTest {
 
     @Test
     public void isCarAvailableTest() {
+        doNothing().when(managementFacade).checkInputData(
+                reservation.getCarId(),
+                reservation.getStartDate(),
+                reservation.getEndDate()
+        );
 
+        doReturn(reservations.stream().collect(Collectors.toSet())).when(managementReservationRepository).findByCarIdAndStatusOrStatus(
+                reservation.getCarId(),
+                ReservationStatus.PENDING,
+                ReservationStatus.ACTIVE
+        );
+        List<CarDTO>carDTOList = Arrays.asList(new CarDTO(
+                randomCarId,
+                "Test",
+                "Test",
+                "Test",
+                "Test",
+                1990,
+                20,
+                true)
+        );
+
+        reservations.add(reservation);
+        doReturn(carDTOList).when(managementFacade).reservationsCheck(new HashSet<>(),reservation.getStartDate(), reservation.getEndDate());
+
+        boolean result = managementFacade.isCarAvailable(
+                reservation.getCarId(),
+                reservation.getStartDate(),
+                reservation.getEndDate()
+        );
+        assertTrue(result);
+    }
+
+    @Test
+    public void isCarAvailableCarNotAvailableTest() {
+        doNothing().when(managementFacade).checkInputData(
+                reservation.getCarId(),
+                reservation.getStartDate(),
+                reservation.getEndDate()
+        );
+
+        doReturn(reservations.stream().collect(Collectors.toSet())).when(managementReservationRepository).findByCarIdAndStatusOrStatus(
+                reservation.getCarId(),
+                ReservationStatus.PENDING,
+                ReservationStatus.ACTIVE
+        );
+        List<CarDTO>carDTOList = Arrays.asList(new CarDTO(
+                0,
+                "Test",
+                "Test",
+                "Test",
+                "Test",
+                1990,
+                20,
+                true)
+        );
+
+        reservations.add(reservation);
+
+        doReturn(carDTOList).when(managementFacade).reservationsCheck(new HashSet<>(),reservation.getStartDate(), reservation.getEndDate());
+
+        boolean result = managementFacade.isCarAvailable(
+                reservation.getCarId(),
+                reservation.getStartDate(),
+                reservation.getEndDate()
+        );
+        assertFalse(result);
     }
 
     @Test
     public void checkInputDataTest() {
+
 
     }
 
