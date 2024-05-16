@@ -1,5 +1,6 @@
 package pl.tdelektro.CarRental.Customer;
 
+import org.assertj.core.api.NotThrownAssert;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -11,7 +12,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import pl.tdelektro.CarRental.Exception.CustomerNotFoundException;
 
 import static org.junit.Assert.assertThrows;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -73,23 +74,61 @@ public class CustomerFacadeTest {
     @Test
     public void addNewCustomerWithDataSuccessTest() {
 
+        when(customerRepository.findByEmailAddress(customerEmail)).thenReturn(Optional.empty());
+
+        try {
+            customerFacade.addNewCustomerWithData(customerName, customerEmail, customerPassword, customerRole);
+        } catch (Exception e) {
+            fail("Exception was thrown");
+        }
+
+        verify(customerRepository, times(1)).findByEmailAddress(customerEmail);
+        verify(customerRepository, times(1)).save(any(Customer.class));
+
     }
 
     @Test
     public void addNewCustomerWithDataFailedTest() {
+        when(customerRepository.findByEmailAddress(customerEmail)).thenReturn(Optional.empty());
+
+        try {
+            customerFacade.addNewCustomerWithData(customerName, customerEmail, customerPassword, customerRole);
+        } catch (Exception e) {
+            assertThrows(CustomerNotFoundException.class, ()-> customerRepository.findByEmailAddress(customerEmail));
+        }
+
+        verify(customerRepository, times(1)).findByEmailAddress(customerEmail);
+        verify(customerRepository, times(1)).save(any(Customer.class));
 
     }
 
 
     @Test
-    public void getReservationsTest() {
+    public void editCustomerTest() {
 
         String[] statusString = {"PENDING", "ACTIVE", "COMPLETED", "UNKNOWN", "ANY_OTHER_TEXT"};
 
     }
 
     @Test
-    public void endReservationTest() {
+    public void getAllCustomersTest() {
+
+    }
+
+    @Test
+    public void findCustomerTest(){
+
+    }
+
+    @Test
+    public void findCustomerByNameTest(){
+
+    }
+
+
+
+    @Test
+    public void findCustomerForUserDetailsTest(){
 
     }
 }
