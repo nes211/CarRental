@@ -11,6 +11,7 @@ import pl.tdelektro.CarRental.Exception.CarNotFoundException;
 import pl.tdelektro.CarRental.Exception.CustomerNotFoundException;
 import pl.tdelektro.CarRental.Exception.ErrorResponse;
 import pl.tdelektro.CarRental.Exception.NotEnoughFoundsException;
+import pl.tdelektro.CarRental.Exception.ReservationManagementProblem;
 import pl.tdelektro.CarRental.Exception.ReservationNotFoundException;
 
 import java.util.Arrays;
@@ -23,13 +24,14 @@ class ApplicationExceptionHandler extends ResponseEntityExceptionHandler {
             CustomerNotFoundException.class,
             NotEnoughFoundsException.class,
             ReservationNotFoundException.class}
+            ReservationNotFoundException.class,
+            ReservationManagementProblem.class}
     )
     public ResponseEntity<ErrorResponse> exceptionHandler(RuntimeException ex) {
         ErrorResponse error = new ErrorResponse(Arrays.asList(ex.getMessage()));
 
         return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
     }
-
 
 
 }

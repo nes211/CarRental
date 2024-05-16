@@ -22,8 +22,6 @@ public class ManagementControllerTest {
     @Before
     public void warmup() {
         RestAssured.baseURI = "http://localhost:8080";
-        //authGeneration.warmup();
-        //authGeneration.generateTokenForTests();
     }
 
     @After

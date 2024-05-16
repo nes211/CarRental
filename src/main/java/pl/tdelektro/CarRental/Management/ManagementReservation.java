@@ -43,7 +43,13 @@ class ManagementReservation {
     private float totalReservationCost;
     private ReservationStatus status ;
 
-    ManagementReservation(String reservationId, String customerEmail, Integer carId, LocalDateTime startDate, LocalDateTime endDate, float totalReservationCost, ReservationStatus status) {
+    ManagementReservation(String reservationId,
+                          String customerEmail,
+                          Integer carId,
+                          LocalDateTime startDate,
+                          LocalDateTime endDate,
+                          float totalReservationCost,
+                          ReservationStatus status) {
         this.reservationId = reservationId;
         this.customerEmail = customerEmail;
         this.carId = carId;

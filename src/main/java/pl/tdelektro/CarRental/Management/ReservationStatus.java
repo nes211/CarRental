@@ -4,5 +4,7 @@ enum ReservationStatus {
     PENDING,
     ACTIVE,
     COMPLETED,
-    UNKNOWN
+    UNKNOWN,
+    REGISTERED,
+    REJECTED
 }

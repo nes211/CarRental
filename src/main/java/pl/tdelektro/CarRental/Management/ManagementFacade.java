@@ -35,15 +35,38 @@ public class ManagementFacade {
     private CustomerFacade customerFacade;
     private ManagementInvoice managementInvoice;
 
-    void addReservation(ManagementReservation reservation) {
-        reservations.add(reservation);
+    public boolean addReservation(ManagementReservation reservation) {
+        if (checkReservationBeforeAdd(reservation)) {
+            return true;
+        } else throw new ReservationManagementProblem("Incorrect input data");
     }
 
-    void removeReservation(ManagementReservation reservation) {
-        reservations.remove(reservation);
+    public boolean checkReservationBeforeAdd(ManagementReservation reservation) {
+        if (isCarAvailable(
+                reservation.getCarId(),
+                reservation.getStartDate(),
+                reservation.getEndDate())
+        ) {
+            managementReservationRepository.save(reservation);
+            reservations.add(reservation);
+            return true;
+
+        } else {
+            return false;
+        }
+    }
+
+    public boolean removeReservation(ManagementReservation reservation) {
+        if (managementReservationRepository.findByReservationId(reservation.getReservationId()).isPresent()) {
+            managementReservationRepository.deleteByReservationId(reservation.getReservationId());
+            reservations.remove(reservation);
+            return true;
+        } else throw new ReservationNotFoundException(reservation.getReservationId());
     }
 
     public boolean isCarAvailable(Integer carId, LocalDateTime startDate, LocalDateTime endDate) {
+
+        checkInputData(carId, startDate, endDate);
 
         Set<ManagementReservation> reservations = managementReservationRepository.findByCarIdAndStatusOrStatus(
                 carId,
@@ -56,24 +79,30 @@ public class ManagementFacade {
         return findStatus;
     }
 
-    public List<CarDTO> findAvailableCars(Integer carId, LocalDateTime startDate, LocalDateTime endDate) {
+    void checkInputData(Integer carId, LocalDateTime startDate, LocalDateTime endDate) {
+        carFacade.findCarById(carId);
+        if (endDate.isBefore(startDate))
+            throw new ReservationManagementProblem("End rent date is before start date");
+        if (ChronoUnit.MINUTES.between(startDate, endDate) <= 120)
+            throw new ReservationManagementProblem("Rental time too short. Lower than 120 minutes");
+    }
+
+    public List<CarDTO> findAvailableCars(LocalDateTime startDate, LocalDateTime endDate) {
+
         Set<ManagementReservation> reservations = managementReservationRepository.findByStatusOrStatus(
                 ReservationStatus.ACTIVE,
                 ReservationStatus.PENDING
         );
 
-        return reservationsCheck(reservations, startDate, endDate)
-                .stream()
-                .filter(carDTO -> carDTO.getId() == carId)
-                .toList();
+        return reservationsCheck(reservations, startDate, endDate);
     }
 
     public List<CarDTO> reservationsCheck(Set<ManagementReservation> reservationSet, LocalDateTime startDate, LocalDateTime endDate) {
+
         List<ManagementReservation> reservationList = new ArrayList<>();
         reservationSet.stream()
                 .filter(reservation ->
-                        ((reservation.getStartDate().isBefore(startDate) ||
-                                reservation.getStartDate().isEqual(startDate))
+                        ((reservation.getStartDate().isBefore(startDate) || reservation.getStartDate().isEqual(startDate))
                                 && (reservation.getEndDate().isBefore(startDate) || reservation.getEndDate().isEqual(startDate))
                                 && (reservation.getStartDate().isBefore(endDate) || reservation.getStartDate().isEqual(endDate))
                                 && (reservation.getEndDate().isBefore(endDate) || reservation.getEndDate().isEqual(endDate))) == false
@@ -88,14 +117,16 @@ public class ManagementFacade {
             reservationList.stream().forEach(carFromReservation -> {
                 carSetFromReservation.add(carFromReservation.getCarId());
             });
-            for(CarDTO car : setOfAvailableCars){
-                for (int valueFromReservation : carSetFromReservation){
-                    if(car.getId() == valueFromReservation){
-                        setOfAvailableCars.remove(car);
+            Set<CarDTO> availableCars = new HashSet<>();
+            for (CarDTO car : setOfAvailableCars) {
+                for (int valueFromReservation : carSetFromReservation) {
+                    if (car.getId() == valueFromReservation) {
+                    } else {
+                        availableCars.add(car);
                     }
                 }
             }
-            return setOfAvailableCars.stream().toList();
+            return availableCars.stream().toList();
         }
     }
 
@@ -147,11 +178,9 @@ public class ManagementFacade {
         ManagementReservation reservationEnd = findReservation(reservationId);
 
         //Checking that  CustomerDTO and CarDTO exist in repo only for exceptions
-        CustomerDTO customerFromRepo = customerFacade.findCustomerByName(customerEmail);
-        CarDTO carToReturn = carFacade.findCarById(carId);
-        setReservationStatus(reservationEnd.getStartDate(), reservationEnd.getEndDate(), carId);
+        customerFacade.findCustomerByName(customerEmail);
+        carFacade.findCarById(carId);
         endReservation(reservationEnd);
-        managementReservationRepository.save(reservationEnd);
         generateInvoice(reservationEnd);
     }
 
@@ -176,12 +205,12 @@ public class ManagementFacade {
         return customerFacade.editCustomer(customerFromRepo);
     }
 
-    private void generateInvoice(ManagementReservation reservation) throws DocumentException, IOException {
+    void generateInvoice(ManagementReservation reservation) throws DocumentException, IOException {
 
         managementInvoice.createInvoice(reservation);
     }
 
-    public ReservationStatus setReservationStatus(LocalDateTime startRent, LocalDateTime endRent, Integer carDtoId) {
+    ReservationStatus setReservationStatus(LocalDateTime startRent, LocalDateTime endRent, Integer carDtoId) {
 
         ReservationStatus reservationStatus;
 
@@ -199,7 +228,7 @@ public class ManagementFacade {
         return reservationStatus;
     }
 
-    public Set<ManagementReservationDTO> getReservations(String status) {
+    Set<ManagementReservationDTO> getReservations(String status) {
 
         ReservationStatus reservationStatus = null;
         switch (status.toUpperCase()) {
@@ -231,7 +260,7 @@ public class ManagementFacade {
         return managementReservationDTOSet;
     }
 
-   public void startReservation(ManagementReservation reservation) {
+    void startReservation(ManagementReservation reservation) {
 
         //Rest endpoint has ability to start
         ManagementReservation reservationFromRepo = findReservation(reservation.getReservationId());
@@ -249,9 +278,8 @@ public class ManagementFacade {
         }
     }
 
-    public void endReservation(ManagementReservation reservation) {
-        ManagementReservation reservationFromRepo = findReservation(reservation.getReservationId());
-        reservationFromRepo.setStatus(ReservationStatus.COMPLETED);
-        managementReservationRepository.save(reservationFromRepo);
+    void endReservation(ManagementReservation reservation) {
+        reservation.setStatus(ReservationStatus.COMPLETED);
+        managementReservationRepository.save(reservation);
     }
 }
