@@ -29,6 +29,8 @@ public class CustomerFacade {
                     .authorities(customer.getAuthorities())
                     .build();
             customerRepository.save(customerToSave);
+        } else {
+            throw new CustomerNotFoundException(customer.getUsername(), customer.getEmailAddress());
         }
     }
 
@@ -41,9 +43,9 @@ public class CustomerFacade {
                 .role(role)
                 .funds(0f)
                 .build();
-        if(customerRepository.findByEmailAddress(emailAddress).isEmpty()) {
+        if (customerRepository.findByEmailAddress(emailAddress).isEmpty()) {
             customerRepository.save(customer);
-        }else{
+        } else {
             throw new CustomerNotFoundException(customer.getUsername(), customer.getName());
         }
         return customer;
@@ -58,7 +60,7 @@ public class CustomerFacade {
         return true;
     }
 
-    public void deleteCustomer (String customerEmail){
+    public void deleteCustomer(String customerEmail) {
         customerRepository.deleteByEmailAddress(customerEmail);
 
     }
@@ -96,7 +98,7 @@ public class CustomerFacade {
 
     public UserDetails findCustomerForUserDetails(String emailAddress) {
         return customerRepository.findByEmailAddress(emailAddress)
-                .orElseThrow(()-> new CustomerNotFoundException("Customer with " + emailAddress +"not found in repo"));
+                .orElseThrow(() -> new CustomerNotFoundException("Customer with " + emailAddress + "not found in repo"));
     }
 
     Customer unwrapCustomer(Optional<Customer> customer) {

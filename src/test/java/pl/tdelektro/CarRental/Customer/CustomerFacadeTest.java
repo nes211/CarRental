@@ -1,102 +1,95 @@
 package pl.tdelektro.CarRental.Customer;
 
-
+import org.junit.Assert;
 import org.junit.Before;
-import org.junit.jupiter.api.Test;
+import org.junit.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+import org.mockito.junit.jupiter.MockitoExtension;
+import pl.tdelektro.CarRental.Exception.CustomerNotFoundException;
 
+import static org.junit.Assert.assertThrows;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
-//@RunWith(SpringRunner.class)
-@ExtendWith(SpringExtension.class)
-@SpringBootTest
-//@ContextConfiguration(classes = CarRentalApplication.class)
+import java.util.ArrayList;
+import java.util.Optional;
+
+@ExtendWith(MockitoExtension.class)
 public class CustomerFacadeTest {
 
-
-    private CustomerFacade customerFacade;
+    @Mock
     private CustomerRepository customerRepository;
-    //ApplicationContext context =
+    @InjectMocks
+    CustomerFacade customerFacade;
 
+    private final String customerName = "testString";
+    private final String customerPassword = "test";
+    private final String customerEmail = "test@test.test";
+    private final String customerPhoneNumber = "100200100";
+    private final String customerRole = "USER";
+    private final float customerFounds = 2000f;
+    private Customer customer = new Customer(
+            0,
+            customerName,
+            customerPassword,
+            customerEmail,
+            customerPhoneNumber,
+            customerRole,
+            new ArrayList<>(),
+            customerFounds
+    );
 
     @Before
     public void warmup() {
-//        customerRepository = context.getBean(CustomerRepository.class);
-//        customerFacade = context.getBean(CustomerFacade.class);
+        MockitoAnnotations.openMocks(this);
     }
 
     @Test
-    public void addNewCustomerTest() {
+    public void addNewCustomerSuccessTest() {
 
-        Customer customer = new Customer("test@test.test", "test", "USER");
-
+        when(customerRepository.findByEmailAddress(customerEmail)).thenReturn(Optional.empty());
         customerFacade.addNewCustomer(customer);
-
-//        assertEquals(customerRepository.findByEmailAddress("test@test.test"), customer);
-//
-//
-//        assertSame(customer, customerRepository.findByEmailAddress(customer.getEmailAddress()).get());
-//        assertFalse(customerRepository.findByEmailAddress(customer.getEmailAddress()).isEmpty());
+        verify(customerRepository, times(1)).findByEmailAddress(customerEmail);
+        verify(customerRepository, times(1)).save(any(Customer.class));
 
     }
 
     @Test
-    public void addNewCustomerWithDataTest() {
+    public void addNewCustomerFailedTest() {
 
-        String name = "testString";
-        String customerEmail = "test@test.test";
-        String password = "test";
-        String role = "USER";
-//
-//        assertTrue(customerRepository.findByEmailAddress(customerEmail).isEmpty());
-//        customerFacade.addNewCustomerWithData(name, customerEmail, password, role);
-//        assertTrue(customerRepository.findByEmailAddress(customerEmail).isPresent());
-//
-//        Customer customer = customerRepository.findByEmailAddress(customerEmail).orElseThrow(CustomerNotFoundException::new);
-//
-//        Assertions.assertSame(customer, customerRepository.findByEmailAddress(customerEmail).get());
-
+        when(customerRepository.findByEmailAddress(customerEmail)).thenReturn(Optional.of(customer));
+        assertThrows(CustomerNotFoundException.class, ()->customerFacade.addNewCustomer(customer));
+        verify(customerRepository, times(1)).findByEmailAddress(any());
+        verify(customerRepository, times(0)).save(customer);
 
     }
 
+    @Test
+    public void addNewCustomerWithDataSuccessTest() {
+
+    }
+
+    @Test
+    public void addNewCustomerWithDataFailedTest() {
+
+    }
 
 
     @Test
     public void getReservationsTest() {
+
         String[] statusString = {"PENDING", "ACTIVE", "COMPLETED", "UNKNOWN", "ANY_OTHER_TEXT"};
 
-//        ManagementReservation reservation = ManagementReservation.builder()
-//                .reservationId("test reservation")
-//                .startDate(LocalDateTime.now().plusDays(2))
-//                .endDate(LocalDateTime.now().plusDays(5))
-//                .customerEmail("test@test.com")
-//                .carId(5)
-//                .build();
-
-
-//        assertFalse(managementFacade.getReservations(statusString[0]).isEmpty());
-//        assertFalse(managementFacade.getReservations(statusString[1]).isEmpty());
-//        assertFalse(managementFacade.getReservations(statusString[2]).isEmpty());
-//        assertFalse(managementFacade.getReservations(statusString[3]).isEmpty());
-//        assertThrows(ReservationNotFoundException.class, () -> managementFacade.getReservations(statusString[4]));
     }
 
     @Test
     public void endReservationTest() {
 
-//        ManagementReservation reservation = ManagementReservation.builder()
-//                .reservationId("testId")
-//                .customerEmail("test@test.test")
-//                .carId(5)
-//                .startDate(LocalDateTime.now().minusDays(2))
-//                .endDate(LocalDateTime.now())
-//                .status(ReservationStatus.ACTIVE)
-//                .build();
-//        when(managementReservationRepository.findByReservationId(anyString())).thenReturn(Optional.ofNullable(reservation));
-//
-//        managementFacade.endReservation(reservation);
-//        verify(managementReservationRepository).findByReservationId("testId");
-//        verify(managementReservationRepository).save(any(ManagementReservation.class));
     }
 }

@@ -9,8 +9,8 @@ public class CustomerNotFoundException extends RuntimeException {
         super("Customer: " + username + " does not exists in repository, please register Yourself");
     }
 
-    public CustomerNotFoundException(String username, String message) {
-        super("Customer name " + username + " already exists in service with email address: " + message);
+    public CustomerNotFoundException(String username, String email) {
+        super("Customer name " + username + " already exists in service with email address: " + email);
     }
 
 
