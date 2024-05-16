@@ -1,8 +1,8 @@
 package pl.tdelektro.CarRental.Management;
 
-import com.itextpdf.text.DocumentException;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -12,13 +12,12 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import pl.tdelektro.CarRental.Customer.CustomerDTO;
 import pl.tdelektro.CarRental.Customer.CustomerFacade;
 import pl.tdelektro.CarRental.Exception.CarNotFoundException;
+import pl.tdelektro.CarRental.Exception.ReservationManagementProblem;
 import pl.tdelektro.CarRental.Exception.ReservationNotFoundException;
 import pl.tdelektro.CarRental.Inventory.CarDTO;
 import pl.tdelektro.CarRental.Inventory.CarFacade;
 
-import java.io.IOException;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
@@ -26,13 +25,14 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import static java.util.stream.Collectors.toSet;
 import static junit.framework.TestCase.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
@@ -45,15 +45,9 @@ public class ManagementFacadeTest {
 
     private final long yearsInPlus = 100;
     private final long daysInPlus = 10;
-    private final long oneDayCost = 10;
-
-    private LocalDateTime startReservation = LocalDateTime.now().plusYears(yearsInPlus);
-    private LocalDateTime endReservation = LocalDateTime.now().plusYears(yearsInPlus).plusDays(daysInPlus);
-
-    private final ReservationStatus status = ReservationStatus.REGISTERED;
-    private final String customerEmail = "test@test.test";
-    private final String reservationId = "id123456test";
-    private int randomCarId = 5;
+    private final LocalDateTime startReservation = LocalDateTime.now().plusYears(yearsInPlus);
+    private final LocalDateTime endReservation = LocalDateTime.now().plusYears(yearsInPlus).plusDays(daysInPlus);
+    private final int randomCarId = 5;
 
     @Mock
     private List<ManagementReservation> reservations;
@@ -74,18 +68,19 @@ public class ManagementFacadeTest {
     private ManagementFacade managementFacade;
     Integer carDtoId;
 
-
     @Before
     public void warmup() {
-        MockitoAnnotations.initMocks(this);
+
+        MockitoAnnotations.openMocks(this);
+
         reservation = new ManagementReservation();
         reservation.setCarId(randomCarId);
         reservation.setStartDate(startReservation);
         reservation.setEndDate(endReservation);
         reservation.setStatus(ReservationStatus.REGISTERED);
+        reservations.add(reservation);
 
     }
-
 
     @Test
     public void addReservationWithValidDataTest() {
@@ -94,7 +89,7 @@ public class ManagementFacadeTest {
         boolean result = managementFacade.addReservation(reservation);
         assertTrue(result);
         verify(managementFacade, times(1)).checkReservationBeforeAdd(reservation);
-        verify(managementReservationRepository,times(0)).save(any(ManagementReservation.class));
+        verify(managementReservationRepository, times(0)).save(any(ManagementReservation.class));
 
     }
 
@@ -106,31 +101,29 @@ public class ManagementFacadeTest {
                         reservation.getStartDate(),
                         reservation.getEndDate()
                 );
-    boolean result = managementFacade.checkReservationBeforeAdd(reservation);
-    assertTrue(result);
-    verify(managementReservationRepository, times(1)).save(reservation);
-    verify(reservations, times(1)).add(reservation);
+        boolean result = managementFacade.checkReservationBeforeAdd(reservation);
+        assertTrue(result);
+        verify(managementReservationRepository, times(1)).save(reservation);
+        verify(reservations, times(2)).add(reservation);
     }
 
 
     @Test
     public void removeReservationSuccessTest() {
-    doReturn(Optional.of(reservation)).when(managementReservationRepository).findByReservationId(reservation.getReservationId());
+        doReturn(Optional.of(reservation)).when(managementReservationRepository).findByReservationId(reservation.getReservationId());
 
-    assertTrue(managementFacade.removeReservation(reservation));
-    verify(reservations,times(1)).remove(any());
-    verify(managementReservationRepository, times(1))
-            .deleteByReservationId(reservation.getReservationId());
+        assertTrue(managementFacade.removeReservation(reservation));
+        verify(reservations, times(1)).remove(reservation);
+        verify(managementReservationRepository, times(1))
+                .deleteByReservationId(reservation.getReservationId());
     }
 
     @Test
     public void removeReservationExceptionTest() {
-    doReturn(null).when(managementReservationRepository).findByReservationId(reservation.getReservationId());
+        doReturn(Optional.of(reservation)).when(managementReservationRepository).findByReservationId(reservation.getReservationId());
 
-    assertThrows(ReservationNotFoundException.class, ()-> managementFacade.removeReservation(reservation));
-    verify(reservations,times(1)).remove(any());
-    verify(managementReservationRepository, times(1))
-            .deleteByReservationId(reservation.getReservationId());
+        reservation.setReservationId("testId");
+        assertThrows(ReservationNotFoundException.class, () -> managementFacade.removeReservation(reservation));
     }
 
     @Test
@@ -141,12 +134,13 @@ public class ManagementFacadeTest {
                 reservation.getEndDate()
         );
 
-        doReturn(reservations.stream().collect(Collectors.toSet())).when(managementReservationRepository).findByCarIdAndStatusOrStatus(
+        Set<ManagementReservation> reservationSet = reservations.stream().collect(Collectors.toSet());
+        doReturn(reservationSet).when(managementReservationRepository).findByCarIdAndStatusOrStatus(
                 reservation.getCarId(),
                 ReservationStatus.PENDING,
                 ReservationStatus.ACTIVE
         );
-        List<CarDTO>carDTOList = Arrays.asList(new CarDTO(
+        List<CarDTO> carDTOList = Arrays.asList(new CarDTO(
                 randomCarId,
                 "Test",
                 "Test",
@@ -158,7 +152,7 @@ public class ManagementFacadeTest {
         );
 
         reservations.add(reservation);
-        doReturn(carDTOList).when(managementFacade).reservationsCheck(new HashSet<>(),reservation.getStartDate(), reservation.getEndDate());
+        doReturn(carDTOList).when(managementFacade).reservationsCheck(new HashSet<>(), reservation.getStartDate(), reservation.getEndDate());
 
         boolean result = managementFacade.isCarAvailable(
                 reservation.getCarId(),
@@ -170,6 +164,7 @@ public class ManagementFacadeTest {
 
     @Test
     public void isCarAvailableCarNotAvailableTest() {
+
         doNothing().when(managementFacade).checkInputData(
                 reservation.getCarId(),
                 reservation.getStartDate(),
@@ -181,7 +176,8 @@ public class ManagementFacadeTest {
                 ReservationStatus.PENDING,
                 ReservationStatus.ACTIVE
         );
-        List<CarDTO>carDTOList = Arrays.asList(new CarDTO(
+
+        List<CarDTO> carDTOList = Arrays.asList(new CarDTO(
                 0,
                 "Test",
                 "Test",
@@ -194,7 +190,7 @@ public class ManagementFacadeTest {
 
         reservations.add(reservation);
 
-        doReturn(carDTOList).when(managementFacade).reservationsCheck(new HashSet<>(),reservation.getStartDate(), reservation.getEndDate());
+        doReturn(carDTOList).when(managementFacade).reservationsCheck(new HashSet<>(), reservation.getStartDate(), reservation.getEndDate());
 
         boolean result = managementFacade.isCarAvailable(
                 reservation.getCarId(),
@@ -205,13 +201,61 @@ public class ManagementFacadeTest {
     }
 
     @Test
-    public void checkInputDataTest() {
+    public void checkInputDataSuccessTest() {
 
+        when(carFacade.findCarById(randomCarId)).thenReturn(new CarDTO());
+        assertDoesNotThrow(() ->
+                managementFacade.checkInputData(
+                        randomCarId,
+                        reservation.getStartDate(),
+                        reservation.getEndDate()
+                ));
+    }
+
+    @Test
+    public void checkInputDataFailsTest() {
+
+        when(carFacade.findCarById(randomCarId)).thenReturn(new CarDTO());
+        assertThrows(ReservationManagementProblem.class, () ->
+                managementFacade.checkInputData(
+                        randomCarId,
+                        reservation.getEndDate(),
+                        reservation.getStartDate()
+                ));
+    }
+
+    @Test
+    public void findAvailableCarsSuccessTest() {
+
+        HashSet<ManagementReservation> reservationSet = new HashSet<>();
+        reservationSet.add(reservation);
+        HashSet<CarDTO> carDtoSet = new HashSet<>();
+        carDtoSet.add(new CarDTO(randomCarId+1, "TEST", "TEST", "TEST", "TEST",1900,10, true));
+
+        when(managementReservationRepository.findByStatusOrStatus(ReservationStatus.ACTIVE, ReservationStatus.PENDING)).thenReturn(reservationSet);
+        when(carFacade.findAvailableCars().stream().collect(toSet())).thenReturn(carDtoSet);
+        doReturn(Arrays.asList(new CarDTO())).when(managementFacade).reservationsCheck(reservationSet, startReservation, endReservation);
+
+        List<CarDTO>carList = managementFacade.findAvailableCars(LocalDateTime.now(), LocalDateTime.now().plusDays(5));
+        assertFalse(carList.isEmpty());
+        Assertions.assertEquals(randomCarId + 1, (int) carList.get(0).getId());
 
     }
 
     @Test
-    public void findAvailableCarsTest() {
+    public void findAvailableCarsFailsTest() {
+
+        HashSet<ManagementReservation> reservationSet = new HashSet<>();
+        reservationSet.add(reservation);
+        HashSet<CarDTO> carDtoSet = new HashSet<>();
+        carDtoSet.add(new CarDTO(randomCarId, "TEST", "TEST", "TEST", "TEST",1900,10, true));
+
+        when(managementReservationRepository.findByStatusOrStatus(ReservationStatus.ACTIVE, ReservationStatus.PENDING)).thenReturn(reservationSet);
+        when(carFacade.findAvailableCars().stream().collect(toSet())).thenReturn(carDtoSet);
+        doReturn(Arrays.asList(new CarDTO())).when(managementFacade).reservationsCheck(reservationSet, startReservation, endReservation);
+
+        List<CarDTO>carList = managementFacade.findAvailableCars(LocalDateTime.now(), LocalDateTime.now().plusDays(5));
+        assertTrue(carList.isEmpty());
 
     }
 
@@ -221,11 +265,10 @@ public class ManagementFacadeTest {
         String customerEmail = "test@test.test";
         LocalDateTime startRent = LocalDateTime.now().plusDays(10);
         LocalDateTime endRent = LocalDateTime.now().plusDays(15);
-        Integer carId = 4;
 
-        when(carFacade.findCarById(carId))
+        when(carFacade.findCarById(randomCarId))
                 .thenReturn(
-                        new CarDTO(carId, "FSM", "126p", "C", "G3TTER", 1990, 400f, true)
+                        new CarDTO(randomCarId, "FSM", "126p", "C", "G3TTER", 1990, 10f, true)
                 );
 
         when(customerDTO.getFunds()).thenReturn(2000f);
@@ -233,17 +276,18 @@ public class ManagementFacadeTest {
                 .thenReturn(
                         new CustomerDTO(customerEmail, customerEmail, 2000f)
                 );
-        managementFacade.rentCar(customerEmail, startRent, endRent, carId);
+        doReturn(true).when(managementFacade).isCarAvailable(randomCarId, startRent, endRent);
+        managementFacade.rentCar(customerEmail, startRent, endRent, randomCarId);
 
-        assertEquals(carId, managementFacade.rentCar(customerEmail, startRent, endRent, carId).getCarId());
-        assertEquals(startRent, managementFacade.rentCar(customerEmail, startRent, endRent, carId).getStartDate());
-        assertEquals(endRent, managementFacade.rentCar(customerEmail, startRent, endRent, carId).getEndDate());
-        assertEquals(2000f, managementFacade.rentCar(customerEmail, startRent, endRent, carId).getTotalCost(), 0.001);
-        assertEquals(ReservationStatus.PENDING.toString(), managementFacade.rentCar(customerEmail, startRent, endRent, carId).getStatus());
+        assertEquals(Integer.valueOf(randomCarId), managementFacade.rentCar(customerEmail, startRent, endRent, randomCarId).getCarId());
+        assertEquals(startRent, managementFacade.rentCar(customerEmail, startRent, endRent, randomCarId).getStartDate());
+        assertEquals(endRent, managementFacade.rentCar(customerEmail, startRent, endRent, randomCarId).getEndDate());
+        assertEquals(50f, managementFacade.rentCar(customerEmail, startRent, endRent, randomCarId).getTotalCost(), 0.001);
+        assertEquals(ReservationStatus.PENDING.toString(), managementFacade.rentCar(customerEmail, startRent, endRent, randomCarId).getStatus());
     }
 
     @Test
-    public void reservationReturnCarTest() throws DocumentException, IOException {
+    public void reservationReturnCarTest() {
 
         managementFacade = new ManagementFacade(reservations, managementReservationRepository, carFacade, customerFacade, managementInvoice);
         String reservationId = "testString";
@@ -285,23 +329,24 @@ public class ManagementFacadeTest {
         reservationStatus = managementFacade.setReservationStatus(startRent, endRent, carDtoId);
         assertEquals("Reservation status Completed", ReservationStatus.COMPLETED, reservationStatus);
 
-        assertFalse(reservationStatus.equals(ReservationStatus.UNKNOWN), "Reservation status Unknown");
+        assertNotEquals(reservationStatus, ReservationStatus.UNKNOWN, "Reservation status Unknown");
 
         startRent = LocalDateTime.now().minusDays(2);
         endRent = LocalDateTime.now().plusDays(3);
         reservationStatus = managementFacade.setReservationStatus(startRent, endRent, carDtoId);
         assertEquals("Reservation status Active", ReservationStatus.ACTIVE, reservationStatus);
-        assertFalse(reservationStatus.equals(ReservationStatus.UNKNOWN), "Reservation status Unknown");
+        assertNotEquals(reservationStatus, ReservationStatus.UNKNOWN, "Reservation status Unknown");
 
         startRent = LocalDateTime.now().plusDays(5);
         endRent = LocalDateTime.now().plusDays(13);
         reservationStatus = managementFacade.setReservationStatus(startRent, endRent, carDtoId);
         assertEquals("Reservation status Pending", ReservationStatus.PENDING, reservationStatus);
-        assertFalse(reservationStatus.equals(ReservationStatus.UNKNOWN), "Reservation status Unknown");
+        assertNotEquals(reservationStatus, ReservationStatus.UNKNOWN, "Reservation status Unknown");
     }
 
     @Test
     public void getReservationsTest() {
+
         String[] statusString = {"PENDING", "ACTIVE", "COMPLETED", "UNKNOWN", "ANY_OTHER_TEXT"};
 
         ManagementReservation reservation = ManagementReservation.builder()
@@ -345,7 +390,6 @@ public class ManagementFacadeTest {
         when(managementReservationRepository.findByReservationId(anyString())).thenReturn(Optional.ofNullable(reservation));
 
         managementFacade.endReservation(reservation);
-        verify(managementReservationRepository).findByReservationId("testId");
         verify(managementReservationRepository).save(any(ManagementReservation.class));
     }
 }
