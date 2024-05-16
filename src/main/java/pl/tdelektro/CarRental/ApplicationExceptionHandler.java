@@ -23,7 +23,6 @@ class ApplicationExceptionHandler extends ResponseEntityExceptionHandler {
             CarNotAvailableException.class,
             CustomerNotFoundException.class,
             NotEnoughFoundsException.class,
-            ReservationNotFoundException.class}
             ReservationNotFoundException.class,
             ReservationManagementProblem.class}
     )
