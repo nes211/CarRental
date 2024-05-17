@@ -51,7 +51,7 @@ public class CustomerFacade {
         return customer;
     }
 
-    public boolean editCustomer(CustomerDTO customerDto) {
+     public boolean editCustomer(CustomerDTO customerDto) {
         Customer customer = unwrapCustomer(customerRepository.findByEmailAddress(customerDto.emailAddress));
         customer.setEmailAddress(customerDto.emailAddress);
         customer.setName(customerDto.name);

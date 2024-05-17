@@ -1,7 +1,5 @@
 package pl.tdelektro.CarRental.Customer;
 
-import org.assertj.core.api.NotThrownAssert;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -11,15 +9,16 @@ import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
 import pl.tdelektro.CarRental.Exception.CustomerNotFoundException;
 
+import java.util.ArrayList;
+import java.util.Optional;
+
 import static org.junit.Assert.assertThrows;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-
-import java.util.ArrayList;
-import java.util.Optional;
 
 @ExtendWith(MockitoExtension.class)
 public class CustomerFacadeTest {
@@ -65,7 +64,7 @@ public class CustomerFacadeTest {
     public void addNewCustomerFailedTest() {
 
         when(customerRepository.findByEmailAddress(customerEmail)).thenReturn(Optional.of(customer));
-        assertThrows(CustomerNotFoundException.class, ()->customerFacade.addNewCustomer(customer));
+        assertThrows(CustomerNotFoundException.class, () -> customerFacade.addNewCustomer(customer));
         verify(customerRepository, times(1)).findByEmailAddress(any());
         verify(customerRepository, times(0)).save(customer);
 
@@ -94,7 +93,7 @@ public class CustomerFacadeTest {
         try {
             customerFacade.addNewCustomerWithData(customerName, customerEmail, customerPassword, customerRole);
         } catch (Exception e) {
-            assertThrows(CustomerNotFoundException.class, ()-> customerRepository.findByEmailAddress(customerEmail));
+            assertThrows(CustomerNotFoundException.class, () -> customerRepository.findByEmailAddress(customerEmail));
         }
 
         verify(customerRepository, times(1)).findByEmailAddress(customerEmail);
@@ -102,11 +101,27 @@ public class CustomerFacadeTest {
 
     }
 
+    @Test
+    public void editCustomerCustomerExistsTest() {
+
+        CustomerDTO customerDto = new CustomerDTO(customerName, customerEmail, customerFounds);
+        when(customerRepository.findByEmailAddress(customerEmail)).thenReturn(Optional.empty());
+        assertTrue(customerFacade.editCustomer(customerDto));
+        verify(customerRepository, times(1)).save(any(Customer.class));
+
+    }
 
     @Test
-    public void editCustomerTest() {
+    public void editCustomerButCustomerDoesNotExistsTest() {
 
-        String[] statusString = {"PENDING", "ACTIVE", "COMPLETED", "UNKNOWN", "ANY_OTHER_TEXT"};
+        CustomerDTO customerDto = new CustomerDTO(customerName, customerEmail, customerFounds);
+        when(customerRepository.findByEmailAddress(customerEmail)).thenReturn(Optional.empty());
+        try {
+            customerFacade.editCustomer(customerDto);
+        } catch (Exception e) {
+            assertTrue(true);
+        }
+        verify(customerRepository, times(0)).save(any(Customer.class));
 
     }
 
@@ -116,19 +131,18 @@ public class CustomerFacadeTest {
     }
 
     @Test
-    public void findCustomerTest(){
+    public void findCustomerTest() {
 
     }
 
     @Test
-    public void findCustomerByNameTest(){
+    public void findCustomerByNameTest() {
 
     }
 
 
-
     @Test
-    public void findCustomerForUserDetailsTest(){
+    public void findCustomerForUserDetailsTest() {
 
     }
 }
