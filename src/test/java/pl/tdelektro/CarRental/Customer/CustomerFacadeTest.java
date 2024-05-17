@@ -12,14 +12,14 @@ import pl.tdelektro.CarRental.Exception.CustomerNotFoundException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
 
+import static java.util.Optional.empty;
+import static java.util.Optional.of;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -57,7 +57,7 @@ public class CustomerFacadeTest {
     @Test
     public void addNewCustomerSuccessTest() {
 
-        when(customerRepository.findByEmailAddress(customerEmail)).thenReturn(Optional.empty());
+        when(customerRepository.findByEmailAddress(customerEmail)).thenReturn(empty());
         customerFacade.addNewCustomer(customer);
         verify(customerRepository, times(1)).findByEmailAddress(customerEmail);
         verify(customerRepository, times(1)).save(any(Customer.class));
@@ -67,7 +67,7 @@ public class CustomerFacadeTest {
     @Test
     public void addNewCustomerFailedTest() {
 
-        when(customerRepository.findByEmailAddress(customerEmail)).thenReturn(Optional.of(customer));
+        when(customerRepository.findByEmailAddress(customerEmail)).thenReturn(of(customer));
         assertThrows(CustomerNotFoundException.class, () -> customerFacade.addNewCustomer(customer));
         verify(customerRepository, times(1)).findByEmailAddress(any());
         verify(customerRepository, times(0)).save(customer);
@@ -77,7 +77,7 @@ public class CustomerFacadeTest {
     @Test
     public void addNewCustomerWithDataSuccessTest() {
 
-        when(customerRepository.findByEmailAddress(customerEmail)).thenReturn(Optional.empty());
+        when(customerRepository.findByEmailAddress(customerEmail)).thenReturn(empty());
 
         try {
             customerFacade.addNewCustomerWithData(customerName, customerEmail, customerPassword, customerRole);
@@ -92,7 +92,7 @@ public class CustomerFacadeTest {
 
     @Test
     public void addNewCustomerWithDataFailedTest() {
-        when(customerRepository.findByEmailAddress(customerEmail)).thenReturn(Optional.empty());
+        when(customerRepository.findByEmailAddress(customerEmail)).thenReturn(empty());
 
         try {
             customerFacade.addNewCustomerWithData(customerName, customerEmail, customerPassword, customerRole);
@@ -109,7 +109,7 @@ public class CustomerFacadeTest {
     public void editCustomerCustomerExistsTest() {
 
         CustomerDTO customerDto = new CustomerDTO(customerName, customerEmail, customerFounds);
-        when(customerRepository.findByEmailAddress(customerEmail)).thenReturn(Optional.empty());
+        when(customerRepository.findByEmailAddress(customerEmail)).thenReturn(empty());
         assertTrue(customerFacade.editCustomer(customerDto));
         verify(customerRepository, times(1)).save(any(Customer.class));
 
@@ -119,7 +119,7 @@ public class CustomerFacadeTest {
     public void editCustomerButCustomerDoesNotExistsTest() {
 
         CustomerDTO customerDto = new CustomerDTO(customerName, customerEmail, customerFounds);
-        when(customerRepository.findByEmailAddress(customerEmail)).thenReturn(Optional.empty());
+        when(customerRepository.findByEmailAddress(customerEmail)).thenReturn(empty());
         try {
             customerFacade.editCustomer(customerDto);
         } catch (Exception e) {
@@ -158,8 +158,8 @@ public class CustomerFacadeTest {
     @Test
     public void findCustomerTest() {
 
-        Customer customerForTest=new Customer(customerEmail, customerPassword, customerRole);
-        when(customerRepository.findByEmailAddress(customerEmail)).thenReturn(Optional.of(customerForTest));
+        Customer customerForTest = new Customer(customerEmail, customerPassword, customerRole);
+        when(customerRepository.findByEmailAddress(customerEmail)).thenReturn(of(customerForTest));
         try {
             customerFacade.findCustomer(customerForTest);
         } catch (Exception e) {
@@ -172,15 +172,24 @@ public class CustomerFacadeTest {
     @Test
     public void findCustomerFailedTest() {
 
-        when(customerRepository.findByEmailAddress(customerEmail)).thenReturn(Optional.empty());
-        assertThrows(CustomerNotFoundException.class,()-> customerFacade.findCustomer(any(Customer.class)));
+        when(customerRepository.findByEmailAddress(customerEmail)).thenReturn(empty());
+        assertThrows(CustomerNotFoundException.class, () -> customerFacade.findCustomer(any(Customer.class)));
         verify(customerRepository, times(1)).findByEmailAddress(any(String.class));
 
     }
 
-
     @Test
     public void findCustomerByNameTest() {
+
+        Customer customerForTests = new Customer(customerName, customerEmail, customerRole);
+        when(customerRepository.findByEmailAddress(customerEmail)).thenReturn(of(customerForTests));
+        CustomerDTO customerDTO = null;
+        try {
+            customerDTO = customerFacade.findCustomerByName(customerEmail);
+        } catch (Exception e) {
+            fail("Customer not found");
+        }
+        assertTrue(customerDTO.getEmailAddress().equals(customerName));
 
     }
 
