@@ -91,14 +91,14 @@ public class CustomerFacade {
     public CustomerDTO findCustomerByName(String customerEmail) {
         Optional<Customer> optional = customerRepository.findByEmailAddress(customerEmail);
         if (optional.isEmpty()) {
-            throw new UsernameNotFoundException("Customer with name: " + customerEmail + " not find in repo. Please register yourself");
+            throw new CustomerNotFoundException("Customer with name: " + customerEmail + " not found in repo. Please register yourself");
         }
         return new CustomerDTO(optional.get());
     }
 
     public UserDetails findCustomerForUserDetails(String emailAddress) {
         return customerRepository.findByEmailAddress(emailAddress)
-                .orElseThrow(() -> new CustomerNotFoundException("Customer with " + emailAddress + "not found in repo"));
+                .orElseThrow(() -> new UsernameNotFoundException("Customer with name " + emailAddress + "not found in repo"));
     }
 
     Customer unwrapCustomer(Optional<Customer> customer) {

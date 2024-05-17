@@ -204,7 +204,7 @@ public class CustomerFacadeTest {
         try {
             customerDTO = customerFacade.findCustomerByName(customerEmail);
         } catch (Exception e) {
-            assertThrows(UsernameNotFoundException.class, () -> customerFacade.findCustomerByName(customerEmail));
+            assertThrows(CustomerNotFoundException.class, () -> customerFacade.findCustomerByName(customerEmail));
             assertTrue(true);
         }
         assertNull(customerDTO);
@@ -220,5 +220,17 @@ public class CustomerFacadeTest {
             fail("Exception found");
         }
         verify(customerRepository, times(1)).findByEmailAddress(customerEmail);
+    }
+
+    @Test
+    public void findCustomerForUserDetailsFailTest() {
+        when(customerRepository.findByEmailAddress(customerEmail)).thenReturn(Optional.empty());
+
+        try {
+            customerFacade.findCustomerForUserDetails(customerEmail);
+        } catch (Exception e) {
+            assertThrows(UsernameNotFoundException.class, ()-> customerFacade.findCustomerForUserDetails(customerEmail));
+        }
+        verify(customerRepository, times(2)).findByEmailAddress(customerEmail);
     }
 }
