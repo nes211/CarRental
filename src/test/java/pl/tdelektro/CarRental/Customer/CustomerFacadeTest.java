@@ -146,6 +146,15 @@ public class CustomerFacadeTest {
     }
 
     @Test
+    public void getAllCustomersNoCustomerInRepoTest() {
+
+        when(customerRepository.findByIdNotNull()).thenReturn(new ArrayList<>());
+        assertThrows(CustomerNotFoundException.class, () -> customerFacade.getAllCustomers());
+        verify(customerRepository, times(1)).findByIdNotNull();
+
+    }
+
+    @Test
     public void findCustomerTest() {
 
     }
