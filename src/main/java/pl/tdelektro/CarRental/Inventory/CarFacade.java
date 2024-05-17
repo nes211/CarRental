@@ -31,7 +31,7 @@ public class CarFacade {
     public CarDTO findCarById(Integer carId) {
         Optional<Car> carFromRepo = carRepository.findById(carId);
         //Null check for test purpose
-        if (carFromRepo.get() == null) {
+        if (carFromRepo.isEmpty()) {
             throw new CarNotFoundException(carId);
         }
         return unwrapCarToCarDto(carFromRepo, carId);

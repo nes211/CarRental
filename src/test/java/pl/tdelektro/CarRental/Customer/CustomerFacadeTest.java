@@ -33,7 +33,7 @@ public class CustomerFacadeTest {
     @Mock
     private CustomerRepository customerRepository;
     @InjectMocks
-    CustomerFacade customerFacade;
+    private CustomerFacade customerFacade;
 
     private final String customerName = "testString";
     private final String customerPassword = "test";
