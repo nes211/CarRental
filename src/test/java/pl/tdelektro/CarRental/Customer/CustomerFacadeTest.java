@@ -170,6 +170,16 @@ public class CustomerFacadeTest {
     }
 
     @Test
+    public void findCustomerFailedTest() {
+
+        when(customerRepository.findByEmailAddress(customerEmail)).thenReturn(Optional.empty());
+        assertThrows(CustomerNotFoundException.class,()-> customerFacade.findCustomer(any(Customer.class)));
+        verify(customerRepository, times(1)).findByEmailAddress(any(String.class));
+
+    }
+
+
+    @Test
     public void findCustomerByNameTest() {
 
     }
