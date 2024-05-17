@@ -7,15 +7,19 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import pl.tdelektro.CarRental.Exception.CustomerNotFoundException;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
@@ -170,7 +174,7 @@ public class CustomerFacadeTest {
     }
 
     @Test
-    public void findCustomerFailedTest() {
+    public void findCustomerFailTest() {
 
         when(customerRepository.findByEmailAddress(customerEmail)).thenReturn(empty());
         assertThrows(CustomerNotFoundException.class, () -> customerFacade.findCustomer(any(Customer.class)));
@@ -190,6 +194,22 @@ public class CustomerFacadeTest {
             fail("Customer not found");
         }
         assertTrue(customerDTO.getEmailAddress().equals(customerName));
+
+    }
+
+    @Test
+    public void findCustomerByNameFailTest() {
+
+        Customer customerForTests = new Customer(customerName, customerEmail, customerRole);
+        when(customerRepository.findByEmailAddress(customerEmail)).thenReturn(Optional.empty());
+        CustomerDTO customerDTO = null;
+        try {
+            customerDTO = customerFacade.findCustomerByName(customerEmail);
+        } catch (Exception e) {
+            assertThrows(UsernameNotFoundException.class, ()->customerFacade.findCustomerByName(customerEmail));
+            assertTrue(true);
+        }
+        assertNull(customerDTO);
 
     }
 
