@@ -112,7 +112,7 @@ public class CustomerFacadeTest {
     public void editCustomerCustomerExistsTest() {
 
         CustomerDTO customerDto = new CustomerDTO(customerName, customerEmail, customerFounds);
-        when(customerRepository.findByEmailAddress(customerEmail)).thenReturn(empty());
+        when(customerRepository.findByEmailAddress(customerEmail)).thenReturn(of(customer));
         assertTrue(customerFacade.editCustomer(customerDto));
         verify(customerRepository, times(1)).save(any(Customer.class));
 
@@ -176,7 +176,7 @@ public class CustomerFacadeTest {
     public void findCustomerFailTest() {
 
         when(customerRepository.findByEmailAddress(customerEmail)).thenReturn(empty());
-        assertThrows(CustomerNotFoundException.class, () -> customerFacade.findCustomer(any(Customer.class)));
+        assertThrows(UsernameNotFoundException.class, () -> customerFacade.findCustomer(customer));
         verify(customerRepository, times(1)).findByEmailAddress(any(String.class));
 
     }
