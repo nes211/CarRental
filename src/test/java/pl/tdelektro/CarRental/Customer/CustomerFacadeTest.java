@@ -10,8 +10,11 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import pl.tdelektro.CarRental.Exception.CustomerNotFoundException;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
@@ -127,6 +130,18 @@ public class CustomerFacadeTest {
 
     @Test
     public void getAllCustomersTest() {
+
+        Customer customer1 = new Customer(customerEmail, customerPassword, customerRole);
+        Customer customer2 = new Customer("2" + customerEmail, customerPassword, customerRole);
+
+        when(customerRepository.findByIdNotNull()).thenReturn(Arrays.asList(customer1, customer2));
+
+        List<CustomerDTO> allCustomers = customerFacade.getAllCustomers();
+
+        assertEquals(2, allCustomers.size());
+        assertTrue(allCustomers.stream().anyMatch(user -> user.getEmailAddress().equals(customer1.getEmailAddress())));
+        assertTrue(allCustomers.stream().anyMatch(user -> user.getEmailAddress().equals(customer2.getEmailAddress())));
+        verify(customerRepository, times(1)).findByIdNotNull();
 
     }
 
