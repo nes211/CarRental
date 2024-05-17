@@ -18,7 +18,6 @@ import java.util.Optional;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
@@ -194,7 +193,6 @@ public class CustomerFacadeTest {
             fail("Customer not found");
         }
         assertTrue(customerDTO.getEmailAddress().equals(customerName));
-
     }
 
     @Test
@@ -206,16 +204,21 @@ public class CustomerFacadeTest {
         try {
             customerDTO = customerFacade.findCustomerByName(customerEmail);
         } catch (Exception e) {
-            assertThrows(UsernameNotFoundException.class, ()->customerFacade.findCustomerByName(customerEmail));
+            assertThrows(UsernameNotFoundException.class, () -> customerFacade.findCustomerByName(customerEmail));
             assertTrue(true);
         }
         assertNull(customerDTO);
-
     }
-
 
     @Test
     public void findCustomerForUserDetailsTest() {
+        when(customerRepository.findByEmailAddress(customerEmail)).thenReturn(of(customer));
 
+        try {
+            customerFacade.findCustomerForUserDetails(customerEmail);
+        } catch (Exception e) {
+            fail("Exception found");
+        }
+        verify(customerRepository, times(1)).findByEmailAddress(customerEmail);
     }
 }
