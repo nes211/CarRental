@@ -121,10 +121,11 @@ public class CarFacadeTest {
         assertEquals(6, managementStatus.length);
 
         Arrays.stream(managementStatus).forEach(status -> {
+            carFacade.saveCarStatus(carId, status.toString());
             if (status.toString().equals("ACTIVE")) {
-                carFacade.saveCarStatus(carId, status.toString());
                 assertFalse(car.isAvailable());
             } if(!status.toString().equals("ACTIVE")) {
+                assertTrue(car.isAvailable());
             }
         });
 
@@ -132,25 +133,7 @@ public class CarFacadeTest {
 
     @Test
     public void saveCarStatusFailedTest() throws ClassNotFoundException {
-        boolean initialStatus = car.isAvailable();
-        when(carRepository.save(any())).thenReturn(car);
-        when(carRepository.findById(carId)).thenReturn(of(car));
-        when(carRepository.save(any(Car.class))).thenAnswer(invocationOnMock -> invocationOnMock.getArgument(0));
 
-
-        //I want to use reflection
-        reservationStatusClassName = Class.forName("pl.tdelektro.CarRental.Management.ReservationStatus");
-        Object[] managementStatus = reservationStatusClassName.getEnumConstants();
-        assertEquals(6, managementStatus.length);
-
-        Arrays.stream(managementStatus).forEach(status -> {
-            if (status.toString().equals("ACTIVE")) {
-                System.out.println("status = " + status);
-            } if(!status.toString().equals("ACTIVE")) {
-                carFacade.saveCarStatus(carId, status.toString());
-                assertTrue(car.isAvailable());
-            }
-        });
 
 
 
