@@ -158,6 +158,20 @@ public class CarFacadeTest {
     @Test
     public void findAllCarsTest() {
 
+        when(carRepository.findAll()).thenReturn(Set.of(car));
+        Set<CarDTO> allCars = carFacade.findAllCars();
+        assertNotNull(allCars);
+        assertTrue(allCars.stream().anyMatch(carDTO -> carDTO.getRegistration().equals(car.getRegistration())));
+        assertTrue(allCars.size()==1);
+    }
+    @Test
+    public void findAllCarsFailedTest() {
+
+        when(carRepository.findAll()).thenReturn(Set.of());
+        Set<CarDTO> allCars = carFacade.findAllCars();
+        assertTrue(allCars.size()==0);
+        assertFalse(allCars.stream().anyMatch(carDTO -> carDTO.getRegistration().equals(car.getRegistration())));
+
     }
 
     @Test
