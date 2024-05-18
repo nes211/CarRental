@@ -41,7 +41,7 @@ public class CustomerFacadeTest {
     private final String customerPhoneNumber = "100200100";
     private final String customerRole = "USER";
     private final float customerFounds = 2000f;
-    private Customer customer = new Customer(
+    private final Customer customer = new Customer(
             0,
             customerName,
             customerPassword,
@@ -192,13 +192,12 @@ public class CustomerFacadeTest {
         } catch (Exception e) {
             fail("Customer not found");
         }
-        assertTrue(customerDTO.getEmailAddress().equals(customerName));
+        assertEquals(customerName, customerDTO.getEmailAddress());
     }
 
     @Test
     public void findCustomerByNameFailTest() {
 
-        Customer customerForTests = new Customer(customerName, customerEmail, customerRole);
         when(customerRepository.findByEmailAddress(customerEmail)).thenReturn(Optional.empty());
         CustomerDTO customerDTO = null;
         try {

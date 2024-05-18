@@ -9,11 +9,13 @@ import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
 import pl.tdelektro.CarRental.Exception.CarNotFoundException;
 
+import java.util.Arrays;
 import java.util.Optional;
 import java.util.Set;
 
 import static java.util.Optional.of;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
@@ -39,6 +41,8 @@ public class CarFacadeTest {
     private final float oneDayCost = 2;
     private final boolean isAvailable = true;
 
+    private Class<?> reservationStatusClassName;
+
     Car car = new Car(
             carId,
             make,
@@ -48,6 +52,7 @@ public class CarFacadeTest {
             modelYear,
             oneDayCost,
             isAvailable);
+
 
     @Before
     public void warmup() {
@@ -78,7 +83,7 @@ public class CarFacadeTest {
 
         when(carRepository.findByIsAvailableTrue()).thenReturn(Set.of());
         Set<CarDTO> availableCars = carFacade.findAvailableCars();
-        assertTrue(availableCars.size() == 0);
+        assertTrue(availableCars.isEmpty());
         verify(carRepository, times(1)).findByIsAvailableTrue();
 
     }
@@ -91,27 +96,63 @@ public class CarFacadeTest {
         assertTrue(carById.isAvailable());
 
     }
+
     @Test
     public void findCarByIdFailedTest() {
 
         when(carRepository.findById(any(Integer.class))).thenReturn(Optional.empty());
         try {
-            CarDTO carById = carFacade.findCarById(carId);
+            carFacade.findCarById(carId);
         } catch (Exception e) {
-            assertThrows(CarNotFoundException.class, ()-> carFacade.findCarById(carId));
+            assertThrows(CarNotFoundException.class, () -> carFacade.findCarById(carId));
         }
     }
 
     @Test
-    public void saveCarStatus(){
+    public void saveCarStatusTest() throws ClassNotFoundException {
 
         boolean initialStatus = car.isAvailable();
         when(carRepository.save(any())).thenReturn(car);
         when(carRepository.findById(carId)).thenReturn(of(car));
         when(carRepository.save(any(Car.class))).thenAnswer(invocationOnMock -> invocationOnMock.getArgument(0));
-        String status = "ACTIVE";
-        carFacade.saveCarStatus(carId, status);
-        assertNotEquals(car.isAvailable(), initialStatus);
+        //I want to use reflection
+        reservationStatusClassName = Class.forName("pl.tdelektro.CarRental.Management.ReservationStatus");
+        Object[] managementStatus = reservationStatusClassName.getEnumConstants();
+        assertEquals(6, managementStatus.length);
+
+        Arrays.stream(managementStatus).forEach(status -> {
+            if (status.toString().equals("ACTIVE")) {
+                carFacade.saveCarStatus(carId, status.toString());
+                assertFalse(car.isAvailable());
+            } if(!status.toString().equals("ACTIVE")) {
+            }
+        });
+
+    }
+
+    @Test
+    public void saveCarStatusFailedTest() throws ClassNotFoundException {
+        boolean initialStatus = car.isAvailable();
+        when(carRepository.save(any())).thenReturn(car);
+        when(carRepository.findById(carId)).thenReturn(of(car));
+        when(carRepository.save(any(Car.class))).thenAnswer(invocationOnMock -> invocationOnMock.getArgument(0));
+
+
+        //I want to use reflection
+        reservationStatusClassName = Class.forName("pl.tdelektro.CarRental.Management.ReservationStatus");
+        Object[] managementStatus = reservationStatusClassName.getEnumConstants();
+        assertEquals(6, managementStatus.length);
+
+        Arrays.stream(managementStatus).forEach(status -> {
+            if (status.toString().equals("ACTIVE")) {
+                System.out.println("status = " + status);
+            } if(!status.toString().equals("ACTIVE")) {
+                carFacade.saveCarStatus(carId, status.toString());
+                assertTrue(car.isAvailable());
+            }
+        });
+
+
 
     }
 
