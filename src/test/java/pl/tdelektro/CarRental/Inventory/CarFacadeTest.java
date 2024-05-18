@@ -16,7 +16,7 @@ import java.util.Set;
 import static java.util.Optional.of;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
@@ -124,7 +124,8 @@ public class CarFacadeTest {
             carFacade.saveCarStatus(carId, status.toString());
             if (status.toString().equals("ACTIVE")) {
                 assertFalse(car.isAvailable());
-            } if(!status.toString().equals("ACTIVE")) {
+            }
+            if (!status.toString().equals("ACTIVE")) {
                 assertTrue(car.isAvailable());
             }
         });
@@ -153,8 +154,36 @@ public class CarFacadeTest {
 
     }
 
+    @Test
+    public void findAllCarsTest() {
 
+    }
 
+    @Test
+    public void unwrapCarTest() {
+
+        when(carRepository.existsById(any())).thenReturn(true);
+        when(carRepository.findById(any())).thenReturn(of(car));
+        Car carToCheck = carFacade.unwrapCar(carId);
+        assertNotNull(carToCheck);
+        assertEquals(carToCheck.getId(), car.getId());
+        assertEquals(carToCheck.getRegistration(), car.getRegistration());
+
+    }
+
+    @Test
+    public void unwrapCarFailedTest() {
+
+        when(carRepository.existsById(any())).thenReturn(false);
+        when(carRepository.findById(any())).thenReturn(of(car));
+        assertThrows(CarNotFoundException.class, () -> carFacade.unwrapCar(carId));
+
+    }
+
+    @Test
+    public void unwrapCarToCarDtoTest() {
+
+    }
 }
 
 

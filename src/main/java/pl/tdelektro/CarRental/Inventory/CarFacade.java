@@ -61,7 +61,7 @@ public class CarFacade {
         return carDtoSet;
     }
 
-    private Car unwrapCar(Integer carId) {
+    Car unwrapCar(Integer carId) {
         if (carRepository.existsById(carId)) {
             return carRepository.findById(carId).get();
         } else {
@@ -69,7 +69,7 @@ public class CarFacade {
         }
     }
 
-    private CarDTO unwrapCarToCarDto(Optional<Car> carFromRepo, Integer carId) {
+    CarDTO unwrapCarToCarDto(Optional<Car> carFromRepo, Integer carId) {
         if (carFromRepo.isEmpty()) {
             throw new CarNotFoundException(carId);
         }
