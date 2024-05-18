@@ -28,8 +28,7 @@ import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 public class CarFacadeTest {
-
-
+    
     @Mock
     private CarRepository carRepository;
     @InjectMocks
@@ -55,7 +54,6 @@ public class CarFacadeTest {
             oneDayCost,
             isAvailable);
 
-
     @Before
     public void warmup() {
 
@@ -75,7 +73,7 @@ public class CarFacadeTest {
 
         when(carRepository.findByIsAvailableTrue()).thenReturn(Set.of(car));
         Set<CarDTO> availableCars = carFacade.findAvailableCars();
-        assertTrue(availableCars.size() == 1);
+        assertEquals(1, availableCars.size());
         verify(carRepository, times(1)).findByIsAvailableTrue();
 
     }
@@ -162,15 +160,15 @@ public class CarFacadeTest {
         Set<CarDTO> allCars = carFacade.findAllCars();
         assertNotNull(allCars);
         assertTrue(allCars.stream().anyMatch(carDTO -> carDTO.getRegistration().equals(car.getRegistration())));
-        assertTrue(allCars.size()==1);
+        assertEquals(1, allCars.size());
     }
+
     @Test
     public void findAllCarsFailedTest() {
 
         when(carRepository.findAll()).thenReturn(Set.of());
         Set<CarDTO> allCars = carFacade.findAllCars();
-        assertTrue(allCars.size()==0);
-        assertFalse(allCars.stream().anyMatch(carDTO -> carDTO.getRegistration().equals(car.getRegistration())));
+        assertTrue(allCars.isEmpty());
 
     }
 
@@ -207,6 +205,7 @@ public class CarFacadeTest {
         assertNotNull(carDTO);
 
     }
+
     @Test
     public void unwrapCarToCarDtoFailedTest() {
 
@@ -214,21 +213,9 @@ public class CarFacadeTest {
         try {
             carDTO = carFacade.unwrapCarToCarDto(Optional.empty(), carId);
         } catch (Exception e) {
-            assertThrows(CarNotFoundException.class, ()-> carFacade.unwrapCarToCarDto(Optional.empty(), carId));
+            assertThrows(CarNotFoundException.class, () -> carFacade.unwrapCarToCarDto(Optional.empty(), carId));
         }
         assertNull(carDTO);
 
     }
 }
-
-
-
-
-
-
-
-
-
-
-
-
