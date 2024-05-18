@@ -17,6 +17,7 @@ import static java.util.Optional.of;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
@@ -182,6 +183,26 @@ public class CarFacadeTest {
 
     @Test
     public void unwrapCarToCarDtoTest() {
+
+        CarDTO carDTO = null;
+        try {
+            carDTO = carFacade.unwrapCarToCarDto(of(car), carId);
+        } catch (Exception e) {
+            fail();
+        }
+        assertNotNull(carDTO);
+
+    }
+    @Test
+    public void unwrapCarToCarDtoFailedTest() {
+
+        CarDTO carDTO = null;
+        try {
+            carDTO = carFacade.unwrapCarToCarDto(Optional.empty(), carId);
+        } catch (Exception e) {
+            assertThrows(CarNotFoundException.class, ()-> carFacade.unwrapCarToCarDto(Optional.empty(), carId));
+        }
+        assertNull(carDTO);
 
     }
 }
