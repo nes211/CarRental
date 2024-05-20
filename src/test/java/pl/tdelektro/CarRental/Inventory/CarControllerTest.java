@@ -12,8 +12,12 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.runners.MethodSorters;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
+import pl.tdelektro.CarRental.Customer.CustomerFacade;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -28,20 +32,16 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.notNullValue;
 
-
+@ExtendWith(SpringExtension.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @Transactional
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class CarControllerTest {
 
-    private static String DB_NAME = "37931948_tom";
     private static String SECRET_KEY;
-    private static String JDBC_URL;
-    private static String USER;
-    private static String PASSWORD;
-    private static String FILE_PATH = "src/test/resources/backup.sql";
     private static String customerToken;
     private static String adminToken;
+    private static String customerEmailAddress = "customer@customer.customer";
 
 
     @BeforeClass
@@ -50,21 +50,17 @@ public class CarControllerTest {
             FileReader fr = new FileReader("src/test/resources/test.properties");
             BufferedReader br = new BufferedReader(fr);
             SECRET_KEY = br.readLine();
-            JDBC_URL = br.readLine();
-            USER = br.readLine();
-            PASSWORD = br.readLine();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
         RestAssured.baseURI = "http://localhost";
         RestAssured.port = 8080;
-        customerToken = generateJwt("test@test.test");
+        customerToken = generateJwt(customerEmailAddress);
         adminToken = generateJwt("admin@admin.admin");
-        createBackup();
     }
 
     @AfterClass()
-    public static void cleanData(){
+    public static void cleanData() {
         Response response = RestAssured.given()
                 .header("Authorization", "Bearer " + adminToken)
                 .get("/car/all");
@@ -84,7 +80,6 @@ public class CarControllerTest {
                         .statusCode(204);
             }
         }
-        restoreBackup();
     }
 
 
@@ -104,47 +99,6 @@ public class CarControllerTest {
         return Keys.hmacShaKeyFor(keyBytes);
     }
 
-    public static void createBackup() {
-        Process process = null;
-        try {
-            process = Runtime.getRuntime().exec("mysqldump --host=" + JDBC_URL
-                    + " --user=" + USER
-                    + " --password=" + PASSWORD
-                    + " --result-file" + FILE_PATH);
-            int exitCode = process.waitFor();
-            if (exitCode == 0) {
-                System.out.println("Backup created successfully");
-            } else {
-                System.out.println("Error during backup");
-            }
-        } catch (IOException e) {
-            System.out.println("No file created");
-        } catch (InterruptedException e) {
-            System.out.println("No file created");
-        }
-    }
-
-    public static void restoreBackup() {
-        Process process = null;
-        try {
-            process = Runtime.getRuntime().exec("mysql --host=" + JDBC_URL
-                    + " --user=" + USER
-                    + " --password=" + PASSWORD
-                    + " " + DB_NAME
-                    + " < " + FILE_PATH);
-            int exitCode = process.waitFor();
-            if (exitCode == 0) {
-                System.out.println("Backup restored successfully");
-            } else {
-                System.out.println("Error during restore backup");
-            }
-        } catch (InterruptedException e) {
-            System.out.println("DB not restored from copy");
-        } catch (IOException e) {
-            System.out.println("DB not restored from copy");
-        }
-    }
-
     @Test
     public void getCarWithIdTest() {
         RestAssured
@@ -154,6 +108,7 @@ public class CarControllerTest {
                 .all()
                 .get("/car/5")
                 .then()
+                .contentType(ContentType.JSON)
                 .body("model", equalTo("1500 GLE"))
                 .statusCode(200);
     }
@@ -197,6 +152,7 @@ public class CarControllerTest {
                 .then()
                 .statusCode(201);
     }
+
     @Test
     public void addSecondSameCarTest() {
         String carJson = """

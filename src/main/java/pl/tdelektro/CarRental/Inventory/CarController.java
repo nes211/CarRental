@@ -22,7 +22,6 @@ class CarController {
 
     private final CarRepository carRepository;
     private final CarFacade carFacade;
-    private ApplicationContext applicationContext;
 
     @GetMapping
     ResponseEntity<Set<CarDTO>> getAvailableCars() {
@@ -60,9 +59,5 @@ class CarController {
                 .orElseThrow(() -> new CarNotFoundException(carId)));
         return new ResponseEntity<>(car, HttpStatus.OK);
     }
-    @GetMapping("/context")
-    ResponseEntity<String[]> applicationContext() {
-        String[] stringOfBeans = applicationContext.getBeanDefinitionNames();
-        return new ResponseEntity<>(stringOfBeans, HttpStatus.OK);
-    }
+
 }

@@ -32,7 +32,7 @@ public class ManagementControllerTest {
 
     @Test
     public void testWithoutAuth() {
-        RestAssured.basePath = "management/rent";
+        RestAssured.basePath = "/management/rent";
         given().when().get().then().log().all().statusCode(401);
     }
 
@@ -50,7 +50,7 @@ public class ManagementControllerTest {
                 .contentType(ContentType.JSON)
                 .body(requestJson)
                 .when()
-                .post("management/rent")
+                .post("/management/rent")
                 .then()
                 .statusCode(401);
     }
