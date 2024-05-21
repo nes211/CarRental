@@ -39,7 +39,7 @@ public class ManagementFacadeIntegrationTest {
     private CarFacade carFacade;
 
     @Autowired
-    CustomerFacade customerFacade;
+    private CustomerFacade customerFacade;
 
     @Autowired
     private ManagementReservationRepository managementReservationRepository;

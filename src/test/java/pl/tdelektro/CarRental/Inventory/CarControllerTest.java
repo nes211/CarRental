@@ -8,6 +8,7 @@ import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import io.restassured.response.Response;
 import jakarta.transaction.Transactional;
+import lombok.AllArgsConstructor;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.FixMethodOrder;
@@ -26,6 +27,7 @@ import java.security.Key;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Random;
 import java.util.Set;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -42,7 +44,6 @@ public class CarControllerTest {
     private static String customerToken;
     private static String adminToken;
     private static String customerEmailAddress = "customer@customer.customer";
-
 
     @BeforeClass
     public static void warmUp() {
@@ -82,7 +83,6 @@ public class CarControllerTest {
         }
     }
 
-
     public static String generateJwt(String user) {
         String jwt = Jwts.builder()
                 .setClaims(new HashMap<>())
@@ -113,9 +113,27 @@ public class CarControllerTest {
                 .statusCode(200);
     }
 
+
+    @Test
+    public void getCarWithIdFailedTest() {
+
+        String randomCar = String.valueOf( Math.random());
+
+        RestAssured
+                .given()
+                .header("Authorization", "Bearer " + customerToken)
+                .log()
+                .all()
+                .get("/car/" + randomCar)
+                .then()
+                .statusCode(400);
+    }
+
     @Test
     public void getAvailableCarsTest() {
-        Set carSet = RestAssured.given().header("Authorization", "Bearer " + customerToken)
+        Set carSet = RestAssured
+                .given()
+                .header("Authorization", "Bearer " + customerToken)
                 .log().all()
                 .when()
                 .get("/car")
