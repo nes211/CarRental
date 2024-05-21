@@ -1,6 +1,8 @@
 package pl.tdelektro.CarRental.Auth;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -58,5 +60,10 @@ class AuthenticateService {
         return AuthenticationResponse.builder()
                 .token(jwtToken)
                 .build();
+    }
+
+    ResponseEntity<String> deleteUser(String userEmail) {
+        customerFacade.deleteCustomer(userEmail);
+        return new ResponseEntity<>("User with email: " + userEmail + " has been removed.", HttpStatus.NO_CONTENT);
     }
 }

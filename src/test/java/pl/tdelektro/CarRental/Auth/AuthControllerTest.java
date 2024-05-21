@@ -2,118 +2,123 @@ package pl.tdelektro.CarRental.Auth;
 
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
-import io.restassured.response.Response;
 import jakarta.transaction.Transactional;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
+import org.junit.jupiter.api.MethodOrderer;
+import org.junit.jupiter.api.TestMethodOrder;
 import org.springframework.boot.test.context.SpringBootTest;
-import pl.tdelektro.CarRental.Inventory.CarDTO;
+import org.springframework.core.annotation.Order;
 
-import java.util.List;
-import java.util.Set;
-
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.notNullValue;
-import static pl.tdelektro.CarRental.Inventory.CarControllerTest.generateJwt;
 
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @Transactional
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class AuthControllerTest {
 
-    private static String DB_NAME = "37931948_tom";
-    private static String SECRET_KEY;
-    private static String JDBC_URL;
-    private static String USER;
-    private static String PASSWORD;
-    private static String FILE_PATH = "src/test/resources/backup.sql";
-    private static String customerToken;
-    private static String adminToken;
+    private static final String userName = "testuser@test.test";
 
 
-    @BeforeClass
-    public static void warmUp() {
-        customerToken = generateJwt("test@test.test");
-        adminToken = generateJwt("admin@admin.admin");
+    @Before
+    public void warmUp() {
 
-    }
-
-    @AfterClass()
-    public static void cleanData() {
-        Response response = RestAssured.given()
-                .header("Authorization", "Bearer " + adminToken)
-                .get("/car/all");
-        List<CarDTO> carDTOList = response.jsonPath().getList("$", CarDTO.class);
-
-        for (int i = 0; i < carDTOList.size(); i++) {
-            String testRegistration = carDTOList.get(i).getRegistration();
-            String testMake = carDTOList.get(i).getMake();
-            if (testRegistration.equals("") || testMake.equals("test")) {
-                String carPath = "/car/" + carDTOList.get(i).getRegistration();
-                RestAssured
-                        .given()
-                        .header("Authorization", "Bearer " + adminToken)
-                        .when()
-                        .delete(carPath)
-                        .then()
-                        .statusCode(204);
-            }
-        }
-    }
+        RestAssured.baseURI = "http://localhost";
+        RestAssured.port = 8080;
 
 
-    @Test
-    public void createCustomerTest() {
+        String newUserString = """
+                {
+                "name":"testuser@test.test",
+                "emailAddress":"testuser@test.test",
+                "password":"test"
+                }
+                """;
+
         RestAssured
                 .given()
-                .header("Authorization", "Bearer " + customerToken)
+                .contentType(ContentType.JSON)
+                .body(newUserString)
                 .log()
                 .all()
-                .get("/car/5")
+                .post("/auth/register")
                 .then()
-                .body("model", equalTo("1500 GLE"))
+                .contentType(ContentType.JSON)
+                .body("token", notNullValue())
                 .statusCode(200);
     }
 
-    @Test
-    public void logInCustomerTest() {
-        Set carSet = RestAssured.given().header("Authorization", "Bearer " + customerToken)
-                .log().all()
-                .when()
-                .get("/customer/register")
-                .then()
-                .statusCode(200)
-                .extract()
-                .jsonPath()
-                .getObject("$", Set.class);
+    @After()
+    public void cleanData() {
 
-        assertThat(carSet, notNullValue());
+        RestAssured
+                .given()
+                .delete("/auth/deleteUser/" + userName);
+        RestAssured
+                .given()
+                .delete("/auth/deleteUser/2testuser@test.test");
     }
 
     @Test
-    public void addNewCarTest() {
-        String carJson = """
+    @Order(1)
+    public void registerCustomerTest() {
+
+        String newUserString = """
                 {
-                "make" : "test",
-                "model" : "test",
-                "type" : "test",
-                "registration" : "RE5PECT",
-                "modelYear" : "1900",
-                "odeDayCost" : "2",
-                "isAvailable" : "true"
+                "name":"2testuser@test.test",
+                "emailAddress":"2testuser@test.test",
+                "password":"test"
                 }
                 """;
         RestAssured
                 .given()
+                .contentType(ContentType.JSON)
+                .body(newUserString)
                 .log()
                 .all()
-                .header("Authorization", "Bearer " + adminToken)
-                .contentType(ContentType.JSON)
-                .body(carJson)
-                .post("/customer/login")
+                .post("/auth/register")
                 .then()
-                .statusCode(201);
+                .contentType(ContentType.JSON)
+                .body("token", notNullValue())
+                .statusCode(200)
+                .extract()
+                .body()
+                .jsonPath();
+
     }
+
+    @Test
+    @Order(2)
+    public void authenticateTest() {
+        String userString = """
+                {
+                "emailAddress":"testuser@test.test",
+                "password" : "test"
+                }
+                """;
+
+        RestAssured.given().log().all()
+                .contentType(ContentType.JSON)
+                .body(userString)
+                .when()
+                .post("/auth/authenticate")
+                .then()
+                .statusCode(200);
+
+//        assertThat(token, notNullValue());
+    }
+
+    @Test
+    @Order(3)
+    public void deleteCustomer() {
+
+        String path = "/auth/deleteUser/" + userName;
+        RestAssured.given()
+                .delete(path)
+                .then()
+                .statusCode(204);
+    }
+
 }
