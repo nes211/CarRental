@@ -16,8 +16,6 @@ import org.springframework.core.annotation.Order;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @Transactional
@@ -138,7 +136,7 @@ public class AuthControllerTest {
                 .statusCode(401)
                 .extract().response();
 
-        assertFalse(response.getStatusCode()==200);
+        assertFalse(response.getStatusCode() == 200);
     }
 
     @Test
