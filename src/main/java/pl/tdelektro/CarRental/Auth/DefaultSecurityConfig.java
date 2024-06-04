@@ -61,6 +61,8 @@ class DefaultSecurityConfig{
                 .formLogin(Customizer.withDefaults());
         return http.build();
     }
+
+    // Configuration added for React interaction from other port
     @Bean
     public CorsConfigurationSource corsConfigurationSource(){
         CorsConfiguration configuration = new CorsConfiguration();

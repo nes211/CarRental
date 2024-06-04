@@ -5,6 +5,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Lob;
 import jakarta.persistence.Table;
 import lombok.Builder;
 import lombok.NoArgsConstructor;
@@ -28,8 +29,10 @@ class Car {
     private int modelYear;
     private float oneDayCost;
     private boolean isAvailable;
+    @Lob
+    private byte[] image;
 
-    Car(Integer cadId, String make, String model, String type, String registration, int modelYear, float oneDayCost, boolean isAvailable) {
+    Car(Integer cadId, String make, String model, String type, String registration, int modelYear, float oneDayCost, boolean isAvailable, byte[] image) {
         this.make = make;
         this.model = model;
         this.type = type;
@@ -37,6 +40,7 @@ class Car {
         this.modelYear = modelYear;
         this.oneDayCost = oneDayCost;
         this.isAvailable = isAvailable;
+        this.image = image;
     }
 
     String getRegistration() {
@@ -78,6 +82,11 @@ class Car {
         return this;
     }
 
+    Car setImage(byte[] image) {
+        this.image = image;
+        return this;
+    }
+
     Integer getId() {
         return id;
     }
@@ -104,6 +113,10 @@ class Car {
 
     boolean isAvailable() {
         return isAvailable;
+    }
+
+    byte[] getImage() {
+        return image;
     }
 }
 

@@ -32,6 +32,7 @@ public class CarFacadeIntegrationTest {
             .registration("test1")
             .oneDayCost(1f)
             .isAvailable(true)
+            .image(null)
             .build();
     private final Car testCar2 = new Car.CarBuilder()
             .make("Test2")
@@ -41,6 +42,7 @@ public class CarFacadeIntegrationTest {
             .registration("test2")
             .oneDayCost(1f)
             .isAvailable(false)
+            .image(null)
             .build();
 
     @Test

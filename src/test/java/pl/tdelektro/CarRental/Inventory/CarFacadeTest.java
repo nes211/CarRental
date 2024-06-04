@@ -9,6 +9,7 @@ import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
 import pl.tdelektro.CarRental.Exception.CarNotFoundException;
 
+import java.io.File;
 import java.util.Arrays;
 import java.util.Optional;
 import java.util.Set;
@@ -41,7 +42,7 @@ public class CarFacadeTest {
     private final int modelYear = 2000;
     private final float oneDayCost = 2;
     private final boolean isAvailable = true;
-
+    private final byte[] image = null;
     private Class<?> reservationStatusClassName;
 
     Car car = new Car(
@@ -52,7 +53,8 @@ public class CarFacadeTest {
             registration,
             modelYear,
             oneDayCost,
-            isAvailable);
+            isAvailable,
+            image);
 
     @Before
     public void warmup() {
