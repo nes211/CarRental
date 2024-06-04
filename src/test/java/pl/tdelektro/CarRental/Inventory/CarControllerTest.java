@@ -8,17 +8,14 @@ import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import io.restassured.response.Response;
 import jakarta.transaction.Transactional;
-import lombok.AllArgsConstructor;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.runners.MethodSorters;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import pl.tdelektro.CarRental.Customer.CustomerFacade;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -27,12 +24,12 @@ import java.security.Key;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Random;
 import java.util.Set;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.notNullValue;
+
 
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -117,7 +114,7 @@ public class CarControllerTest {
     @Test
     public void getCarWithIdFailedTest() {
 
-        String randomCar = String.valueOf( Math.random());
+        String randomCar = String.valueOf(Math.random());
 
         RestAssured
                 .given()
@@ -195,4 +192,18 @@ public class CarControllerTest {
                 .then()
                 .statusCode(409);
     }
+
+    @Test
+    public void getImageTest() {
+
+        RestAssured.given()
+                .log()
+                .all()
+                .header("Authorization", "Bearer " + customerToken)
+                .get("/car/image/5")
+                .then()
+                .contentType("image/jpeg")
+                .statusCode(200);
+    }
+
 }

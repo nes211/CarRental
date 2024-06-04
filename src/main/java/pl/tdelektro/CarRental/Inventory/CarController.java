@@ -65,7 +65,6 @@ class CarController {
         CarDTO carDto = new CarDTO(carRepository.findById(carId).orElseThrow(() -> new CarNotFoundException(carId)));
         byte[] carImage = carDto.getImage();
 
-
         return ResponseEntity.ok()
                 .contentType(MediaType.IMAGE_JPEG)
                 .body(carDto.getImage());
