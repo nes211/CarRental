@@ -1,5 +1,7 @@
 package pl.tdelektro.CarRental.Exception;
 
+import java.util.function.Supplier;
+
 public class CarNotFoundException extends RuntimeException {
 
     public CarNotFoundException(int carId){

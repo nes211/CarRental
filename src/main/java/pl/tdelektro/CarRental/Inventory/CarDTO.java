@@ -20,6 +20,7 @@ public class CarDTO {
     private int modelYear;
     private float oneDayCost;
     private boolean available;
+    private byte[] image;
 
 
     public CarDTO (Car car){
@@ -31,6 +32,7 @@ public class CarDTO {
         this.modelYear = car.getModelYear();
         this.oneDayCost = car.getOneDayCost();
         this.available = car.isAvailable();
+        this.image = car.getImage();
     }
 
     public String getRegistration() {
@@ -65,6 +67,7 @@ public class CarDTO {
         return available;
     }
 
+    byte[] getImage() { return image; }
 
     CarDTO setId(Integer id) {
         this.id = id;
@@ -98,6 +101,11 @@ public class CarDTO {
 
     CarDTO setAvailable(boolean available) {
         this.available = available;
+        return this;
+    }
+
+    CarDTO setImage(byte[] image) {
+        this.image = image;
         return this;
     }
 

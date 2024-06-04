@@ -3,6 +3,7 @@ package pl.tdelektro.CarRental.Inventory;
 import lombok.AllArgsConstructor;
 import org.springframework.context.ApplicationContext;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -59,5 +60,14 @@ class CarController {
                 .orElseThrow(() -> new CarNotFoundException(carId)));
         return new ResponseEntity<>(car, HttpStatus.OK);
     }
+    @GetMapping("image/{carId}")
+    ResponseEntity<byte[]> getImage(@PathVariable Integer carId){
+        CarDTO carDto = new CarDTO(carRepository.findById(carId).orElseThrow(() -> new CarNotFoundException(carId)));
+        byte[] carImage = carDto.getImage();
 
+
+        return ResponseEntity.ok()
+                .contentType(MediaType.IMAGE_JPEG)
+                .body(carDto.getImage());
+    }
 }

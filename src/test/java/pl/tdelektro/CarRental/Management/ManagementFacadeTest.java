@@ -148,7 +148,8 @@ public class ManagementFacadeTest {
                 "Test",
                 1990,
                 20,
-                true)
+                true,
+                null)
         );
 
         reservations.add(reservation);
@@ -185,7 +186,9 @@ public class ManagementFacadeTest {
                 "Test",
                 1990,
                 20,
-                true)
+                true,
+                null
+                )
         );
 
         reservations.add(reservation);
@@ -230,7 +233,7 @@ public class ManagementFacadeTest {
         HashSet<ManagementReservation> reservationSet = new HashSet<>();
         reservationSet.add(reservation);
         HashSet<CarDTO> carDtoSet = new HashSet<>();
-        carDtoSet.add(new CarDTO(randomCarId+1, "TEST", "TEST", "TEST", "TEST",1900,10, true));
+        carDtoSet.add(new CarDTO(randomCarId+1, "TEST", "TEST", "TEST", "TEST",1900,10, true, null));
 
         when(managementReservationRepository.findByStatusOrStatus(ReservationStatus.ACTIVE, ReservationStatus.PENDING)).thenReturn(reservationSet);
         when(carFacade.findAvailableCars().stream().collect(toSet())).thenReturn(carDtoSet);
@@ -248,7 +251,7 @@ public class ManagementFacadeTest {
         HashSet<ManagementReservation> reservationSet = new HashSet<>();
         reservationSet.add(reservation);
         HashSet<CarDTO> carDtoSet = new HashSet<>();
-        carDtoSet.add(new CarDTO(randomCarId, "TEST", "TEST", "TEST", "TEST",1900,10, true));
+        carDtoSet.add(new CarDTO(randomCarId, "TEST", "TEST", "TEST", "TEST",1900,10, true, null));
 
         when(managementReservationRepository.findByStatusOrStatus(ReservationStatus.ACTIVE, ReservationStatus.PENDING)).thenReturn(reservationSet);
         when(carFacade.findAvailableCars().stream().collect(toSet())).thenReturn(carDtoSet);
@@ -268,7 +271,7 @@ public class ManagementFacadeTest {
 
         when(carFacade.findCarById(randomCarId))
                 .thenReturn(
-                        new CarDTO(randomCarId, "FSM", "126p", "C", "G3TTER", 1990, 10f, true)
+                        new CarDTO(randomCarId, "FSM", "126p", "C", "G3TTER", 1990, 10f, true, null)
                 );
 
         when(customerDTO.getFunds()).thenReturn(2000f);
@@ -322,7 +325,7 @@ public class ManagementFacadeTest {
 
         carDtoId = 0;
         ReservationStatus reservationStatus;
-        when(carFacade.findCarById(carDtoId)).thenReturn(new CarDTO(carDtoId, "FSM", "126p", "C", "MALUSZEK", 1990, 400f, true));
+        when(carFacade.findCarById(carDtoId)).thenReturn(new CarDTO(carDtoId, "FSM", "126p", "C", "MALUSZEK", 1990, 400f, true, null));
 
         LocalDateTime startRent = LocalDateTime.of(2024, 1, 10, 11, 30);
         LocalDateTime endRent = LocalDateTime.of(2024, 1, 11, 14, 30);
