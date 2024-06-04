@@ -206,4 +206,20 @@ public class CarControllerTest {
                 .statusCode(200);
     }
 
+    @Test
+    public void getImageTestFailed (){
+        RestAssured
+                .given()
+                .log().all()
+                .header("Authorization", "Bearer " + customerToken)
+                .get("/car/image/1000")
+                .then()
+                .contentType(ContentType.JSON)
+                .statusCode(400);
+
+
+
+
+    }
+
 }
