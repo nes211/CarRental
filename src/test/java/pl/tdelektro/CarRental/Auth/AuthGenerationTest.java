@@ -11,6 +11,11 @@ import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Value;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.Reader;
 import java.security.Key;
 import java.util.Date;
 import java.util.HashMap;
@@ -18,7 +23,7 @@ import java.util.HashMap;
 import static io.restassured.RestAssured.given;
 
 
-public class AuthGeneration {
+public class AuthGenerationTest {
 
     public String authToken;
     @Value("${token.secret.key}")
@@ -34,7 +39,6 @@ public class AuthGeneration {
 
     }
 
-
     public String testTokenWithRandomData() {
         this.authToken = Jwts.builder()
                 .setClaims(new HashMap<>())
@@ -47,6 +51,17 @@ public class AuthGeneration {
     }
 
     private Key getSignInKey() {
+
+        if(SECRET_KEY == null){
+
+            try {
+                BufferedReader reader = new BufferedReader(new FileReader("src/test/resources/test.properties"));
+                SECRET_KEY = reader.readLine();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
+
         byte[] keyBytes = Decoders.BASE64.decode(SECRET_KEY);
         return Keys.hmacShaKeyFor(keyBytes);
     }
@@ -55,15 +70,15 @@ public class AuthGeneration {
     public void getRentCar() {
         RestAssured.baseURI = "http://localhost:8080";
 
-        String requestJson = "";
-//                """
-//                {
-//                    "customerEmail":"test@test.test",
-//                    "startDate":"2024-05-05 10:22:00",
-//                    "endDate":"2024-05-11 10:22:00",
-//                    "carId":"5"
-//                }
-//                """;
+        String requestJson =
+                """
+                {
+                    "customerEmail":"test@test.test",
+                    "startDate":"2024-05-05 10:22:00",
+                    "endDate":"2024-05-11 10:22:00",
+                    "carId":"5"
+                }
+                """;
 
         authToken = testTokenWithRandomData();
         given().header("Authorization", "Barer " + authToken)
@@ -76,6 +91,4 @@ public class AuthGeneration {
                 .all()
                 .statusCode(401);
     }
-
-
 }

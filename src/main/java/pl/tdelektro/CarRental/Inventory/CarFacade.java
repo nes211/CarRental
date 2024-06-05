@@ -1,9 +1,15 @@
 package pl.tdelektro.CarRental.Inventory;
 
 import lombok.AllArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 import pl.tdelektro.CarRental.Exception.CarNotFoundException;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
@@ -74,6 +80,15 @@ public class CarFacade {
             throw new CarNotFoundException(carId);
         }
         return new CarDTO(carFromRepo.get());
+    }
+
+    HttpStatus saveFile(MultipartFile file, String carRegistration) throws IOException {
+        byte[] imageFile = file.getBytes();
+
+        Car carFromRepo = carRepository.findByRegistration(carRegistration);
+        carFromRepo.setImage(imageFile);
+        carRepository.save(carFromRepo);
+        return HttpStatus.CREATED;
     }
 }
 

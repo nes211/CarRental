@@ -3,6 +3,7 @@ package pl.tdelektro.CarRental.Inventory;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentMatchers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
@@ -146,7 +147,7 @@ public class CarFacadeTest {
         assertEquals(6, managementStatus.length);
 
         Arrays.stream(managementStatus).forEach(status -> {
-            if (status.toString().equals("ACTIVEE")) {
+            if (status.toString().equals("ACTIVEe")) {
                 carFacade.saveCarStatus(carId, status.toString());
                 fail();
             }

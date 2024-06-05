@@ -8,7 +8,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
-import pl.tdelektro.CarRental.Auth.AuthGeneration;
+import pl.tdelektro.CarRental.Auth.AuthGenerationTest;
 
 import static io.restassured.RestAssured.given;
 
@@ -17,7 +17,7 @@ import static io.restassured.RestAssured.given;
 public class ManagementControllerTest {
 
 
-    AuthGeneration authGeneration = new AuthGeneration();
+    AuthGenerationTest authGeneration = new AuthGenerationTest();
 
     @Before
     public void warmup() {

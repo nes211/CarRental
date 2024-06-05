@@ -11,4 +11,7 @@ public class CarNotFoundException extends RuntimeException {
         super("There is no car in repository");
     }
 
+    public CarNotFoundException(String carRegistration){
+        super("Car with registration number: " + carRegistration + " not found in repo");
+    }
 }
