@@ -15,8 +15,6 @@ import org.junit.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.runners.MethodSorters;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.io.BufferedReader;
@@ -42,8 +40,10 @@ public class CarControllerTest {
 
     private static String SECRET_KEY;
     private static String customerToken;
-    private static String adminToken;
     private static String customerEmailAddress = "customer@customer.customer";
+    private static String adminToken;
+    private static String adminEmailAddress = "admin@admin.admin";
+
 
     @BeforeClass
     public static void warmUp() {
@@ -57,7 +57,7 @@ public class CarControllerTest {
         RestAssured.baseURI = "http://localhost";
         RestAssured.port = 8080;
         customerToken = generateJwt(customerEmailAddress);
-        adminToken = generateJwt("admin@admin.admin");
+        adminToken = generateJwt(adminEmailAddress);
     }
 
     @AfterClass()
@@ -106,7 +106,7 @@ public class CarControllerTest {
                 .header("Authorization", "Bearer " + customerToken)
                 .log()
                 .all()
-                .get("/car/5")
+                .get("/car/find/5")
                 .then()
                 .contentType(ContentType.JSON)
                 .body("model", equalTo("1500 GLE"))
@@ -124,7 +124,7 @@ public class CarControllerTest {
                 .header("Authorization", "Bearer " + customerToken)
                 .log()
                 .all()
-                .get("/car/" + randomCar)
+                .get("/car/find/" + randomCar)
                 .then()
                 .statusCode(400);
     }
@@ -156,7 +156,8 @@ public class CarControllerTest {
                 "registration" : "RE5PECT",
                 "modelYear" : "1900",
                 "odeDayCost" : "2",
-                "isAvailable" : "true"
+                "isAvailable" : "true",
+                "image" : "null"
                 }
                 """;
         RestAssured
@@ -211,7 +212,7 @@ public class CarControllerTest {
     }
 
     @Test
-    public void getImageTestFailed (){
+    public void getImageTestFailed() {
         RestAssured
                 .given()
                 .log()
@@ -232,7 +233,8 @@ public class CarControllerTest {
                 "registration" : "RE5PECT",
                 "modelYear" : "1900",
                 "odeDayCost" : "2",
-                "isAvailable" : "true"
+                "isAvailable" : "true",
+                "image" : "null"
                 }
                 """;
 
