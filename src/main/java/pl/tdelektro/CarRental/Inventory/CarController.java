@@ -55,17 +55,21 @@ class CarController {
         }
     }
 
-    @GetMapping("/{carId}")
-    ResponseEntity<CarDTO> findCar(@PathVariable Integer carId) throws Throwable {
+    @GetMapping("/find/{carId}")
+    ResponseEntity<CarDTO> findCarById(@PathVariable Integer carId) throws Throwable {
         CarDTO car = new CarDTO(carRepository.findById(carId)
                 .orElseThrow(() -> new CarNotFoundException(carId)));
+        return new ResponseEntity<>(car, HttpStatus.OK);
+    }
+    @GetMapping("/{carRegistration}")
+    ResponseEntity<CarDTO> findCarByRegistration(@PathVariable String carRegistration){
+        CarDTO car = new CarDTO(carRepository.findByRegistration(carRegistration));
         return new ResponseEntity<>(car, HttpStatus.OK);
     }
 
     @GetMapping("/image/{carRegistration}")
     ResponseEntity<byte[]> getImage(@PathVariable String carRegistration) {
         CarDTO carDto = new CarDTO(carRepository.findByRegistration(carRegistration));
-        byte[] carImage = carDto.getImage();
         return ResponseEntity.ok()
                 .contentType(MediaType.IMAGE_JPEG)
                 .body(carDto.getImage());

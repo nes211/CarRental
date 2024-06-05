@@ -15,9 +15,12 @@ import org.junit.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.runners.MethodSorters;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.security.Key;
@@ -196,11 +199,12 @@ public class CarControllerTest {
     @Test
     public void getImageTest() {
 
-        RestAssured.given()
+        RestAssured
+                .given()
                 .log()
                 .all()
                 .header("Authorization", "Bearer " + customerToken)
-                .get("/car/image/5")
+                .get("/car/image/GA00003")
                 .then()
                 .contentType("image/jpeg")
                 .statusCode(200);
@@ -210,15 +214,51 @@ public class CarControllerTest {
     public void getImageTestFailed (){
         RestAssured
                 .given()
-                .log().all()
+                .log()
+                .all()
                 .header("Authorization", "Bearer " + customerToken)
-                .get("/car/image/1000")
+                .get("/car/image/GA00000")
                 .then()
+                .statusCode(401);
+    }
+
+    @Test
+    public void uploadImageTest() {
+        String carJson = """
+                {
+                "make" : "test",
+                "model" : "test",
+                "type" : "test",
+                "registration" : "RE5PECT",
+                "modelYear" : "1900",
+                "odeDayCost" : "2",
+                "isAvailable" : "true"
+                }
+                """;
+
+        File file = new File("src/test/resources/testImg.jpg");
+        RestAssured
+                .given()
+                .log()
+                .all()
+                .header("Authorization", "Bearer " + adminToken)
                 .contentType(ContentType.JSON)
-                .statusCode(400);
+                .body(carJson)
+                .post("/car/addNew")
+                .then()
+                .statusCode(201);
 
-
-
+        RestAssured
+                .given()
+                .log()
+                .all()
+                .header("Authorization", "Bearer " + adminToken)
+                .contentType(ContentType.MULTIPART)
+                .multiPart(file)
+                .post("/car/image/RE5PECT/upload")
+                .then()
+                .statusCode(201)
+                .body(equalTo("Image uploaded successfully."));
 
     }
 
