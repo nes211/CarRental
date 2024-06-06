@@ -302,15 +302,12 @@ public class ManagementFacade {
             connection.setRequestMethod("GET");
             if (connection.getResponseCode() == 200) {
                 JSONArray jsonArray = getObjects(connection);
-                System.out.println("jsonArray = " + jsonArray);
-                List<String> result = new ArrayList<>();
-
                 for (int i = 0; i < jsonArray.length(); i++) {
                     JSONObject object = jsonArray.getJSONObject(i);
                     try {
-                        result.add("Short name: " + object.getString("Mfr_CommonName") + " , long company name :  "+ object.getString("Mfr_Name"));
+                        brandList.add("Short name: " + object.getString("Mfr_CommonName") + " , long company name :  "+ object.getString("Mfr_Name"));
                     } catch (JSONException e) {
-                        result.add("Short name:  ----------  , long company name : --------------");
+                        brandList.add("Short name: ----------  , long company name : --------------");
                     }
                 }
             } else {
