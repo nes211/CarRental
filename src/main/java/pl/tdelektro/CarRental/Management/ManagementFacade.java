@@ -295,6 +295,7 @@ public class ManagementFacade {
     List<String> getListOfManufacturers() {
 
         String urlString = "https://vpic.nhtsa.dot.gov/api/vehicles/getallmanufacturers?format=json";
+        List<String> brandList = new ArrayList<>();
         try {
             URL url = new URL(urlString);
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
@@ -309,21 +310,21 @@ public class ManagementFacade {
                     try {
                         result.add("Short name: " + object.getString("Mfr_CommonName") + " , long company name :  "+ object.getString("Mfr_Name"));
                     } catch (JSONException e) {
-                        result.add("------");
+                        result.add("Short name:  ----------  , long company name : --------------");
                     }
                 }
-                return result;
             } else {
                 throw new CarNotFoundException();
             }
-        } catch (MalformedURLException e) {
-            throw new RuntimeException(e);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+        } catch (MalformedURLException ex) {
+            throw new RuntimeException(ex);
+        } catch (IOException ex) {
+            throw new RuntimeException(ex);
         }
-    }
 
-    private static JSONArray getObjects(HttpURLConnection connection) throws IOException {
+        return brandList;
+    }
+        private static JSONArray getObjects(HttpURLConnection connection) throws IOException {
         BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
         String line = "";
         StringBuilder response = new StringBuilder();
