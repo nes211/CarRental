@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 import pl.tdelektro.CarRental.Inventory.CarDTO;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 
@@ -76,5 +77,11 @@ class ManagementController {
     ResponseEntity<Set<ManagementReservationDTO>> getActiveReservations(@PathVariable String reservationType) {
 
         return new ResponseEntity<>(managementFacade.getReservations(reservationType.toUpperCase()), HttpStatus.OK);
+    }
+
+    @GetMapping("/carBrandsFromApi")
+    ResponseEntity<List<String>>getExchangeRate(){
+        List<String> manufacturers = managementFacade.getListOfManufacturers();
+        return new ResponseEntity<>(manufacturers,HttpStatus.OK);
     }
 }

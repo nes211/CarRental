@@ -2,17 +2,26 @@ package pl.tdelektro.CarRental.Management;
 
 import com.itextpdf.text.DocumentException;
 import lombok.AllArgsConstructor;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.springframework.stereotype.Service;
 import pl.tdelektro.CarRental.Customer.CustomerDTO;
 import pl.tdelektro.CarRental.Customer.CustomerFacade;
 import pl.tdelektro.CarRental.Exception.CarNotAvailableException;
+import pl.tdelektro.CarRental.Exception.CarNotFoundException;
 import pl.tdelektro.CarRental.Exception.NotEnoughFoundsException;
 import pl.tdelektro.CarRental.Exception.ReservationManagementProblem;
 import pl.tdelektro.CarRental.Exception.ReservationNotFoundException;
 import pl.tdelektro.CarRental.Inventory.CarDTO;
 import pl.tdelektro.CarRental.Inventory.CarFacade;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
@@ -281,5 +290,51 @@ public class ManagementFacade {
     void endReservation(ManagementReservation reservation) {
         reservation.setStatus(ReservationStatus.COMPLETED);
         managementReservationRepository.save(reservation);
+    }
+
+    List<String> getListOfManufacturers() {
+
+        String urlString = "https://vpic.nhtsa.dot.gov/api/vehicles/getallmanufacturers?format=json";
+        try {
+            URL url = new URL(urlString);
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            connection.setRequestMethod("GET");
+            if (connection.getResponseCode() == 200) {
+                JSONArray jsonArray = getObjects(connection);
+                System.out.println("jsonArray = " + jsonArray);
+                List<String> result = new ArrayList<>();
+
+                for (int i = 0; i < jsonArray.length(); i++) {
+                    JSONObject object = jsonArray.getJSONObject(i);
+                    try {
+                        result.add("Short name: " + object.getString("Mfr_CommonName") + " , long company name :  "+ object.getString("Mfr_Name"));
+                    } catch (JSONException e) {
+                        result.add("------");
+                    }
+                }
+                return result;
+            } else {
+                throw new CarNotFoundException();
+            }
+        } catch (MalformedURLException e) {
+            throw new RuntimeException(e);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private static JSONArray getObjects(HttpURLConnection connection) throws IOException {
+        BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+        String line = "";
+        StringBuilder response = new StringBuilder();
+
+        while ((line = bufferedReader.readLine()) != null) {
+            response.append(line);
+        }
+        bufferedReader.close();
+
+        JSONObject jsonObject = new JSONObject(response.toString());
+        JSONArray jsonArray = jsonObject.getJSONArray("Results");
+        return jsonArray;
     }
 }
