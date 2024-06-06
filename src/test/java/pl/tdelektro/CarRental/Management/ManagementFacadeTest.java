@@ -395,4 +395,12 @@ public class ManagementFacadeTest {
         managementFacade.endReservation(reservation);
         verify(managementReservationRepository).save(any(ManagementReservation.class));
     }
+
+    @Test
+    public void getListOfManufacturersTest(){
+
+        List<String> listOfManufacturers = managementFacade.getListOfManufacturers();
+        assertFalse(listOfManufacturers.isEmpty());
+        assertTrue(listOfManufacturers.size() == 100);
+    }
 }
