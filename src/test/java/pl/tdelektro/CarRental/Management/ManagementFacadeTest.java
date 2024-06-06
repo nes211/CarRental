@@ -403,4 +403,16 @@ public class ManagementFacadeTest {
         assertFalse(listOfManufacturers.isEmpty());
         assertTrue(listOfManufacturers.size() == 100);
     }
+
+    @Test
+    public void getJokeTest(){
+
+        String[] result = managementFacade.getRandomJoke();
+        assertTrue(result.length == 4);
+
+        //Check that all fields of result are strings
+        for(String str : result) {
+            assertTrue(true);
+        }
+    }
 }

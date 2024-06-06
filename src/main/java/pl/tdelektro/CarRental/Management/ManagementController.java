@@ -84,4 +84,11 @@ class ManagementController {
         List<String> manufacturers = managementFacade.getListOfManufacturers();
         return new ResponseEntity<>(manufacturers,HttpStatus.OK);
     }
+
+    @GetMapping("joke")
+    ResponseEntity<String[]>getJoke(){
+        return new ResponseEntity<>(managementFacade.getRandomJoke(), HttpStatus.OK);
+
+
+    }
 }

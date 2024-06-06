@@ -33,8 +33,8 @@ public class ManagementInvoiceTest {
         when(reservationMock.getReservationId()).thenReturn("2024-03-27 test@test.com 43222342");
         when(reservationMock.getCarId()).thenReturn(5);
         when(reservationMock.getCustomerEmail()).thenReturn("test@test.com");
-        when(reservationMock.getStartDate()).thenReturn(LocalDateTime.of(2024, 03, 20, 10, 10));
-        when(reservationMock.getEndDate()).thenReturn(LocalDateTime.of(2024, 03, 26, 10, 10));
+        when(reservationMock.getStartDate()).thenReturn(LocalDateTime.of(2024, 3, 20, 10, 10));
+        when(reservationMock.getEndDate()).thenReturn(LocalDateTime.of(2024, 3, 26, 10, 10));
         when(reservationMock.getTotalReservationCost()).thenReturn(1800f);
 
         managementInvoice.createInvoice(reservationMock);

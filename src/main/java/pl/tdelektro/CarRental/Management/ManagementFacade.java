@@ -335,4 +335,45 @@ public class ManagementFacade {
         JSONArray jsonArray = jsonObject.getJSONArray("Results");
         return jsonArray;
     }
+
+    //Those jokes are for footer to change after some time
+    public String[] getRandomJoke(){
+        StringBuilder joke = new StringBuilder();
+
+        try {
+            URL url = new URL("https://official-joke-api.appspot.com/random_joke");
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+
+            if (connection.getResponseCode() == 200) {
+
+                BufferedReader reader =new BufferedReader(new InputStreamReader(connection.getInputStream()));
+
+
+                String anotherLine = "";
+                while((anotherLine =reader.readLine())!= null){
+                    joke.append(anotherLine);
+                }
+            } else {
+                throw new RuntimeException();
+            }
+
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        String jokeId = null;
+        String jokeType = null;
+        String jokeSetup = null;
+        String jokePunchline = null;
+        try {
+            JSONObject jsonObject = new JSONObject(joke.toString());
+            jokeId = String.valueOf(jsonObject.getInt("id"));
+            jokeType = jsonObject.getString("type");
+            jokeSetup = jsonObject.getString("setup");
+            jokePunchline = jsonObject.getString("punchline");
+        } catch (JSONException e) {
+            return new String[]{"-----------", "-----------", "-----------" ,"-----------"};
+        }
+
+        return new String[]{jokeId, jokeType, jokeSetup, jokePunchline};
+    }
 }
