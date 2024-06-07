@@ -10,7 +10,7 @@
 	</parent>
 	<groupId>pl.tdelektro</groupId>
 	<artifactId>CarRental</artifactId>
-	<version>0.0.1</version>
+	<version>1</version>
 	<name>CarRental</name>
 	<description>Car rental application</description>
 	<properties>
